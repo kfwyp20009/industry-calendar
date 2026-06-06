@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+{% block title %}- 仪表盘{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-gauge-high me-2"></i>仪表盘</h2>
+    <div class="subtitle">{{ now.year }}年{{ now.month }}月 · 实时监控11个行业事件日历</div>
+</div>
+
+<!-- 本月概览 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold text-primary">{{ current_month_events|length }}</div>
+            <div class="text-muted">本月事件</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold text-danger">
+                {{ current_month_events|selectattr('importance', '>=', 5)|list|length }}
+            </div>
+            <div class="text-muted">★★★★★ 重磅催化</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold text-warning">
+                {{ upcoming|length }}
+            </div>
+            <div class="text-muted">未来14天事件</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold text-success">{{ industries|length }}</div>
+            <div class="text-muted">覆盖行业</div>
+        </div>
+    </div>
+</div>
+
+{% if pending_count and pending_count > 0 %}
+<div class="alert alert-warning d-flex justify-content-between align-items-center py-2" role="alert">
+    <span><i class="fas fa-lightbulb me-2"></i> 新闻自动检测到 <strong>{{ pending_count }}</strong> 个新事件，待审核</span>
+    <a href="/settings" class="btn btn-sm btn-outline-warning">去审核</a>
+</div>
+{% endif %}
+
+<!-- 实时新闻 -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-newspaper me-1"></i> 行业实时新闻
+                    <small class="text-muted ms-2">每次启动自动获取最新资讯</small>
+                </span>
+                <button class="btn btn-sm btn-outline-primary" onclick="refreshNews()">
+                    <i class="fas fa-sync me-1"></i>刷新
+                </button>
+            </div>
+            <div class="card-body p-2 border-bottom">
+                <div class="filter-bar">
+                    <div class="input-group input-group-sm" style="max-width:280px;">
+                        <span class="input-group-text bg-transparent"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="newsSearch" placeholder="搜索新闻标题..." oninput="filterNews()">
+                    </div>
+                    <select class="form-select form-select-sm" id="newsIndustryFilter" onchange="filterNews()" style="max-width:160px;">
+                        <option value="">所有行业</option>
+                        {% for code, ind in industries.items() %}
+                        <option value="{{ ind.industry }}">{{ ind.industry }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-check form-check-inline mb-0">
+                        <input class="form-check-input" type="checkbox" id="matchedOnly" onchange="filterNews()">
+                        <label class="form-check-label" for="matchedOnly" style="font-size:0.85rem;">仅已匹配</label>
+                    </div>
+                    <span class="text-muted" style="font-size:0.8rem;" id="newsCount"></span>
+                </div>
+            </div>
+            <div class="card-body p-0" id="news-container">
+                {% if news_items %}
+                {% set matched_news = news_items|selectattr('matched', 'equalto', True)|list %}
+                {% set display_news = matched_news if matched_news else news_items %}
+                <div class="list-group list-group-flush" id="news-list">
+                    {% for item in display_news[:30] %}
+                    <a href="{{ item.url }}" target="_blank"
+                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-start py-2 {% if loop.index <= 3 %}fw-semibold{% endif %}"
+                       data-title="{{ item.title }}"
+                       data-industries="{{ item.industries|join(',') }}"
+                       data-matched="{{ 'true' if item.matched else 'false' }}">
+                        <div class="me-2" style="flex:1;min-width:0;">
+                            <div style="font-size:0.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                {% if item.matched %}
+                                <i class="fas fa-tag text-danger me-1" style="font-size:0.6rem;"></i>
+                                {% endif %}
+                                {{ item.title }}
+                            </div>
+                            {% if item.industries %}
+                            <div class="mt-1">
+                                {% for ind in item.industries[:3] %}
+                                <span class="badge bg-light text-dark me-1" style="font-size:0.6rem;">{{ ind }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted text-nowrap ms-2" style="font-size:0.7rem;">
+                            {{ item.time }}
+                        </small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    <i class="fas fa-cloud me-2"></i>新闻加载中，请点击刷新
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 近期待办事件 -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-clock me-1"></i> 未来两周关键事件
+                {% if upcoming %}
+                <span class="badge bg-danger ms-2">{{ upcoming|length }}</span>
+                {% endif %}
+            </div>
+            <div class="card-body p-0">
+                {% if upcoming %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:90px">日期</th>
+                                <th style="width:40px"></th>
+                                <th style="width:100px">行业</th>
+                                <th>事件</th>
+                                <th style="width:80px">操作</th>
+                                <th style="width:80px">倒计时</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ev in upcoming %}
+                            <tr>
+                                <td class="align-middle">{{ ev.date[:10] }}</td>
+                                <td class="align-middle">
+                                    <span class="badge-star" style="color:{{ get_importance_color(ev.importance) }}">
+                                        {{ get_importance_label(ev.importance) }}
+                                    </span>
+                                </td>
+                                <td class="align-middle">
+                                    <a href="/industry/{{ ev.industry_code }}" class="text-decoration-none">
+                                        {{ ev.industry }}
+                                    </a>
+                                </td>
+                                <td class="align-middle">
+                                    <strong>{{ ev.name }}</strong>
+                                    {% if ev.confirmed %}
+                                    <span class="badge bg-success" style="font-size:0.6rem;">确认</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark" style="font-size:0.6rem;">预期</span>
+                                    {% endif %}
+                                    <div class="text-muted" style="font-size:0.8rem;">{{ ev.description }}</div>
+                                </td>
+                                <td class="align-middle">
+                                    {% set act = ev.suggested_action.action if ev.suggested_action else '' %}
+                                    {% if act %}
+                                    <span class="stock-tag" style="background:{{ get_action_color(act) }}; color:#fff;">
+                                        {{ act }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle">
+                                    <span class="badge bg-{{ 'danger' if ev.days_left <= 3 else 'warning' if ev.days_left <= 7 else 'info' }}">
+                                        {{ ev.days_left }}天
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">未来两周无已确认事件</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- 本月事件全景 -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-alt me-1"></i> {{ now.month }}月 · 全行业事件日历
+            </div>
+            <div class="card-body p-0">
+                    {% if current_month_events %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:85px">日期</th>
+                                <th style="width:40px"></th>
+                                <th>行业 · 事件</th>
+                                <th style="width:80px">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ev in current_month_events %}
+                            <tr>
+                                <td class="align-middle text-nowrap">{{ ev.date[5:10] }}</td>
+                                <td class="align-middle">
+                                    <span style="color:{{ get_importance_color(ev.importance) }};font-size:0.7rem;">
+                                        {{ get_importance_label(ev.importance) }}
+                                    </span>
+                                </td>
+                                <td class="align-middle">
+                                    <span class="badge bg-secondary me-1">{{ ev.industry }}</span>
+                                    <strong>{{ ev.name }}</strong>
+                                    {% if ev.confirmed %}
+                                    <span class="badge bg-success" style="font-size:0.6rem;">确认</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark" style="font-size:0.6rem;">预期</span>
+                                    {% endif %}
+                                    {% if ev.linked_industries and ev.linked_industries|length > 0 and ev.linked_industries[0] != '__all__' %}
+                                    <span class="badge bg-info text-dark" style="font-size:0.6rem;">
+                                        <i class="fas fa-link"></i> {{ ev.linked_industries|join(', ') }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle">
+                                    {% set act = ev.suggested_action.action if ev.suggested_action else '' %}
+                                    {% if act %}
+                                    <span class="stock-tag" style="background:{{ get_action_color(act) }}; color:#fff;">
+                                        {{ act }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">本月暂无事件数据</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧栏 -->
+    <div class="col-lg-4">
+        <!-- 热点行业 -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-fire me-1"></i> 本月催化热度
+            </div>
+            <div class="card-body">
+                {% for ind_name, count in hot_industries %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ ind_name }}</span>
+                    <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                </div>
+                <div class="heat-bar mb-3">
+                    {% set pct = (count / hot_industries[0][1] * 100) if hot_industries else 0 %}
+                    <div class="heat-bar-fill bg-primary" style="width:{{ pct }}%"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 跨行业联动 -->
+        {% if cross_events %}
+        <div class="card">
+            <div class="card-header text-danger">
+                <i class="fas fa-project-diagram me-1"></i> 本月跨行业联动
+            </div>
+            <div class="card-body">
+                {% for ev in cross_events %}
+                <div class="mb-3 pb-2 border-bottom">
+                    <div class="fw-bold mb-1">
+                        <span style="color:{{ get_importance_color(ev.importance) }}">{{ get_importance_label(ev.importance) }}</span>
+                        {{ ev.name }}
+                    </div>
+                    <div class="mb-1">
+                        {% for ind_name in ev.industries %}
+                        <span class="badge bg-danger me-1">{{ ind_name }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="text-muted" style="font-size:0.8rem;">{{ ev.description }}</div>
+                    {% if ev.action %}
+                    <span class="stock-tag" style="background:{{ get_action_color(ev.action) }}; color:#fff; font-size:0.7rem;">
+                        {{ ev.action }}
+                    </span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 快速导航 -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-list me-1"></i> 行业快速入口
+            </div>
+            <div class="card-body p-2">
+                {% for code, ind in industries.items() %}
+                <a href="/industry/{{ code }}" class="btn btn-outline-secondary btn-sm m-1">
+                    {{ ind.industry }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let _allNewsItems = [];
+
+function filterNews() {
+    const search = (document.getElementById('newsSearch').value || '').toLowerCase();
+    const industry = document.getElementById('newsIndustryFilter').value;
+    const matchedOnly = document.getElementById('matchedOnly').checked;
+    const items = document.querySelectorAll('#news-list .list-group-item');
+    let visible = 0;
+    items.forEach(el => {
+        const title = (el.dataset.title || '').toLowerCase();
+        const inds = (el.dataset.industries || '').split(',');
+        const isMatched = el.dataset.matched === 'true';
+        let show = true;
+        if (search && !title.includes(search)) show = false;
+        if (industry && !inds.includes(industry)) show = false;
+        if (matchedOnly && !isMatched) show = false;
+        el.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    document.getElementById('newsCount').textContent = '显示 ' + visible + ' 条';
+}
+
+function refreshNews() {
+    const btn = document.querySelector('#news-container + .card-header button, .card-header button');
+    if (btn) btn.disabled = true;
+    if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>刷新中';
+
+    fetch('/api/news')
+        .then(r => r.json())
+        .then(data => {
+            _allNewsItems = data.items || [];
+            const container = document.getElementById('news-container');
+            if (data.items && data.items.length > 0) {
+                let html = '<div class="list-group list-group-flush" id="news-list">';
+                const matched = data.items.filter(n => n.matched);
+                const display = matched.length > 0 ? matched : data.items;
+                display.slice(0, 30).forEach((item, idx) => {
+                    const bold = idx < 3 ? 'fw-semibold' : '';
+                    const tag = item.matched ? '<i class="fas fa-tag text-danger me-1" style="font-size:0.6rem;"></i>' : '';
+                    const industries = item.industries && item.industries.length > 0
+                        ? '<div class="mt-1">' + item.industries.slice(0, 3).map(i =>
+                            '<span class="badge bg-light text-dark me-1" style="font-size:0.6rem;">' + i + '</span>'
+                          ).join('') + '</div>'
+                        : '';
+                    html += '<a href="' + item.url + '" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start py-2 ' + bold + '"'
+                        + ' data-title="' + (item.title || '').replace(/"/g, '&quot;') + '"'
+                        + ' data-industries="' + (item.industries || []).join(',') + '"'
+                        + ' data-matched="' + (item.matched ? 'true' : 'false') + '">'
+                        + '<div class="me-2" style="flex:1;min-width:0;">'
+                        + '<div style="font-size:0.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + tag + item.title + '</div>'
+                        + industries
+                        + '</div>'
+                        + '<small class="text-muted text-nowrap ms-2" style="font-size:0.7rem;">' + item.time + '</small>'
+                        + '</a>';
+                });
+                html += '</div>';
+                container.innerHTML = html;
+                filterNews();
+            } else {
+                container.innerHTML = '<div class="p-4 text-center text-muted"><i class="fas fa-cloud me-2"></i>暂无新闻</div>';
+            }
+        })
+        .catch(() => {
+            document.getElementById('news-container').innerHTML = '<div class="p-4 text-center text-danger">新闻加载失败</div>';
+        })
+        .finally(() => {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync me-1"></i>刷新'; }
+        });
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% block title %}- 智能分析{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-brain me-2"></i>智能分析</h2>
+    <div class="subtitle">AI 驱动行业深度分析 · 可多选批量生成，支持直接写入行业日历</div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">分析配置</div>
+            <div class="card-body">
+                <form id="analysisForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">选择行业 <small class="text-muted">(可多选)</small></label>
+                        <div class="border rounded p-2" style="max-height:280px;overflow-y:auto;">
+                            {% for code, ind in industries.items() %}
+                            <div class="form-check">
+                                <input class="form-check-input industry-check" type="checkbox" name="industries"
+                                       value="{{ ind.industry }}" id="ind_{{ code }}">
+                                <label class="form-check-label" for="ind_{{ code }}">
+                                    {{ ind.industry }}
+                                    <span class="badge bg-light text-dark ms-1" style="font-size:0.6rem;">{{ ind.events|length }}事件</span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                            {% if custom_skills %}
+                            <hr class="my-1">
+                            <div class="text-muted mb-1" style="font-size:0.75rem;">自定义技能</div>
+                            {% for s in custom_skills %}
+                            <div class="form-check">
+                                <input class="form-check-input industry-check" type="checkbox" name="industries"
+                                       value="{{ s.name }}" id="skill_{{ s.id }}">
+                                <label class="form-check-label" for="skill_{{ s.id }}">
+                                    {{ s.name }}
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:0.6rem;">自定义</span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="mt-1">
+                            <a href="#" onclick="selectAll(true); return false;" style="font-size:0.8rem;">全选</a>
+                            <span class="text-muted mx-1">·</span>
+                            <a href="#" onclick="selectAll(false); return false;" style="font-size:0.8rem;">取消</a>
+                            <span class="text-muted ms-2" id="selectedCount" style="font-size:0.8rem;">已选 0 个</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">选择模型</label>
+                        <select class="form-select" name="provider" id="providerSelect">
+                            {% for key, cfg in enabled_providers %}
+                            <option value="{{ key }}">{{ llm.BUILTIN_PROVIDERS[key].name }} — {{ cfg.get('model', llm.BUILTIN_PROVIDERS[key].default_model) }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if not enabled_providers %}
+                        <div class="text-warning mt-1" style="font-size:0.8rem;">
+                            未启用任何大模型，请先在 <a href="/settings#llm">设置 → 大模型配置</a> 中配置。
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">额外指令 <small class="text-muted">(可选)</small></label>
+                        <textarea class="form-control" name="extra_instructions" rows="2"
+                                  placeholder="如：重点关注政策面影响"></textarea>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="save_to_calendar" id="saveToCalendar">
+                        <label class="form-check-label" for="saveToCalendar">
+                            生成后写入该行业日历文件
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="generateBtn">
+                        <i class="fas fa-magic me-1"></i> 生成分析报告
+                    </button>
+                    <div class="text-muted text-center mt-1" id="batchInfo" style="font-size:0.8rem;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-file-lines me-1"></i> 分析报告</span>
+                <span id="reportStatus" class="text-muted" style="font-size:0.8rem;">就绪</span>
+            </div>
+            <div class="card-body" id="reportContent">
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-robot" style="font-size:3rem;opacity:0.3;"></i>
+                    <p class="mt-3">选择一个或多个行业，点击生成按钮<br>系统将调用 AI 生成结构化行业分析报告</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量进度 -->
+        <div class="card" id="batchProgress" style="display:none;">
+            <div class="card-header">
+                <i class="fas fa-tasks me-1"></i> 批量生成进度
+            </div>
+            <div class="card-body" id="batchProgressBody"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function selectAll(checked) {
+    document.querySelectorAll('.industry-check').forEach(cb => cb.checked = checked);
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    var count = document.querySelectorAll('.industry-check:checked').length;
+    document.getElementById('selectedCount').textContent = '已选 ' + count + ' 个';
+}
+
+document.querySelectorAll('.industry-check').forEach(function(cb) {
+    cb.addEventListener('change', updateSelectedCount);
+});
+
+document.getElementById('analysisForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = new FormData(this);
+    var selected = document.querySelectorAll('.industry-check:checked');
+
+    if (selected.length === 0) {
+        showToast('请至少选择一个行业', 'warning');
+        return;
+    }
+
+    var industries = [];
+    selected.forEach(function(cb) { industries.push(cb.value); });
+    var provider = form.get('provider');
+    var extra = form.get('extra_instructions') || '';
+    var saveToCalendar = form.get('save_to_calendar') === 'on';
+
+    var btn = document.getElementById('generateBtn');
+    var status = document.getElementById('reportStatus');
+    var content = document.getElementById('reportContent');
+    var batchProgress = document.getElementById('batchProgress');
+    var batchBody = document.getElementById('batchProgressBody');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> 生成中...';
+
+    if (industries.length === 1) {
+        // 单个行业：直接生成
+        status.textContent = '生成中...';
+        content.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary mb-3" role="status"></div><p class="text-muted">AI 正在分析...</p></div>';
+
+        fetch('/api/analysis/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                industry: industries[0],
+                provider: provider,
+                extra_instructions: extra,
+                save_to_calendar: saveToCalendar,
+            })
+        }).then(r => r.json()).then(function(data) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic me-1"></i> 生成分析报告';
+            if (data.ok) {
+                status.textContent = '✓ 完成';
+                renderReport(data.content, content);
+                if (data.saved) showToast('报告已写入行业日历', 'success');
+            } else {
+                status.textContent = '✗ 失败';
+                content.innerHTML = '<div class="alert alert-danger">生成失败: ' + (data.error || '未知错误') + '</div>';
+            }
+        });
+    } else {
+        // 多行业批量
+        batchProgress.style.display = '';
+        status.textContent = '批量生成 ' + industries.length + ' 个...';
+        content.innerHTML = '<div class="text-center py-5 text-muted"><i class="fas fa-list-check" style="font-size:2rem;opacity:0.3;"></i><p class="mt-2">批量生成中，查看右侧进度</p></div>';
+
+        var results = [];
+        var idx = 0;
+
+        function generateNext() {
+            if (idx >= industries.length) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic me-1"></i> 生成分析报告';
+                status.textContent = '✓ 全部完成 (' + industries.length + ' 个)';
+                return;
+            }
+
+            var ind = industries[idx];
+            batchBody.innerHTML += '<div class="mb-2" id="batch-' + idx + '">'
+                + '<div class="d-flex justify-content-between"><span>' + ind + '</span><span class="text-muted" id="batch-status-' + idx + '">生成中...</span></div>'
+                + '<div class="progress" style="height:4px;"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div></div>'
+                + '</div>';
+
+            fetch('/api/analysis/generate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    industry: ind,
+                    provider: provider,
+                    extra_instructions: extra,
+                    save_to_calendar: saveToCalendar,
+                })
+            }).then(r => r.json()).then(function(data) {
+                results.push({industry: ind, result: data});
+                var statusEl = document.getElementById('batch-status-' + idx);
+                if (data.ok) {
+                    statusEl.textContent = '✓ 完成';
+                    statusEl.className = 'text-success';
+                } else {
+                    statusEl.textContent = '✗ ' + (data.error || '失败');
+                    statusEl.className = 'text-danger';
+                }
+                // Show latest report
+                if (data.ok && data.content) {
+                    var header = '<h5 class="text-primary mt-3">—— ' + ind + ' ——</h5>';
+                    content.innerHTML = header + renderReportText(data.content);
+                }
+                idx++;
+                generateNext();
+            });
+        }
+
+        generateNext();
+    }
+});
+
+function renderReport(text, container) {
+    var html = renderReportText(text);
+    container.innerHTML = '<div class="analysis-report">' + html + '</div>';
+    var style = document.createElement('style');
+    style.textContent = '.analysis-report h4 { color: #0d6efd; border-bottom: 2px solid var(--border-color, #e9ecef); padding-bottom: 0.3rem; } .analysis-report li { margin-bottom: 0.3rem; }';
+    document.head.appendChild(style);
+}
+
+function renderReportText(text) {
+    if (!text) return '<div class="text-muted">无内容</div>';
+    return text
+        .replace(/^### (.+)$/gm, '<h5 class="mt-3 mb-2">$1</h5>')
+        .replace(/^## (.+)$/gm, '<h4 class="mt-4 mb-2">$1</h4>')
+        .replace(/^\*\*(.+?)\*\*/gm, '<strong>$1</strong>')
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+}
+</script>
+{% endblock %}

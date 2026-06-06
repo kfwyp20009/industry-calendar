@@ -1,0 +1,215 @@
+industry: 量子计算
+description: 量子计算行业
+tags:
+- 量子
+- 量子计算机
+updated: '2026-06-06'
+core_stocks:
+- code: '600487'
+  name: 亨通光电
+  sector: 量子通信
+  reason: 量子通信干线建设核心供应商
+- code: '002335'
+  name: 科华数据
+  sector: 量子计算温控
+  reason: 极低温制冷设备龙头
+- code: '688981'
+  name: 中芯国际
+  sector: 量子芯片制造
+  reason: 超导量子比特芯片代工
+- code: 000988
+  name: 华工科技
+  sector: 量子激光器
+  reason: 量子光源与激光器核心
+- code: '600703'
+  name: 三安光电
+  sector: 量子材料
+  reason: 氮化镓/砷化镓衬底龙头
+events:
+- date: '2026-01-15'
+  date_precision: day
+  name: CES 2026量子计算专题展
+  importance: 4
+  type: exhibition
+  description: 多家量子初创公司展示最新量子处理器原型机
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600487'
+    - '002335'
+    action: 埋伏
+- date: 2026-02
+  date_precision: month
+  name: 中国量子计算产业联盟年会
+  importance: 4
+  type: policy
+  description: 发布年度量子计算产业白皮书及政策支持方向
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600487'
+    - '688981'
+    action: 加仓
+- date: '2026-03-20'
+  date_precision: day
+  name: IBM量子开发者大会
+  importance: 5
+  type: technology
+  description: 发布1000+量子比特处理器及量子纠错里程碑
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '002335'
+    - 000988
+    action: 埋伏
+- date: 2026-04
+  date_precision: month
+  name: 国家量子信息重大专项中期评审
+  importance: 5
+  type: policy
+  description: 十四五量子科技专项中期考核，决定后续资金分配
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600487'
+    - '688981'
+    action: 加仓
+- date: '2026-05-10'
+  date_precision: day
+  name: 谷歌量子AI团队发布Sycamore二代
+  importance: 5
+  type: technology
+  description: 实现量子霸权验证，解决经典超算无法完成的任务
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '002335'
+    - 000988
+    action: 埋伏
+- date: 2026-06
+  date_precision: month
+  name: 中国量子计算原型机‘九章三号’成果发布
+  importance: 5
+  type: technology
+  description: 光量子计算突破，实现特定问题指数级加速
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600487'
+    - 000988
+    action: 加仓
+- date: '2026-07-15'
+  date_precision: day
+  name: 量子计算国际标准制定会议（ISO/IEC）
+  importance: 4
+  type: regulation
+  description: 讨论量子计算安全标准与互操作规范
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600703'
+    action: 观望
+- date: 2026-08
+  date_precision: month
+  name: 华为量子计算云平台公测
+  importance: 4
+  type: product
+  description: 华为发布量子计算云服务，开放超导量子芯片访问
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '688981'
+    - '002335'
+    action: 埋伏
+- date: '2026-09-10'
+  date_precision: day
+  name: 全球量子计算投融资峰会
+  importance: 3
+  type: exhibition
+  description: 头部VC与产业资本对接，公布年度融资榜单
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600487'
+    - '600703'
+    action: 持有
+- date: 2026-10
+  date_precision: month
+  name: 中国第三代超导量子芯片流片成功
+  importance: 4
+  type: technology
+  description: 中科院/中芯国际联合完成100+比特芯片制造
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '688981'
+    - 000988
+    action: 加仓
+- date: '2026-11-05'
+  date_precision: day
+  name: 美国量子计算出口管制新规生效
+  importance: 4
+  type: regulation
+  description: 限制超导量子芯片及稀释制冷机对华出口
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '002335'
+    - '600703'
+    action: 减仓
+- date: 2026-12
+  date_precision: month
+  name: 量子计算年度财报季（美股）
+  importance: 3
+  type: earnings
+  description: IonQ、Rigetti等上市公司公布营收与订单指引
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600487'
+    - '688981'
+    action: 持有
+- date: '2026-01-25'
+  date_precision: day
+  name: D-Wave退火量子计算机新应用案例发布
+  importance: 3
+  type: technology
+  description: 物流优化与药物发现领域突破性应用
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 000988
+    action: 埋伏
+- date: '2026-03-05'
+  date_precision: day
+  name: 欧洲量子旗舰计划第二阶段启动
+  importance: 4
+  type: policy
+  description: 欧盟投入10亿欧元支持量子计算研发
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600703'
+    action: 观望
+- date: '2026-08-20'
+  date_precision: day
+  name: 量子计算+AI融合技术研讨会
+  importance: 3
+  type: technology
+  description: 探讨量子机器学习在金融建模中的应用
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '002335'
+    - 000988
+    action: 持有
+monitors:
+- indicator: 超导量子比特相干时间突破进展
+  risk_level: high
+  action: 若低于100微秒，减仓超导芯片相关标的
+- indicator: 中美量子技术出口管制政策变化
+  risk_level: high
+  action: 若新增限制，减仓依赖进口设备公司
+- indicator: 量子计算初创公司融资热度
+  risk_level: medium
+  action: 融资额连续两季度下降，降低板块配置

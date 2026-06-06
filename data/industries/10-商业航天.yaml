@@ -1,0 +1,250 @@
+# ============================================================
+# 商业航天/火箭 — 事件日历数据
+# ============================================================
+industry: "商业航天/火箭"
+description: "2026年是国产可回收火箭元年——朱雀三号/双曲线三号/星云一号等多型号首飞+回收验证"
+tags: [航天, 发射, 制造]
+updated: "2026-06-05"
+
+core_stocks:
+  - code: "688333"
+    name: "铂力特"
+    reason: "金属3D打印火箭零部件龙头，发动机/结构件增材制造"
+    sector: "火箭零部件"
+  - code: "688102"
+    name: "斯瑞新材"
+    reason: "铜合金推力室内壁材料供应商，间接持股蓝箭航天"
+    sector: "火箭材料"
+  - code: "301005"
+    name: "超捷股份"
+    reason: "火箭结构件直接供应商"
+    sector: "火箭结构件"
+  - code: "002149"
+    name: "西部材料"
+    reason: "钛合金/稀有金属航天结构材料龙头"
+    sector: "航天材料"
+  - code: "688523"
+    name: "航天环宇"
+    reason: "航天地面设备与复材，发射场设施供应商"
+    sector: "地面设备"
+
+events:
+
+  # ── 1月 ──
+  - date: "2026-01"
+    date_precision: month
+    confirmed: true
+    name: "谷神星一号海射成功 + 谷神星二号首飞失败"
+    importance: 3
+    type: other
+    description: "星河动力海射成功但谷神星二号首飞失利"
+    impact: "固体火箭技术成熟但液体火箭仍在探索"
+    suggested_action:
+      stocks: []
+      action: "观望"
+
+  - date: "2026-01"
+    date_precision: month
+    confirmed: false
+    name: "SpaceX IPO传闻（估值1.75万亿）"
+    importance: 4
+    type: ipo
+    description: "若SpaceX上市→重构全球商业航天估值体系"
+    suggested_action:
+      stocks: []
+      action: "观望"
+      reason: "影响全球估值锚，间接传导A股"
+
+  # ── 4月 ──
+  - date: "2026-04-24"
+    date_precision: day
+    confirmed: true
+    name: "《商业航天标准体系(1.0版)》发布"
+    importance: 5
+    type: policy
+    description: "国家航天局+市场监管总局联合发布，6大领域/32个二级分支/千余标准"
+    impact: "产业里程碑——标准化推动产业化"
+    suggested_action:
+      stocks: ["688333", "688102", "301005"]
+      action: "建仓"
+      reason: "标准化→产业化加速→供应链标的受益"
+
+  - date: "2026-04"
+    date_precision: month
+    confirmed: true
+    name: "天龙三号重型液氧甲烷火箭首飞失利"
+    importance: 4
+    type: technology
+    description: "天兵科技LEO 17-22t火箭首飞失败"
+    impact: "可回收火箭技术难度再次验证"
+    suggested_action:
+      stocks: []
+      action: "观望"
+
+  # ── 5月 ──
+  - date: "2026-05-14"
+    date_precision: day
+    confirmed: true
+    name: "朱雀二号改进型遥五成功发射"
+    importance: 4
+    type: technology
+    description: "蓝箭航天液氧甲烷技术持续验证"
+    impact: "液氧甲烷路线确认可行"
+    suggested_action:
+      stocks: ["688102"]
+      action: "持有"
+
+  # ── 6月 ──
+  - date: "2026-06-01"
+    date_precision: day
+    confirmed: true
+    name: "长征十二号乙首飞成功"
+    importance: 5
+    type: technology
+    description: "国内最大单芯级火箭(LEO≥20t)，全液氧煤油动力"
+    impact: "后续将择机一子级回收试验→中国可回收火箭里程碑"
+    suggested_action:
+      stocks: ["688333", "688523"]
+      action: "加仓"
+      reason: "液氧煤油火箭成功→可回收验证预期升温"
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "引力二号预计首飞（东方空间）"
+    importance: 4
+    type: technology
+    description: "芯级回收设计，支持≥30次重复使用"
+    impact: "中国可回收火箭再添新玩家"
+    suggested_action:
+      stocks: ["301005"]
+      action: "埋伏"
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "蓝箭航天科创板问询推进"
+    importance: 4
+    type: ipo
+    description: "拟募资75亿元，估值超200亿"
+    impact: "商业火箭第一股争夺领跑"
+    suggested_action:
+      stocks: ["688102"]
+      action: "持有"
+      reason: "参股蓝箭航天的A股标的受益"
+
+  # ── 7月 ⭐ 朱雀三号回收 ⭐ ──
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "朱雀三号第二次回收验证（首次回收尝试）"
+    importance: 5
+    type: technology
+    description: "蓝箭航天朱雀三号遥二首次回收——若成功=中国首次轨道级火箭回收"
+    impact: "中国航天史里程碑——可回收火箭从0到1"
+    suggested_action:
+      stocks: ["688102", "688333"]
+      action: "加仓"
+      reason: "若回收成功→全板块估值重估"
+
+  - date: "2026-07-07"
+    date_precision: day
+    confirmed: false
+    name: "长征十号乙首飞（新一代载人火箭）"
+    importance: 4
+    type: technology
+    description: "一级回收技术验证"
+    suggested_action:
+      stocks: ["688523"]
+      action: "持有"
+
+  # ── 8-9月 ──
+  - date: "2026-08"
+    date_precision: month
+    confirmed: false
+    name: "朱雀三号密集发射启动（全年8次计划）"
+    importance: 4
+    type: other
+    description: "验证可回收火箭高频次发射能力"
+    suggested_action:
+      stocks: ["688102"]
+      action: "持有"
+
+  # ── Q4 ⭐ 多型号密集首飞 ⭐ ──
+  - date: "2026-10"
+    date_precision: month
+    confirmed: false
+    name: "双曲线三号首飞+海上回收（星际荣耀）"
+    importance: 5
+    type: technology
+    description: "首飞即挑战入轨+海上回收"
+    impact: "若成功→中国可回收火箭再下一城"
+    suggested_action:
+      stocks: ["688333"]
+      action: "加仓"
+
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "星云一号首飞+海上回收验证（深蓝航天）"
+    importance: 4
+    type: technology
+    description: "首飞即回收（海上溅落垂直回收）"
+    suggested_action:
+      stocks: []
+      action: "观望"
+
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "朱雀三号首次回收复用飞行（同一枚火箭二次发射+回收）"
+    importance: 5
+    type: technology
+    description: "验证可重复使用全链路"
+    impact: "中国可回收火箭从'试一次'到'反复用'的飞跃"
+    suggested_action:
+      stocks: ["688102", "688333"]
+      action: "加仓"
+      reason: "复用成功→火箭发射成本预期大降→星座建设加速"
+
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "海南商发二期形成发射能力（年60发）"
+    importance: 4
+    type: other
+    description: "3号/4号工位形成能力"
+    impact: "发射瓶颈缓解→商业火箭常态化发射"
+    suggested_action:
+      stocks: ["688523"]
+      action: "持有"
+
+  # ── 全年政策 ──
+  - date: "2026"
+    date_precision: month
+    confirmed: false
+    name: "《航天法》草案预备审议"
+    importance: 5
+    type: policy
+    description: "中国航天领域顶层法律制度"
+    impact: "行业长期制度利好"
+    suggested_action:
+      stocks: ["688333", "688102"]
+      action: "持有"
+
+monitors:
+  - indicator: "朱雀三号回收验证失败"
+    risk_level: high
+    action: "减仓商业航天板块（预期落空）"
+  - indicator: "双曲线三号/星云一号首飞失败"
+    risk_level: medium
+    action: "减仓（单公司利空）"
+  - indicator: "科创板对商业航天IPO阶段性收紧"
+    risk_level: medium
+    action: "减仓板块（估值锚下移）"
+  - indicator: "航天动力(600343)概念炒作被监管处罚"
+    risk_level: low
+    action: "规避伪概念标的"
+  - indicator: "ITU频谱截止日期压力下星座建设不及预期"
+    risk_level: medium
+    action: "卫星+火箭板块联动利空"

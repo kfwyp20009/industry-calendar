@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}- 全年全景{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-earth-asia me-2"></i>全年全景</h2>
+    <div class="subtitle">2026年 · 11个行业 × 12个月 · 事件分布热力图</div>
+</div>
+
+<!-- 矩阵视图 -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0" style="min-width:900px;">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width:120px;">行业</th>
+                        {% for mn in months_names %}
+                        <th class="text-center {% if loop.index == now.month %}table-active{% endif %}"
+                            style="width:calc((100% - 120px) / 12);">
+                            {{ mn }}
+                            {% if loop.index == now.month %}
+                            <span class="now-indicator">本月</span>
+                            {% endif %}
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ind in industry_list %}
+                    <tr>
+                        <td>
+                            <a href="/industry/{{ ind.code }}" class="text-decoration-none fw-semibold">
+                                {{ ind.name }}
+                            </a>
+                        </td>
+                        {% for m in ind.months %}
+                        <td class="align-top p-2" style="min-height:60px; font-size:0.75rem;
+                            {% if m.top_count > 0 %}
+                            background: rgba(220,53,69,{{ 0.05 * m.top_count }});
+                            {% endif %}
+                        ">
+                            {% if m.events %}
+                            <div class="d-flex gap-1 mb-1">
+                                {% for ev in m.top_events[:3] %}
+                                <span style="color:{{ get_importance_color(ev.importance) }}; font-size:0.6rem;">
+                                    {{ get_importance_label(ev.importance) }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% for ev in m.top_events[:2] %}
+                            <div class="mb-1" style="line-height:1.2;">
+                                <strong>{{ ev.name[:18] }}{% if ev.name|length > 18 %}..{% endif %}</strong>
+                            </div>
+                            {% endfor %}
+                            {% if m.count > 0 %}
+                            <div class="text-muted mt-1" style="font-size:0.65rem;">
+                                +{{ m.count - m.top_count }} 个事件
+                            </div>
+                            {% endif %}
+                            {% else %}
+                            <span class="text-muted" style="font-size:0.7rem;">—</span>
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 月度策略 -->
+<div class="row g-3 mt-2">
+    {% for ind in industry_list %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between">
+                <span>{{ ind.name }}</span>
+                {% set ys = ind.months|sum(attribute='count') %}
+                <span class="badge bg-secondary">{{ ys }} 事件</span>
+            </div>
+            <div class="card-body p-2">
+                <!-- 热力条 -->
+                <div class="d-flex gap-1" style="height:20px;">
+                    {% for m in ind.months %}
+                    <div class="flex-fill" title="{{ m.name }}: {{ m.count }}事件"
+                         style="background:{% if m.count > 0 %}rgba(220,53,69,{{ 0.1 * m.count }}){% else %}#f0f0f0{% endif %};
+                                border-radius:2px;">
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="d-flex flex-wrap gap-1 mt-1" style="font-size:0.7rem;">
+                    {% for m in ind.months %}
+                    {% if m.top_count > 0 %}
+                    <span class="badge bg-danger">
+                        {{ m.num }}月({{ m.top_count }})
+                    </span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

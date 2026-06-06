@@ -1,0 +1,115 @@
+project:
+  name: 行业投资日历系统
+  version: 1.0.0
+  created: '2026-06-05'
+  updated: '2026-06-06'
+  status: active
+industries:
+- id: 1
+  name: 6G通信
+  enabled: true
+  tags:
+  - 通信
+  - 技术
+  - 标准
+- id: 2
+  name: 低空经济
+  enabled: true
+  tags:
+  - 政策
+  - 基建
+  - 交通
+- id: 3
+  name: 卫星互联网
+  enabled: true
+  tags:
+  - 基建
+  - 国防
+  - 通信
+- id: 4
+  name: 机器人零部件
+  enabled: true
+  tags:
+  - 制造
+  - 量产
+  - 供应链
+- id: 5
+  name: 具身智能
+  enabled: true
+  tags:
+  - AI
+  - 机器人
+  - 技术
+- id: 6
+  name: 绿氢氨醇
+  enabled: true
+  tags:
+  - 能源
+  - 航运
+  - 政策
+- id: 7
+  name: 数字人民币
+  enabled: true
+  tags:
+  - 金融
+  - 政策
+  - 跨境
+- id: 08
+  name: AI大模型/应用
+  enabled: true
+  tags:
+  - AI
+  - 技术
+  - 应用
+- id: 09
+  name: 半导体/国产替代
+  enabled: true
+  tags:
+  - 芯片
+  - 制造
+  - 安全
+- id: 10
+  name: 商业航天/火箭
+  enabled: true
+  tags:
+  - 航天
+  - 发射
+  - 制造
+- id: 11
+  name: 自动驾驶/L4
+  enabled: true
+  tags:
+  - 汽车
+  - AI
+  - 法规
+- id: '13'
+  name: 测试行业
+  enabled: true
+  tags:
+  - 测试
+  - 试玩
+  - demo
+- id: '12'
+  name: 量子计算
+  enabled: true
+  tags:
+  - 量子
+  - 量子计算机
+delivery:
+  primary_channel: telegram
+  fallback_channel: feishu
+  schedules:
+    morning_time: 30 8 * * 1-5
+    noon_time: 30 12 * * 1-5
+    evening_time: 0 18 * * 1-5
+    weekly_time: 0 10 * * 6
+    monthly_time: 0 9 1 * *
+calendar:
+  year: 2026
+  include_all_events: true
+  importance_labels:
+    5: 板块级行情
+    4: 龙头行情
+    3: 短期脉冲
+    2: 局部影响
+    1: 噪声

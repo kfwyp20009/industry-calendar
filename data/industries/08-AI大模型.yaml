@@ -1,0 +1,251 @@
+# ============================================================
+# AI大模型/应用 — 事件日历数据
+# ============================================================
+industry: "AI大模型/应用"
+description: "2026年是AI应用商业化元年——豆包/星火等启动付费，Agent大规模落地，大模型迭代加速至50天/版本"
+tags: [AI, 技术, 应用]
+updated: "2026-06-05"
+
+core_stocks:
+  - code: "688256"
+    name: "寒武纪"
+    reason: "国产AI训练/推理芯片龙头，思元系列适配DeepSeek等国产大模型"
+    sector: "AI芯片"
+  - code: "002230"
+    name: "科大讯飞"
+    reason: "AI国家队，星火X2大模型基于全国产算力训练"
+    sector: "大模型"
+  - code: "688041"
+    name: "海光信息"
+    reason: "x86兼容CPU+DCU双生态，国产算力核心受益"
+    sector: "算力"
+  - code: "688111"
+    name: "金山办公"
+    reason: "WPS AI深度融合，AI办公商业化兑现大年"
+    sector: "AI应用"
+  - code: "300308"
+    name: "中际旭创"
+    reason: "800G/1.6T光模块全球龙头，AI算力'卖水人'"
+    sector: "算力基础设施"
+
+events:
+
+  # ── 1月 ──
+  - date: "2026-01"
+    date_precision: month
+    confirmed: true
+    name: "智谱港股上市（大模型第一股）"
+    importance: 4
+    type: ipo
+    description: "智谱港股IPO获超千倍认购，对A股AI板块形成估值锚定"
+    suggested_action:
+      stocks: ["002230"]
+      action: "持有"
+
+  - date: "2026-01"
+    date_precision: month
+    confirmed: true
+    name: "字节豆包月活达3.45亿"
+    importance: 4
+    type: product
+    description: "日Token消耗突破120万亿，推理需求爆发"
+    suggested_action:
+      stocks: ["300308", "688256"]
+      action: "持有"
+
+  # ── 2月 ⭐ 星火X2 ──
+  - date: "2026-02-11"
+    date_precision: day
+    confirmed: true
+    name: "科大讯飞星火X2大模型发布"
+    importance: 5
+    type: product
+    description: "基于全国产算力训练，通用能力对标国际顶尖"
+    impact: "国产大模型里程碑——验证全国产算力路线可行性"
+    suggested_action:
+      stocks: ["002230"]
+      action: "加仓"
+      reason: "星火X2若超预期→科大讯飞估值重估"
+
+  # ── 3月 ──
+  - date: "2026-03"
+    date_precision: month
+    confirmed: true
+    name: "OpenAI GPT-5.3/5.4发布（Codex+Agent）"
+    importance: 5
+    type: product
+    description: "编程加速25%，融合推理+编码+Agent工作流"
+    impact: "全球AI能力边界突破，算力需求预期再升级"
+    suggested_action:
+      stocks: ["300308", "688041"]
+      action: "持有"
+
+  # ── 4月 ──
+  - date: "2026-04-10"
+    date_precision: day
+    confirmed: true
+    name: "AI拟人化互动服务管理办法公布（7月15日施行）"
+    importance: 4
+    type: regulation
+    description: "五部门联合发布，首部AI拟人化专门立法"
+    impact: "AI监管框架确立"
+    suggested_action:
+      stocks: ["002230", "688111"]
+      action: "观望"
+
+  # ── 5月 ⭐ 豆包付费 ⭐ ──
+  - date: "2026-05"
+    date_precision: month
+    confirmed: true
+    name: "豆包启动分层付费（68/200/500元/月）"
+    importance: 5
+    type: product
+    description: "中国AI C端付费从0到1的拐点"
+    impact: "标志中国AI从'免费教育'到'商业化元年'拐点"
+    suggested_action:
+      stocks: ["688111", "002230"]
+      action: "加仓"
+      reason: "AI付费模式验证→AI应用板块估值重估"
+
+  - date: "2026-05-13"
+    date_precision: day
+    confirmed: true
+    name: "百度Create 2026大会（发布通用智能体DuMate）"
+    importance: 4
+    type: product
+    description: "AI智能体全线发布"
+    suggested_action:
+      stocks: []
+      action: "观望"
+
+  # ── 6月 ──
+  - date: "2026-06-01"
+    date_precision: day
+    confirmed: true
+    name: "智谱公告冲刺科创板IPO（拟募资不超150亿）"
+    importance: 5
+    type: ipo
+    description: "A股首次迎来大模型公司IPO定价"
+    impact: "AI板块估值锚确定——智谱A股IPO估值决定板块天花板"
+    suggested_action:
+      stocks: ["002230", "688256"]
+      action: "持有"
+      reason: "大模型IPO→板块估值中枢上移"
+
+  - date: "2026-06-03"
+    date_precision: day
+    confirmed: true
+    name: "阿里千问开放第三方Agent平台"
+    importance: 5
+    type: product
+    description: "肯德基/瑞幸/蜜雪冰城/东航首批接入"
+    impact: "AI Agent商业化大规模验证"
+    suggested_action:
+      stocks: ["300308"]
+      action: "持有"
+      reason: "Agent放量→推理算力需求增加→光模块/算力受益"
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: true
+    name: "火山引擎MaaS年目标上调至1500亿，Seedance月营收超10亿"
+    importance: 5
+    type: earnings
+    description: "MaaS商业模式获验证"
+    impact: "AI算力需求确定性强增长"
+    suggested_action:
+      stocks: ["300308", "688041"]
+      action: "持有"
+
+  # ── 7月 ──
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "中报业绩披露——算力链业绩兑现验证"
+    importance: 5
+    type: earnings
+    description: "寒武纪/中际旭创/海光信息中报"
+    impact: "决定AI算力板块估值是否合理"
+    suggested_action:
+      stocks: ["688256", "300308", "688041"]
+      action: "持有"
+
+  - date: "2026-07-15"
+    date_precision: day
+    confirmed: true
+    name: "AI拟人化互动服务管理办法正式施行"
+    importance: 4
+    type: regulation
+    description: "监管沙箱机制落地"
+    suggested_action:
+      stocks: ["002230"]
+      action: "观望"
+
+  # ── 10月 ⭐ 1024开发者节 ⭐ ──
+  - date: "2026-10-24"
+    date_precision: day
+    confirmed: false
+    name: "科大讯飞1024开发者节——旗舰大模型发布"
+    importance: 5
+    type: product
+    description: "预计在昇腾950平台发布中国首个对标业界最先进水平的旗舰大模型"
+    impact: "科大讯飞年度最重要催化"
+    suggested_action:
+      stocks: ["002230"]
+      action: "加仓"
+      reason: "旗舰模型发布前1-2周布局"
+
+  # ── 11月 ──
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "双11 AI电商智能体大规模商用验证"
+    importance: 4
+    type: product
+    description: "阿里千问Agent+淘宝生态全链路闭环"
+    suggested_action:
+      stocks: []
+      action: "观望"
+
+  # ── 12月 ──
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "中央经济工作会议——AI政策定调"
+    importance: 5
+    type: policy
+    description: "人工智能+政策延续性"
+    impact: "决定2027年AI产业政策力度"
+    suggested_action:
+      stocks: ["002230", "688256", "300308"]
+      action: "持有"
+    linked_industries: ["__all__"]
+
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "年终AI商业化数据汇总"
+    importance: 4
+    type: earnings
+    description: "豆包/千问/星火全年收入数据"
+    impact: "中国AI C端付费元年成绩单"
+    suggested_action:
+      stocks: ["688111", "002230"]
+      action: "持有"
+
+monitors:
+  - indicator: "AI应用付费转化率低于预期（豆包付费用户<500万）"
+    risk_level: high
+    action: "减仓AI应用板块"
+  - indicator: "OpenAI/Anthropic IPO估值大幅低于预期"
+    risk_level: medium
+    action: "减仓AI板块（全球估值锚下移）"
+  - indicator: "美国GPU出口管制进一步收紧"
+    risk_level: high
+    action: "短期利空算力链，中期利好国产替代"
+  - indicator: "Sora关停式失败重演（技术领先≠商业成功）"
+    risk_level: medium
+    action: "重新评估AI应用标的"
+  - indicator: "AI监管超预期收紧"
+    risk_level: high
+    action: "减仓AI应用/社交/情感陪伴标的"

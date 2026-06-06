@@ -1,0 +1,184 @@
+# ============================================================
+# 跨行业联动事件
+# ============================================================
+# 这些事件会同时影响多个行业板块，是超额收益的重要来源
+# ============================================================
+updated: "2026-06-05"
+
+cross_events:
+
+  # ── 6月 ──
+  - date: "2026-06-24"
+    date_precision: day
+    confirmed: true
+    name: "MWC上海"
+    importance: 5
+    industries: ["6G通信", "卫星互联网"]
+    description: "6G专区+卫星产业专区同时设展，华为/中兴6G原型展示+千帆星座最新进展"
+    stocks: ["000063", "688387", "688283", "001270", "600118"]
+    action: "加仓"
+    reason: "两板块共振，主题投资最强窗口"
+    type: exhibition
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉2026 AI Day"
+    importance: 5
+    industries: ["机器人零部件", "具身智能"]
+    description: "Optimus Gen3发布+量产时间表+供应链变化→两个板块同时催化"
+    stocks: ["688017", "603662", "603728", "9880.HK"]
+    action: "加仓"
+    reason: "全年机器人/具身最强催化"
+    type: product
+
+  - date: "2026-06-01"
+    date_precision: day
+    confirmed: true
+    name: "宇树科技科创板IPO上会"
+    importance: 5
+    industries: ["具身智能", "机器人零部件"]
+    description: "人形机器人第一股A股IPO→供应链标的联动"
+    stocks: ["688017", "688322"]
+    action: "加仓"
+    reason: "宇树供应链（绿的谐波、奥比中光）直接受益"
+    type: ipo
+
+  # ── 7月 ──
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "世界机器人大会（北京）"
+    importance: 5
+    industries: ["机器人零部件", "具身智能"]
+    description: "人形新品发布+VLA模型进展→零部件和整机同时受益"
+    stocks: ["688017", "300124", "300647", "9880.HK"]
+    action: "持有"
+    type: exhibition
+
+  # ── 9月 ──
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉Optimus供应商大会"
+    importance: 5
+    industries: ["机器人零部件", "具身智能"]
+    description: "供应链定点→零部件确定性和整机情绪双重催化"
+    stocks: ["688017", "603662", "601100"]
+    action: "加仓"
+    type: other
+
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "IMT-2030 + PT Expo通信展"
+    importance: 5
+    industries: ["6G通信", "卫星互联网"]
+    description: "6G年度发布+通信展→天地融合主题共振"
+    stocks: ["000063", "688387", "688283", "001270"]
+    action: "加仓"
+    type: exhibition
+
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "NVIDIA GTC 2026 Fall"
+    importance: 5
+    industries: ["AI大模型/应用", "具身智能"]
+    description: "Isaac平台更新+机器人基础模型→AI+具身双催化"
+    stocks: []
+    action: "观望"
+    type: technology
+
+  # ── 10月 ──
+  - date: "2026-10"
+    date_precision: month
+    confirmed: false
+    name: "IMO MEPC 85 碳定价会议"
+    importance: 5
+    industries: ["绿氢氨醇"]
+    description: "碳定价→绿色燃料需求爆发"
+    stocks: ["002202", "000035", "601012"]
+    action: "加仓"
+    type: regulation
+
+  - date: "2026-10"
+    date_precision: month
+    confirmed: false
+    name: "三季报密集披露期"
+    importance: 4
+    industries: ["__all__"]
+    description: "业绩验证→跨行业比较→资金流向选择"
+    stocks: []
+    action: "持有"
+    reason: "关注各行业龙头业绩是否兑现预期"
+    type: earnings
+
+  # ── 12月 ──
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "中央经济工作会议"
+    importance: 5
+    industries: ["__all__"]
+    description: "定调次年产业政策，相关行业最强调仓信号"
+    stocks: []
+    action: "埋伏"
+    reason: "会议前2周布局政策预期"
+    type: policy
+
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "OpenAI/Google新一代VLA模型发布"
+    importance: 5
+    industries: ["具身智能", "AI大模型/应用"]
+    description: "VLA能力边界突破→AI+具身双重催化"
+    stocks: []
+    action: "观望"
+    type: product
+
+
+# ── 行业关联矩阵 ──
+# 表示行业间关联程度（5=强关联，1=弱关联）
+affinity_matrix:
+  6G通信:
+    卫星互联网: 5
+    半导体/国产替代: 4
+    AI大模型/应用: 3
+    自动驾驶/L4: 2
+    低空经济: 2
+  卫星互联网:
+    6G通信: 5
+    商业航天/火箭: 5
+    半导体/国产替代: 3
+  机器人零部件:
+    具身智能: 5
+    自动驾驶/L4: 2
+    半导体/国产替代: 3
+  具身智能:
+    机器人零部件: 5
+    AI大模型/应用: 4
+    半导体/国产替代: 2
+  绿氢氨醇:
+    自动驾驶/L4: 1
+  数字人民币:
+    AI大模型/应用: 2
+  AI大模型/应用:
+    具身智能: 4
+    半导体/国产替代: 5
+    自动驾驶/L4: 3
+    6G通信: 3
+  半导体/国产替代:
+    AI大模型/应用: 5
+    机器人零部件: 3
+    6G通信: 4
+    自动驾驶/L4: 3
+    商业航天/火箭: 3
+  商业航天/火箭:
+    卫星互联网: 5
+    6G通信: 2
+  自动驾驶/L4:
+    AI大模型/应用: 3
+    半导体/国产替代: 3
+    低空经济: 2

@@ -1,0 +1,275 @@
+# ============================================================
+# 6G通信 — 事件日历数据
+# ============================================================
+industry: "6G通信"
+description: "6G将在2030年前后商用，2026年处于3GPP R20标准研究启动的早期布局窗口"
+tags: [通信, 技术, 标准]
+updated: "2026-06-05"
+
+core_stocks:
+  - code: "000063"
+    name: "中兴通讯"
+    reason: "3GPP 6G提案贡献量前五，A股唯一6G主设备商，MWC+TSG双重催化"
+    sector: "主设备商"
+  - code: "688387"
+    name: "信科移动"
+    reason: "卫星+6G标准双主线，央企背景"
+    sector: "主设备商"
+  - code: "688283"
+    name: "坤恒顺维"
+    reason: "6G信道仿真仪稀缺标的，国内垄断，标准先行受益"
+    sector: "测试仪器"
+  - code: "600562"
+    name: "国睿科技"
+    reason: "太赫兹雷达，军工电子向6G映射"
+    sector: "太赫兹/RIS"
+  - code: "002446"
+    name: "盛路通信"
+    reason: "天线/射频产品，高频化升级受益"
+    sector: "射频/天线"
+
+events:
+
+  # ── 6月 ──
+  - date: "2026-06-08"
+    date_precision: day
+    confirmed: true
+    name: "3GPP TSG#112全会"
+    importance: 5
+    type: standard
+    description: "R20 Stage2达80%、R21时间表明确"
+    impact: "全年最重要6G事件——R21时间表若提前→6G商业化预期升温→主设备商直接受益"
+    suggested_action:
+      stocks: ["000063", "688387", "688283"]
+      action: "加仓"
+      reason: "标准催化确定性最高的事件"
+    linked_industries: []
+
+  - date: "2026-06-23"
+    date_precision: day
+    confirmed: true
+    name: "GTI峰会上海（移动AI赋能6G未来）"
+    importance: 3
+    type: exhibition
+    description: "移动AI与6G融合专题"
+    impact: "6G主题短期脉冲"
+    suggested_action:
+      stocks: ["000063"]
+      action: "持有"
+      reason: "MWC前预热，非独立催化"
+
+  - date: "2026-06-24"
+    date_precision: day
+    confirmed: true
+    name: "MWC上海（首次设6G专区+卫星专区）"
+    importance: 5
+    type: exhibition
+    description: "华为/中兴6G原型展示、千帆星座最新进展"
+    impact: "全年最直接6G主题催化剂，6G+卫星双线共振"
+    suggested_action:
+      stocks: ["000063", "688387", "688283", "002446"]
+      action: "加仓"
+      reason: "MWC前后2周是6G最强主题窗口"
+    linked_industries: ["卫星互联网"]
+
+  # ── 7月 ──
+  - date: "2026-07-08"
+    date_precision: day
+    confirmed: true
+    name: "中国互联网大会（北京，6G通信专题论坛）"
+    importance: 3
+    type: policy
+    description: "6G政策预期、算力网络"
+    impact: "6G主题短期催化"
+    suggested_action:
+      stocks: ["000063"]
+      action: "持有"
+
+  - date: "2026-07-15"
+    date_precision: day
+    confirmed: true
+    name: "西部智能光电博览会（成都，F6G光通信与6G论坛）"
+    importance: 3
+    type: exhibition
+    description: "光通信+6G专题"
+    suggested_action:
+      stocks: ["000063"]
+      action: "观望"
+    linked_industries: []
+
+  - date: "2026-07-16"
+    date_precision: day
+    confirmed: true
+    name: "西部微波射频技术研讨会（6G+AI测试）"
+    importance: 4
+    type: exhibition
+    description: "太赫兹/6G测试专题"
+    impact: "太赫兹概念事件驱动"
+    suggested_action:
+      stocks: ["600562", "688283"]
+      action: "波段"
+      reason: "太赫兹概念脉冲行情"
+
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "工信部6G相关政策/白皮书可能发布"
+    importance: 4
+    type: policy
+    description: "频谱政策、产业促进政策"
+    impact: "政策催化，影响全产业链预期"
+    suggested_action:
+      stocks: ["000063", "688387"]
+      action: "加仓"
+      reason: "政策信号确认行业投入力度"
+
+  # ── 8月 ──
+  - date: "2026-08"
+    date_precision: month
+    confirmed: false
+    name: "华为/中兴2026半年报（6G研发投入数据）"
+    importance: 4
+    type: earnings
+    description: "6G研发投入同比变化"
+    impact: "研发投入若超预期→板块催化"
+    suggested_action:
+      stocks: ["000063"]
+      action: "持有"
+      reason: "半年报验证期，持有等待数据"
+
+  - date: "2026-08"
+    date_precision: month
+    confirmed: false
+    name: "Pre6G试验网（南京）阶段成果更新"
+    importance: 3
+    type: technology
+    description: "RIS/太赫兹/通感一体化概念验证"
+    impact: "技术路线验证，影响概念股"
+    suggested_action:
+      stocks: []
+      action: "观望"
+      reason: "技术验证，短线博弈"
+
+  - date: "2026-08"
+    date_precision: month
+    confirmed: false
+    name: "WRC-27各区域频谱立场文件预发布"
+    importance: 3
+    type: policy
+    description: "各国6G频谱立场"
+    suggested_action:
+      stocks: ["000063"]
+      action: "观望"
+      reason: "提前布局频谱主题"
+
+  # ── 9月 ──
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "3GPP TSG#113全会（R20 Stage2正式完成）"
+    importance: 5
+    type: standard
+    description: "6G系统架构初步确定"
+    impact: "6G主题最强催化，系统架构确定"
+    suggested_action:
+      stocks: ["000063", "688387"]
+      action: "加仓"
+      reason: "6G架构确定→设备商受益确定性提升"
+
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "IMT-2030（6G）推进组年度成果发布"
+    importance: 5
+    type: standard
+    description: "中国6G国家队年度最重磅发布——关键技术验证/原型测试/频谱研究全景"
+    impact: "中国6G全景成果展示"
+    suggested_action:
+      stocks: ["000063", "688387", "688283"]
+      action: "加仓"
+      reason: "国家队年度发布，行情确定性高"
+
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "PT Expo中国国际信息通信展览会"
+    importance: 4
+    type: exhibition
+    description: "华为/中兴6G原型展示、天线/射频/光模块全产业链"
+    impact: "MWC之后又一个通信大展"
+    suggested_action:
+      stocks: ["000063", "688387", "002446", "688283"]
+      action: "持有"
+      reason: "同TSG#113+IMT-2030共振，催化密集"
+
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "十五五新基建细则可能出台（算力网/新一代通信网）"
+    importance: 4
+    type: policy
+    description: "6G作为新一代通信网核心"
+    impact: "产业预期实质性提升"
+    suggested_action:
+      stocks: ["000063", "688387"]
+      action: "加仓"
+      reason: "国家规划背书"
+
+  # ── 10月 ──
+  - date: "2026-10"
+    date_precision: month
+    confirmed: false
+    name: "WRC-27议程准备工作文件集中发布"
+    importance: 4
+    type: policy
+    description: "频谱分配预期升温"
+    impact: "频谱主题催化"
+    suggested_action:
+      stocks: ["000063"]
+      action: "持有"
+      reason: "WRC-27准备，频谱博弈主题"
+
+  # ── 12月 ──
+  - date: "2026-12-01"
+    date_precision: day
+    confirmed: false
+    name: "ITU-R SG5正式批准IMT-2030空口性能指标报告"
+    importance: 5
+    type: standard
+    description: "6G从'愿景'进入'工程指标'阶段"
+    impact: "年底最大6G催化"
+    suggested_action:
+      stocks: ["000063", "688387", "688283"]
+      action: "加仓"
+      reason: "跨年布局，ITU批准+中央会议双催化"
+
+  - date: "2026-12-15"
+    date_precision: day
+    confirmed: false
+    name: "中央经济工作会议"
+    importance: 5
+    type: policy
+    description: "6G/新基建政策定调"
+    impact: "全市场关注，若提及6G→最强催化剂"
+    suggested_action:
+      stocks: ["000063", "688387"]
+      action: "埋伏"
+      reason: "政策预期催化，提前1-2周布局"
+    linked_industries: ["__all__"]
+
+monitors:
+  - indicator: "3GPP R21时间表推迟（2027→2028）"
+    risk_level: high
+    action: "减仓通信板块"
+  - indicator: "千帆星座发射连续失败"
+    risk_level: high
+    action: "减仓卫星+通信板块"
+  - indicator: "太赫兹技术路线在3GPP中被边缘化"
+    risk_level: medium
+    action: "国睿科技/四创电子逻辑证伪"
+  - indicator: "中美科技摩擦升级限制华为/中兴6G参与"
+    risk_level: high
+    action: "减仓通信板块"
+  - indicator: "中央经济工作会议不提6G/新基建"
+    risk_level: medium
+    action: "主题预期落空，减仓"

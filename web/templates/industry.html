@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% block title %}- {{ ind.industry }}{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-folder-open me-2"></i>{{ ind.industry }}</h2>
+    <div class="subtitle">{{ ind.description }}</div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- 概述 -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">行业概览</div>
+            <div class="card-body">
+                {% if ind.tags %}
+                <div class="mb-2">
+                    {% for tag in ind.tags %}
+                    <span class="badge bg-secondary me-1">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="mb-1"><small class="text-muted">数据更新</small><br>{{ ind.updated }}</div>
+                <div class="mt-2">
+                    <small class="text-muted">事件总数</small><br>
+                    <span class="fs-5 fw-bold">{{ ind.events|length }}</span>
+                </div>
+                <div class="mt-2">
+                    <small class="text-muted">核心标的</small><br>
+                    <span class="fs-5 fw-bold">{{ ind.core_stocks|length }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心标的 -->
+        <div class="card">
+            <div class="card-header"><i class="fas fa-star me-1"></i> 核心标的</div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for s in ind.core_stocks %}
+                    {% set ps = portfolio_map.get(s.code, {}) %}
+                    <div class="list-group-item">
+                        <div class="fw-bold">{{ s.code }} · {{ s.name }}
+                            {% if ps.get('market') %}
+                            <span class="badge bg-info text-dark" style="font-size:0.6rem;">{{ ps.market }}</span>
+                            {% endif %}
+                            {% if ps.get('estimated_pe') and ps.estimated_pe != '-' %}
+                            <span class="badge bg-light text-dark" style="font-size:0.6rem;">PE {{ ps.estimated_pe }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted" style="font-size:0.8rem;">{{ s.sector }}</div>
+                        <div style="font-size:0.8rem;">{{ s.reason[:60] }}{% if s.reason|length > 60 %}...{% endif %}</div>
+                        {% if ps.get('key_dates') and ps.key_dates %}
+                        <div class="mt-1">
+                            {% for kd in ps.key_dates %}
+                            <span class="badge bg-warning text-dark me-1" style="font-size:0.6rem;">{{ kd }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 关联行业 -->
+        {% if related %}
+        <div class="card">
+            <div class="card-header"><i class="fas fa-link me-1"></i> 关联行业</div>
+            <div class="card-body p-2">
+                {% for r in related %}
+                <div class="d-flex justify-content-between align-items-center mb-2 px-2">
+                    <a href="/industry/{{ r.code }}" class="text-decoration-none">{{ r.name }}</a>
+                    <span>
+                        {% for i in range(r.strength) %}
+                        <span style="color:#0d6efd;">●</span>
+                        {% endfor %}
+                        {% for i in range(5 - r.strength) %}
+                        <span style="color:#dee2e6;">●</span>
+                        {% endfor %}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 事件列表 -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="fas fa-calendar me-1"></i> 2026年事件日历</span>
+                <span>
+                    <span class="badge bg-danger">★★★★★ {{ ind.events|selectattr('importance', '>=', 5)|list|length }}</span>
+                    <span class="badge bg-warning text-dark">★★★★ {{ ind.events|selectattr('importance', '==', 4)|list|length }}</span>
+                    <button class="btn btn-sm btn-outline-primary ms-2" onclick="openAddEvent()">
+                        <i class="fas fa-plus"></i> 新增
+                    </button>
+                </span>
+            </div>
+            <div class="card-body p-0">
+                {% if ind.events %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:80px">日期</th>
+                                <th style="width:40px"></th>
+                                <th>事件</th>
+                                <th style="width:60px">类型</th>
+                                <th style="width:100px">操作建议</th>
+                                <th style="width:50px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ev in ind.events %}
+                            <tr class="{% if ev.importance >= 5 %}table-danger{% elif ev.importance >= 4 %}table-warning{% endif %}">
+                                <td class="align-middle text-nowrap">
+                                    {% if ev.date_precision == 'month' %}
+                                    {{ ev.date[:7] }}
+                                    {% else %}
+                                    {{ ev.date[5:10] }}
+                                    {% endif %}
+                                    {% if ev.confirmed %}
+                                    <span class="badge bg-success" style="font-size:0.55rem;">✓</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark" style="font-size:0.55rem;">~</span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle">
+                                    <span style="color:{{ get_importance_color(ev.importance) }};font-size:0.7rem;">
+                                        {{ get_importance_label(ev.importance) }}
+                                    </span>
+                                </td>
+                                <td class="align-middle">
+                                    <div class="fw-bold">{{ ev.name }}</div>
+                                    <div class="text-muted" style="font-size:0.8rem;">{{ ev.description }}</div>
+                                    {% if ev.impact %}
+                                    <div class="mt-1" style="font-size:0.8rem;">
+                                        <i class="fas fa-arrow-right text-primary me-1"></i>{{ ev.impact[:100] }}{% if ev.impact|length > 100 %}...{% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% if ev.linked_industries and ev.linked_industries|length > 0 %}
+                                    <div class="mt-1">
+                                        {% for li in ev.linked_industries %}
+                                        {% if li != '__all__' %}
+                                        <span class="badge bg-info text-dark" style="font-size:0.6rem;">{{ li }}</span>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle">
+                                    <span class="badge bg-info text-dark" style="font-size:0.7rem;">{{ ev.type }}</span>
+                                </td>
+                                <td class="align-middle">
+                                    {% set act = ev.suggested_action.action if ev.suggested_action else '' %}
+                                    {% if act %}
+                                    <span class="stock-tag" style="background:{{ get_action_color(act) }}; color:#fff;">
+                                        {{ act }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle text-nowrap">
+                                    <button class="event-edit-btn" onclick="openEditEvent({{ loop.index0 }})" title="编辑事件">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button class="event-edit-btn text-danger" onclick="deleteEvent({{ loop.index0 }})" title="删除事件">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">暂无事件数据</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 监控项 -->
+        {% if ind.monitors %}
+        <div class="card mt-3">
+            <div class="card-header text-danger">
+                <i class="fas fa-exclamation-triangle me-1"></i> 风险监控
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for m in ind.monitors %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span><strong>{{ m.indicator }}</strong></span>
+                            <span class="badge bg-{{ 'danger' if m.risk_level == 'high' else 'warning' }}">
+                                {{ m.risk_level }}
+                            </span>
+                        </div>
+                        <div class="text-muted" style="font-size:0.8rem;">触发行动: {{ m.action }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{# ── 事件编辑弹窗 ── #}
+<div class="modal fade" id="eventEditModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalTitle">编辑事件</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="eventEditForm">
+                <div class="modal-body">
+                    <input type="hidden" name="idx" id="eventIdx">
+                    <div class="mb-3">
+                        <label class="form-label">事件名称</label>
+                        <input type="text" class="form-control" name="name" id="eventName" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-5">
+                            <label class="form-label">日期</label>
+                            <input type="text" class="form-control" name="date" id="eventDate" placeholder="2026-06 或 2026-06-15">
+                        </div>
+                        <div class="col-3">
+                            <label class="form-label">精度</label>
+                            <select class="form-select" name="date_precision" id="eventPrecision">
+                                <option value="month">月</option>
+                                <option value="day">日</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">重要性</label>
+                            <select class="form-select" name="importance" id="eventImportance">
+                                <option value="5">★★★★★ 板块级</option>
+                                <option value="4">★★★★ 龙头行情</option>
+                                <option value="3">★★★ 短期脉冲</option>
+                                <option value="2">★★ 局部影响</option>
+                                <option value="1">★ 噪声</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">类型</label>
+                            <select class="form-select" name="type" id="eventType">
+                                <option value="policy">政策</option>
+                                <option value="product">产品发布</option>
+                                <option value="regulation">监管</option>
+                                <option value="ipo">IPO</option>
+                                <option value="earnings">财报</option>
+                                <option value="exhibition">展会</option>
+                                <option value="technology">技术突破</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">确认状态</label>
+                            <select class="form-select" name="confirmed" id="eventConfirmed">
+                                <option value="true">已确认</option>
+                                <option value="false">预期</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">描述</label>
+                        <textarea class="form-control" name="description" id="eventDescription" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">影响分析 <small class="text-muted">(可选)</small></label>
+                        <textarea class="form-control" name="impact" id="eventImpact" rows="2"></textarea>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">操作建议</label>
+                            <select class="form-select" name="action" id="eventAction">
+                                <option value="">--</option>
+                                <option value="加仓">加仓</option>
+                                <option value="建仓">建仓</option>
+                                <option value="埋伏">埋伏</option>
+                                <option value="波段">波段</option>
+                                <option value="持有">持有</option>
+                                <option value="观望">观望</option>
+                                <option value="减仓">减仓</option>
+                                <option value="清仓">清仓</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteEventBtn" onclick="deleteCurrentEvent()">
+                        <i class="fas fa-trash"></i> 删除
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+var INDUSTRY_NAME = '{{ ind.industry }}';
+var _editIdx = -1;
+
+function openEditEvent(idx) {
+    _editIdx = idx;
+    document.getElementById('eventModalTitle').textContent = '编辑事件';
+    document.getElementById('eventIdx').value = idx;
+    document.getElementById('deleteEventBtn').style.display = '';
+    var ev = {{ ind.events | tojson }};
+    var e = ev[idx];
+    document.getElementById('eventName').value = e.name || '';
+    document.getElementById('eventDate').value = e.date || '2026-';
+    document.getElementById('eventPrecision').value = e.date_precision || 'month';
+    document.getElementById('eventImportance').value = e.importance || 3;
+    document.getElementById('eventType').value = e.type || 'other';
+    document.getElementById('eventConfirmed').value = e.confirmed ? 'true' : 'false';
+    document.getElementById('eventDescription').value = e.description || '';
+    document.getElementById('eventImpact').value = e.impact || '';
+    document.getElementById('eventAction').value = (e.suggested_action && e.suggested_action.action) || '';
+    new bootstrap.Modal(document.getElementById('eventEditModal')).show();
+}
+
+function openAddEvent() {
+    _editIdx = -1;
+    document.getElementById('eventModalTitle').textContent = '新增事件';
+    document.getElementById('eventIdx').value = '';
+    document.getElementById('deleteEventBtn').style.display = 'none';
+    document.getElementById('eventName').value = '';
+    document.getElementById('eventDate').value = '2026-';
+    document.getElementById('eventPrecision').value = 'month';
+    document.getElementById('eventImportance').value = '3';
+    document.getElementById('eventType').value = 'other';
+    document.getElementById('eventConfirmed').value = 'false';
+    document.getElementById('eventDescription').value = '';
+    document.getElementById('eventImpact').value = '';
+    document.getElementById('eventAction').value = '';
+    new bootstrap.Modal(document.getElementById('eventEditModal')).show();
+}
+
+document.getElementById('eventEditForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = new FormData(this);
+    var modal = bootstrap.Modal.getInstance(document.getElementById('eventEditModal'));
+    if (modal) modal.hide();
+    var isNew = form.get('idx') === '';
+    var action_val = form.get('action');
+    var payload = {
+        industry: INDUSTRY_NAME,
+        name: form.get('name'),
+        date: form.get('date'),
+        date_precision: form.get('date_precision'),
+        importance: parseInt(form.get('importance')) || 3,
+        type: form.get('type'),
+        confirmed: form.get('confirmed') === 'true',
+        description: form.get('description'),
+        impact: form.get('impact'),
+        suggested_action: action_val ? {action: action_val, stocks: []} : undefined,
+    };
+    if (isNew) {
+        doActionAndReload('/api/events/add', payload, '✓ 事件已添加');
+    } else {
+        var idx = parseInt(form.get('idx'));
+        doActionAndReload('/api/events/update', {
+            industry: INDUSTRY_NAME,
+            idx: idx,
+            fields: payload
+        }, '✓ 事件已更新');
+    }
+});
+
+async function deleteEvent(idx) {
+    if (await showConfirm('确定删除此事件？')) {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('eventEditModal'));
+        if (modal) modal.hide();
+        doActionAndReload('/api/events/delete', {
+            industry: INDUSTRY_NAME,
+            idx: idx
+        }, '✓ 事件已删除');
+    }
+}
+
+function deleteCurrentEvent() {
+    if (_editIdx >= 0) deleteEvent(_editIdx);
+}
+</script>
+{% endblock %}

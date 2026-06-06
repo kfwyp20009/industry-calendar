@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block title %}- 联动地图{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-project-diagram me-2"></i>跨行业联动地图</h2>
+    <div class="subtitle">行业关联矩阵 · 共振事件 · 超额收益来源</div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- 关联矩阵 -->
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i> 行业关联矩阵
+                <small class="text-muted ms-2">● 越强 = 联动越紧密</small>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0" style="min-width:600px; font-size:0.8rem;">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width:100px;">行业</th>
+                                {% for name in ind_names %}
+                                <th class="text-center" style="
+                                    width:calc((100% - 100px) / {{ ind_names|length }});
+                                    font-size:0.65rem;
+                                    text-align:center;
+                                " title="{{ name }}">
+                                    {% set short = name[:4] if name|length > 4 else name %}
+                                    {{ short }}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row_name in ind_names %}
+                            <tr>
+                                <td class="fw-semibold">{{ row_name[:8] }}{% if row_name|length > 8 %}..{% endif %}</td>
+                                {% for col_name in ind_names %}
+                                {% set val = affinity.get(row_name, {}).get(col_name, 0) %}
+                                <td class="text-center" style="
+                                    background: {% if val >= 5 %}rgba(220,53,69,0.25)
+                                              {% elif val >= 4 %}rgba(253,126,20,0.2)
+                                              {% elif val >= 3 %}rgba(255,193,7,0.15)
+                                              {% elif val >= 2 %}rgba(13,110,253,0.08)
+                                              {% else %}transparent{% endif %};
+                                ">
+                                    {% if val > 0 %}
+                                    <span class="fw-bold" style="
+                                        color: {% if val >= 5 %}#dc3545{% elif val >= 4 %}#fd7e14{% elif val >= 3 %}#856404{% else %}#6c757d{% endif %};
+                                    ">{{ val }}</span>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图例说明 -->
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">关联强度说明</div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <span style="display:inline-block;width:20px;height:20px;background:rgba(220,53,69,0.25);border-radius:4px;"></span>
+                    <span class="ms-2"><strong>5 — 强关联</strong>：技术/供应链重叠，事件几乎必定共振</span>
+                </div>
+                <div class="mb-2">
+                    <span style="display:inline-block;width:20px;height:20px;background:rgba(253,126,20,0.2);border-radius:4px;"></span>
+                    <span class="ms-2"><strong>4 — 较强关联</strong>：主题情绪传导明显</span>
+                </div>
+                <div class="mb-2">
+                    <span style="display:inline-block;width:20px;height:20px;background:rgba(255,193,7,0.15);border-radius:4px;"></span>
+                    <span class="ms-2"><strong>3 — 中等关联</strong>：间接影响，资金外溢</span>
+                </div>
+                <div class="mb-2">
+                    <span style="display:inline-block;width:20px;height:20px;background:rgba(13,110,253,0.08);border-radius:4px;"></span>
+                    <span class="ms-2"><strong>2 — 弱关联</strong>：偶尔联动</span>
+                </div>
+                <div>
+                    <span style="display:inline-block;width:20px;height:20px;background:transparent;border-radius:4px;border:1px solid #dee2e6;"></span>
+                    <span class="ms-2"><strong>0/1 — 无关联</strong></span>
+                </div>
+                <hr>
+                <div class="fw-bold">核心联动链条</div>
+                <div class="mt-1" style="font-size:0.85rem;">
+                    <div>• 6G通信 ⟷ 卫星互联网 (5)</div>
+                    <div>• 具身智能 ⟷ 机器人零部件 (5)</div>
+                    <div>• AI大模型 ⟷ 半导体/国产替代 (5)</div>
+                    <div>• 商业航天 ⟷ 卫星互联网 (5)</div>
+                    <div>• AI大模型 ⟷ 具身智能 (4)</div>
+                    <div>• 半导体 ⟷ 6G通信 (4)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 共振事件 -->
+<div class="card">
+    <div class="card-header text-danger">
+        <i class="fas fa-bolt me-1"></i> 跨行业共振事件
+        <small class="text-muted ms-2">一次事件同时催化多个板块</small>
+    </div>
+    <div class="card-body p-0">
+        {% if cross_events %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:80px">日期</th>
+                        <th style="width:40px"></th>
+                        <th>事件</th>
+                        <th>联动行业</th>
+                        <th>受益标的</th>
+                        <th style="width:60px">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in cross_events %}
+                    <tr class="{% if ev.importance >= 5 %}table-danger{% endif %}">
+                        <td class="align-middle text-nowrap">
+                            {% if ev.date_precision == 'month' %}
+                            {{ ev.date[:7] }}
+                            {% else %}
+                            {{ ev.date[:10] }}
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            <span style="color:{{ get_importance_color(ev.importance) }};font-size:0.7rem;">
+                                {{ get_importance_label(ev.importance) }}
+                            </span>
+                        </td>
+                        <td class="align-middle">
+                            <strong>{{ ev.name }}</strong>
+                            <div class="text-muted" style="font-size:0.8rem;">{{ ev.description }}</div>
+                        </td>
+                        <td class="align-middle">
+                            {% for ind_name in ev.industries %}
+                            {% if ind_name != '__all__' %}
+                            <span class="badge bg-danger me-1">{{ ind_name }}</span>
+                            {% else %}
+                            <span class="badge bg-dark me-1">全行业</span>
+                            {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td class="align-middle" style="font-size:0.8rem;">
+                            {% if ev.stocks %}
+                            {{ ev.stocks|join(', ') }}
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            {% if ev.action %}
+                            <span class="stock-tag" style="background:{{ get_action_color(ev.action) }}; color:#fff;">
+                                {{ ev.action }}
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-muted">暂无共振事件数据</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

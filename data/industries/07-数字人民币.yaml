@@ -1,0 +1,186 @@
+# ============================================================
+# 数字人民币 — 事件日历数据
+# ============================================================
+industry: "数字人民币"
+description: "2.0改革建设高峰期，2026年看计息效果验证+跨境扩展+银行IT改造"
+tags: [金融, 政策, 跨境]
+updated: "2026-06-05"
+
+core_stocks:
+  - code: "300348"
+    name: "长亮科技"
+    reason: "银行核心系统龙头，覆盖7家运营机构"
+    sector: "银行IT"
+  - code: "300674"
+    name: "宇信科技"
+    reason: "数币2.0产品+跨境布局"
+    sector: "银行IT"
+  - code: "600570"
+    name: "恒生电子"
+    reason: "金融IT绝对龙头，大行核心系统"
+    sector: "银行IT"
+  - code: "002152"
+    name: "广电运通"
+    reason: "ATM/智慧柜员机，数币改造刚需"
+    sector: "硬件"
+  - code: "300468"
+    name: "四方精创"
+    reason: "mBridge深度参与者，跨境支付"
+    sector: "跨境"
+
+events:
+
+  # ── 6月 ──
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "SWIFT发布5月人民币国际支付排名"
+    importance: 3
+    type: other
+    description: "人民币国际化进度跟踪"
+    suggested_action:
+      stocks: ["300468"]
+      action: "观望"
+
+  - date: "2026-06-15"
+    date_precision: day
+    confirmed: false
+    name: "央行发布2026Q1支付体系运行数据（数币计息后首季）"
+    importance: 5
+    type: policy
+    description: "钱包数/交易额季度变化——验证数币2.0计息后的效果"
+    impact: "数币2.0最重要的验证节点——决定全年投资节奏"
+    suggested_action:
+      stocks: ["300348", "300674", "600570", "002152"]
+      action: "加仓"
+      reason: "若钱包增速超预期→银行IT加速→板块主升浪"
+    linked_industries: []
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "浦发银行正式获批运营机构（预期）"
+    importance: 5
+    type: regulation
+    description: "新增运营机构验证"
+    impact: "验证'更多银行加入'逻辑→银行IT市场空间扩张"
+    suggested_action:
+      stocks: ["300348", "300674", "600570"]
+      action: "加仓"
+      reason: "银行IT改造需求增加"
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "银行IT系统改造招标公告持续发布"
+    importance: 4
+    type: other
+    description: "招标金额与中标方"
+    impact: "订单验证"
+    suggested_action:
+      stocks: ["300348", "300674"]
+      action: "持有"
+
+  # ── 7月 ──
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "央行发布2026H1数币运营半年报"
+    importance: 5
+    type: policy
+    description: "计息半年效果验证"
+    impact: "上半年数据总结→决定H2投资力度"
+    suggested_action:
+      stocks: ["300348", "300674"]
+      action: "持有"
+      reason: "半年报验证，持有等待数据"
+
+  # ── 8月 ──
+  - date: "2026-08"
+    date_precision: month
+    confirmed: false
+    name: "美联储主账户准入规则发布（90天窗口到期）"
+    importance: 5
+    type: regulation
+    description: "非银行稳定币能否接入美联储系统"
+    impact: "影响全球稳定币格局→数字人民币跨境长期利好"
+    suggested_action:
+      stocks: ["300468"]
+      action: "观望"
+      reason: "政策影响偏长期，短期不急于操作"
+
+  # ── 9月 ──
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "2026年金砖峰会——CBDC互联方案提案"
+    importance: 4
+    type: policy
+    description: "BRICS Pay进展、mBridge扩容"
+    impact: "跨境CBDC国际影响力提升"
+    suggested_action:
+      stocks: ["300468", "300348"]
+      action: "埋伏"
+      reason: "金砖峰会前布局跨境支付标的"
+
+  # ── 10月 ──
+  - date: "2026-10"
+    date_precision: month
+    confirmed: false
+    name: "央行发布2026Q3支付体系运行数据"
+    importance: 4
+    type: policy
+    description: "数币钱包数是否达到3亿+"
+    impact: "季度数据验证增长趋势"
+    suggested_action:
+      stocks: ["300348", "300674"]
+      action: "持有"
+
+  # ── 11月 ──
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "mBridge从MVP向生产级过渡公告"
+    importance: 5
+    type: technology
+    description: "mBridge商业化运营时间表"
+    impact: "跨境支付逻辑最强催化剂"
+    suggested_action:
+      stocks: ["300468", "002152"]
+      action: "加仓"
+      reason: "mBridge商业化→四方精创直接受益"
+
+  # ── 12月 ──
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "中央经济工作会议——数字经济/数币表述"
+    importance: 5
+    type: policy
+    description: "定调2027年政策方向"
+    impact: "决定2027年数币板块政策力度"
+    suggested_action:
+      stocks: ["300348", "300674", "600570"]
+      action: "埋伏"
+      reason: "跨年布局，政策预期"
+    linked_industries: ["__all__"]
+
+monitors:
+  - indicator: "央行明确宣布2.0改革推迟或取消"
+    risk_level: high
+    action: "清仓数币板块"
+  - indicator: "主要运营机构暂停数币系统改造"
+    risk_level: high
+    action: "清仓银行IT板块"
+  - indicator: "2026H1数币订单显著低于预期（累计<10亿）"
+    risk_level: medium
+    action: "减仓银行IT"
+  - indicator: "数币钱包增长连续两月净增<500万"
+    risk_level: medium
+    action: "减仓数币板块"
+  - indicator: "美国通过针对中国数字货币的制裁法案"
+    risk_level: medium
+    action: "减仓跨境支付标的"
+  - indicator: "重大安全事故（钱包被盗、隐私泄露）"
+    risk_level: high
+    action: "清仓数币板块"

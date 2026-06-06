@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>行业投资日历 {% block title %}{% endblock %}</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #f5f6fa;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-muted: #6c757d;
+            --border-color: rgba(0,0,0,0.06);
+            --sidebar-gradient: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            --sidebar-text: rgba(255,255,255,0.7);
+            --sidebar-text-hover: #fff;
+            --sidebar-hover-bg: rgba(255,255,255,0.08);
+            --shadow: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.1);
+            --table-stripe: rgba(0,0,0,0.02);
+            --ns-importance-height: 0;
+        }
+        [data-theme="dark"] {
+            --bg-body: #0d0d1a;
+            --bg-card: #1a1a2e;
+            --text-primary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255,255,255,0.06);
+            --sidebar-gradient: linear-gradient(180deg, #080812 0%, #0d0d1a 100%);
+            --sidebar-text: rgba(255,255,255,0.5);
+            --sidebar-text-hover: #e2e8f0;
+            --sidebar-hover-bg: rgba(255,255,255,0.06);
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.4);
+            --table-stripe: rgba(255,255,255,0.02);
+        }
+        body {
+            font-size: 14px;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.3s, color 0.3s;
+        }
+        .wrapper { display: flex; }
+        .sidebar {
+            width: 220px;
+            min-height: 100vh;
+            background: var(--sidebar-gradient);
+            color: #fff;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            padding-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s;
+        }
+        .sidebar .brand {
+            padding: 1rem 1.25rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 0.5rem;
+            flex-shrink: 0;
+        }
+        .sidebar .brand small {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-top: 0.2rem;
+        }
+        .sidebar .nav-item {
+            padding: 0.5rem 1.25rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+        .sidebar .nav-item:hover, .sidebar .nav-item.active {
+            color: var(--sidebar-text-hover);
+            background: var(--sidebar-hover-bg);
+            border-left-color: #0d6efd;
+        }
+        .sidebar .nav-item i { width: 1.25rem; text-align: center; }
+        .sidebar .nav-section {
+            padding: 0.75rem 1.25rem 0.25rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .sidebar .nav-section .toggle-icon {
+            cursor: pointer;
+            font-size: 0.6rem;
+            opacity: 0.6;
+            transition: transform 0.2s;
+        }
+        .sidebar .nav-section .toggle-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+        .sidebar .nav-scroll {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.1) transparent;
+        }
+        .sidebar .nav-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar .nav-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .sidebar .sidebar-footer {
+            padding: 0.75rem 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar .theme-toggle {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6);
+            border-radius: 6px;
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .sidebar .theme-toggle:hover {
+            color: #fff;
+            border-color: rgba(255,255,255,0.4);
+        }
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            padding: 1.5rem 2rem;
+            min-height: 100vh;
+        }
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+        .page-header h2 {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .page-header .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .card {
+            background: var(--bg-card);
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.25rem;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            padding: 0.9rem 1.25rem;
+            color: var(--text-primary);
+        }
+        .badge-star { font-size: 0.75rem; letter-spacing: 1px; }
+        .event-item { padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); }
+        .event-item:last-child { border-bottom: none; }
+        .event-date { font-size: 0.8rem; color: var(--text-muted); min-width: 5rem; }
+        .event-name { font-weight: 600; color: var(--text-primary); }
+        .now-indicator {
+            background: #0d6efd;
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            margin-left: 0.4rem;
+        }
+        .month-tab {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            margin: 0.15rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .month-tab:hover {
+            background: var(--table-stripe);
+            color: var(--text-primary);
+        }
+        .month-tab.current {
+            background: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+        }
+        .month-tab .count { font-size: 0.7rem; opacity: 0.7; }
+        .stock-tag {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 0.1rem;
+        }
+        .heat-bar { height: 6px; border-radius: 3px; background: var(--border-color); overflow: hidden; }
+        .heat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-bar .form-control, .filter-bar .form-select {
+            font-size: 0.85rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        /* Toast */
+        #toastContainer {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .my-toast {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 10px;
+            padding: 0.75rem 1.25rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            min-width: 280px;
+            max-width: 420px;
+            animation: slideInRight 0.3s ease;
+            font-size: 0.9rem;
+            border-left: 4px solid #0d6efd;
+        }
+        .my-toast.success { border-left-color: #22c55e; }
+        .my-toast.error { border-left-color: #ef4444; }
+        .my-toast.warning { border-left-color: #f59e0b; }
+        .my-toast i { font-size: 1.1rem; }
+        .my-toast.success i { color: #22c55e; }
+        .my-toast.error i { color: #ef4444; }
+        .my-toast.warning i { color: #f59e0b; }
+        .my-toast.info i { color: #0d6efd; }
+        .my-toast .toast-close {
+            margin-left: auto;
+            cursor: pointer;
+            opacity: 0.5;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+        }
+        .my-toast .toast-close:hover { opacity: 1; }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .table { color: var(--text-primary); }
+        .table-light { background: var(--table-stripe); color: var(--text-primary); }
+        .table-hover tbody tr:hover { background: var(--table-stripe); }
+        .table-danger { background: rgba(220,53,69,0.08) !important; }
+        .table-warning { background: rgba(255,193,7,0.08) !important; }
+        .text-muted { color: var(--text-muted) !important; }
+        .list-group-item {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        .list-group-flush .list-group-item { border-color: var(--border-color); }
+        .btn-outline-secondary {
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        .btn-outline-secondary:hover {
+            background: var(--table-stripe);
+            color: var(--text-primary);
+        }
+        .modal-content {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .modal-header { border-color: var(--border-color); }
+        .modal-footer { border-color: var(--border-color); }
+        .form-control, .form-select {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        .form-control:focus, .form-select:focus {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .form-check-input { background: var(--bg-card); }
+        .border { border-color: var(--border-color) !important; }
+
+        footer {
+            margin-top: 2rem;
+            padding: 1rem 0;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .collapse-indent { padding-left: 1rem; }
+
+        .badge { font-weight: 500; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 1rem; }
+        }
+
+        /* Event edit inline button */
+        /* Sidebar unfollow button */
+        .nav-item-wrapper {
+            position: relative;
+            display: block;
+        }
+        .nav-item-wrapper .nav-item {
+            padding-right: 2rem !important;
+            display: block;
+        }
+        .sidebar-unfollow {
+            position: absolute;
+            right: 0.4rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: rgba(255,255,255,0.3);
+            font-size: 1rem;
+            line-height: 1;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 2;
+            background: none;
+            border: none;
+        }
+        .nav-item-wrapper:hover .sidebar-unfollow {
+            opacity: 1;
+        }
+        .sidebar-unfollow:hover {
+            color: #ef4444 !important;
+            background: rgba(239,68,68,0.15);
+        }
+        .toggle-follow-btn { border: none; background: none; font-size:0.85rem; }
+        .toggle-follow-btn:hover { text-decoration: underline; }
+
+        .event-edit-btn {
+            opacity: 0;
+            transition: opacity 0.2s;
+            cursor: pointer;
+            color: var(--text-muted);
+            border: none;
+            background: none;
+            padding: 0 0.25rem;
+        }
+        tr:hover .event-edit-btn { opacity: 1; }
+        .event-edit-btn:hover { color: #0d6efd; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="brand">
+            📅 行业投资日历
+            <small>2026 · 监控中</small>
+        </div>
+        <div class="nav-scroll">
+            <div class="nav-section">概览</div>
+            <a class="nav-item {% if active_page == 'dashboard' %}active{% endif %}" href="/">
+                <i class="fas fa-gauge-high"></i> 仪表盘
+            </a>
+            <a class="nav-item {% if active_page == 'calendar' %}active{% endif %}" href="/calendar">
+                <i class="fas fa-calendar-days"></i> 事件日历
+            </a>
+            <a class="nav-item {% if active_page == 'analysis' %}active{% endif %}" href="/analysis">
+                <i class="fas fa-brain"></i> 智能分析
+            </a>
+            <a class="nav-item {% if active_page == 'panorama' %}active{% endif %}" href="/panorama">
+                <i class="fas fa-earth-asia"></i> 全年全景
+            </a>
+            <div class="nav-section">
+                行业
+                <span style="display:flex;gap:0.3rem;align-items:center;">
+                    <span class="toggle-icon" id="industryToggle" onclick="toggleIndustries()" style="position:static;">▼</span>
+                    <span class="toggle-icon" onclick="openQuickAddModal()" title="新增行业" style="font-size:0.75rem;cursor:pointer;opacity:0.7;">＋</span>
+                </span>
+            </div>
+            <div id="industryList">
+                {% for code, ind in (industries or {}).items() %}
+                {% if is_followed(ind.industry) %}
+                <div class="nav-item-wrapper">
+                    <a class="nav-item {% if active_page == 'industry' and industry_code == code %}active{% endif %} collapse-indent"
+                       href="/industry/{{ code }}">
+                        <i class="fas fa-folder-open"></i> {{ ind.industry }}
+                    </a>
+                    <span class="sidebar-unfollow" onclick="toggleFollow('{{ ind.industry }}', event)" title="取消关注">×</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+                <div style="padding:0.3rem 1.25rem;font-size:0.75rem;">
+                    <a href="#" onclick="openManageModal(); return false;" style="color:var(--sidebar-text);opacity:0.6;text-decoration:none;">
+                        <i class="fas fa-sliders me-1"></i> 管理行业
+                    </a>
+                </div>
+            </div>
+            <div class="nav-section">组合</div>
+            <a class="nav-item {% if active_page == 'portfolio' %}active{% endif %}" href="/portfolio">
+                <i class="fas fa-chart-pie"></i> 核心标的池
+            </a>
+            <a class="nav-item {% if active_page == 'linkage' %}active{% endif %}" href="/linkage">
+                <i class="fas fa-project-diagram"></i> 联动地图
+            </a>
+            <div class="nav-section">系统</div>
+            <a class="nav-item {% if active_page == 'settings' %}active{% endif %}" href="/settings">
+                <i class="fas fa-cog"></i> 设置
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换主题">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+            <span style="font-size:0.65rem;opacity:0.4;">v1.0</span>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <div class="main-content">
+        {% block content %}{% endblock %}
+        <footer>
+            行业投资日历系统 v1.0 &mdash; 不构成投资建议
+        </footer>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<!-- Confirm Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size:2rem;"></i>
+                <p id="confirmMessage" class="mb-3" style="font-size:1rem;"></p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-secondary" onclick="confirmResolve(false)">取消</button>
+                    <button class="btn btn-danger" onclick="confirmResolve(true)">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manage Followed Industries Modal -->
+<div class="modal fade" id="manageFollowModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">管理关注的行业</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="manageFollowBody">
+                {% for code, ind in (industries or {}).items() %}
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <a href="/industry/{{ code }}" class="text-decoration-none fw-semibold" style="color:var(--text-primary);" data-bs-dismiss="modal">{{ ind.industry }}</a>
+                    <button class="toggle-follow-btn" data-name="{{ ind.industry }}"
+                            onclick="toggleManageFollow('{{ ind.industry }}', this)">
+                        {% if is_followed(ind.industry) %}
+                        <i class="fas fa-check-circle text-success"></i> 已关注
+                        {% else %}
+                        <i class="fas fa-plus-circle text-muted"></i> 关注
+                        {% endif %}
+                    </button>
+                </div>
+                {% endfor %}
+                <div class="text-center pt-3 pb-1">
+                    <button class="btn btn-sm btn-outline-primary" onclick="openQuickAddModalFromManage()">
+                        <i class="fas fa-plus me-1"></i> 新增行业
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Add Industry Modal -->
+<div class="modal fade" id="quickAddModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">快速新增行业</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="quickAddForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">行业名称</label>
+                        <input type="text" class="form-control" name="name" required placeholder="如: 量子计算">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">关键词 <small class="text-muted">(逗号分隔)</small></label>
+                        <textarea class="form-control" name="keywords" rows="2" required placeholder="量子, 量子比特, 超导"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">描述 <small class="text-muted">(可选)</small></label>
+                        <input type="text" class="form-control" name="description" placeholder="监控什么内容">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">创建并关注</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script></script>
+<script>
+// ── Toast 系统 ──
+function showToast(message, type) {
+    type = type || 'info';
+    const icons = {success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle'};
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'my-toast ' + type;
+    toast.innerHTML = '<i class="fas ' + (icons[type] || icons.info) + '"></i>'
+        + '<span>' + message + '</span>'
+        + '<button class="toast-close" onclick="this.parentElement.remove()">&times;</button>';
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// ── 黑暗模式 ──
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    document.getElementById('themeIcon').className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
+(function initTheme() {
+    const saved = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+})();
+
+// ── 侧边栏行业折叠 ──
+function toggleIndustries() {
+    const list = document.getElementById('industryList');
+    const toggle = document.getElementById('industryToggle');
+    const isHidden = list.style.display === 'none';
+    list.style.display = isHidden ? '' : 'none';
+    toggle.classList.toggle('collapsed', !isHidden);
+    localStorage.setItem('industriesCollapsed', isHidden ? 'no' : 'yes');
+}
+(function initIndustryCollapse() {
+    const collapsed = localStorage.getItem('industriesCollapsed');
+    if (collapsed === 'yes') {
+        document.getElementById('industryList').style.display = 'none';
+        document.getElementById('industryToggle').classList.add('collapsed');
+    }
+})();
+
+// ── 通用操作包装：显示 Toast 后刷新 ──
+function doAction(url, data, successMsg) {
+    return fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    }).then(r => r.json()).then(result => {
+        if (result.ok) {
+            if (successMsg) showToast(successMsg, 'success');
+            return result;
+        } else {
+            showToast(result.error || '操作失败', 'error');
+            return result;
+        }
+    }).catch(err => {
+        showToast('网络错误: ' + err.message, 'error');
+        return {ok: false};
+    });
+}
+
+function doActionAndReload(url, data, successMsg, delay) {
+    delay = delay || 800;
+    return doAction(url, data, successMsg).then(result => {
+        if (result.ok) setTimeout(() => location.reload(), delay);
+        return result;
+    });
+}
+
+// ── 确认弹窗 ──
+let confirmResolve = null;
+function showConfirm(message) {
+    return new Promise((resolve) => {
+        confirmResolve = resolve;
+        document.getElementById('confirmMessage').textContent = message;
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        modal.show();
+        document.getElementById('confirmModal').addEventListener('hidden.bs.modal', function() {
+            if (confirmResolve) { confirmResolve(false); confirmResolve = null; }
+        }, {once: true});
+    });
+}
+window.confirmResolve = function(value) {
+    const resolve = confirmResolve;
+    confirmResolve = null;
+    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+    if (modal) modal.hide();
+    if (resolve) resolve(value);
+};
+
+// ── 关注行业管理 ──
+function toggleFollow(name, event) {
+    if (event) event.preventDefault();
+    const wrapper = event.target.closest('.nav-item-wrapper');
+    fetch('/api/follow/toggle', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: name})
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            if (wrapper) {
+                wrapper.style.transition = 'all 0.3s';
+                wrapper.style.opacity = '0';
+                wrapper.style.transform = 'translateX(-20px)';
+                setTimeout(() => wrapper.remove(), 300);
+            }
+            showToast('已取消关注 "' + name + '"', 'info');
+        } else {
+            showToast('操作失败', 'error');
+        }
+    });
+}
+
+function toggleManageFollow(name, btn) {
+    fetch('/api/follow/toggle', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: name})
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            if (data.followed) {
+                btn.innerHTML = '<i class="fas fa-check-circle text-success"></i> 已关注';
+                btn.className = 'toggle-follow-btn';
+            } else {
+                btn.innerHTML = '<i class="fas fa-plus-circle text-muted"></i> 关注';
+                btn.className = 'toggle-follow-btn';
+            }
+        } else {
+            showToast('操作失败', 'error');
+        }
+    });
+}
+
+function openManageModal() {
+    new bootstrap.Modal(document.getElementById('manageFollowModal')).show();
+}
+
+function openQuickAddModal() {
+    new bootstrap.Modal(document.getElementById('quickAddModal')).show();
+}
+
+function openQuickAddModalFromManage() {
+    const m = bootstrap.Modal.getInstance(document.getElementById('manageFollowModal'));
+    if (m) m.hide();
+    setTimeout(() => openQuickAddModal(), 300);
+}
+
+document.getElementById('quickAddForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('quickAddModal'));
+    if (modal) modal.hide();
+    fetch('/api/follow/quick-add', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            name: form.get('name'),
+            keywords: form.get('keywords'),
+            description: form.get('description'),
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            showToast('✓ 已创建并关注 "' + data.name + '"', 'success');
+            setTimeout(() => location.reload(), 800);
+        } else {
+            showToast(data.error || '创建失败', 'error');
+        }
+    });
+});
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

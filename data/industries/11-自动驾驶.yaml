@@ -1,0 +1,194 @@
+# ============================================================
+# 自动驾驶/L4商业化 — 事件日历数据
+# ============================================================
+industry: "自动驾驶/L4"
+description: "2026年是L4商业化元年——FSD入华+L3法规+Robotaxi密集落地"
+tags: [汽车, AI, 法规]
+updated: "2026-06-05"
+
+core_stocks:
+  - code: "002920"
+    name: "德赛西威"
+    reason: "智驾域控制器龙头（市占~35%），英伟达Orin/Thor核心合作伙伴"
+    sector: "域控"
+  - code: "688326"
+    name: "经纬恒润"
+    reason: "域控+线控底盘一体化Tier1，适配Orin/征程双平台"
+    sector: "域控/底盘"
+  - code: "603596"
+    name: "伯特利"
+    reason: "线控制动龙头，L3/L4执行层核心供应商"
+    sector: "线控制动"
+  - code: "002703"
+    name: "浙江世宝"
+    reason: "线控转向稀缺A股标的"
+    sector: "线控转向"
+  - code: "601777"
+    name: "千里科技"
+    reason: "吉利智驾整合平台，Robotaxi运营轻资产模式"
+    sector: "Robotaxi运营"
+
+events:
+
+  # ── 2月 ⭐ FSD入华前奏 ⭐ ──
+  - date: "2026-02-12"
+    date_precision: day
+    confirmed: true
+    name: "工信部就L3/L4《自动驾驶系统安全要求》强制国标征求意见"
+    importance: 5
+    type: regulation
+    description: "中国首部L3/L4强制国标"
+    impact: "自动驾驶法规里程碑——为FSD入华+L4商业化扫清法规障碍"
+    suggested_action:
+      stocks: ["002920", "603596"]
+      action: "建仓"
+      reason: "法规落地→自动驾驶板块估值中枢上移"
+    linked_industries: []
+
+  # ── 5月 ⭐ FSD入华 ⭐ ──
+  - date: "2026-05-21"
+    date_precision: day
+    confirmed: true
+    name: "FSD Supervised（监督版）正式登陆中国大陆"
+    importance: 5
+    type: product
+    description: "特斯拉FSD入华，鲶鱼效应启动"
+    impact: "A股智驾板块掀涨停潮——FSD对中国智驾产业链的重估"
+    suggested_action:
+      stocks: ["002920", "603596", "002703"]
+      action: "加仓"
+      reason: "FSD入华→中国智驾加速→域控+执行层直接受益"
+    linked_industries: []
+
+  # ── 6月 ──
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉HW3.0 FSD V14 Lite推送（存量车辆OTA）"
+    importance: 3
+    type: product
+    description: "存量车辆OTA验证FSD性能"
+    suggested_action:
+      stocks: ["002920"]
+      action: "持有"
+
+  # ── Q3 ⭐ 全面商用推进 ⭐ ──
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉力争FSD全面商用批准（中国区）"
+    importance: 5
+    type: regulation
+    description: "FSD从监督版→无监督版的关键审批"
+    impact: "若获批→中国自动驾驶商业化里程碑"
+    suggested_action:
+      stocks: ["002920", "603596"]
+      action: "加仓"
+      reason: "FSD商用获批→Robotaxi逻辑全面激活"
+
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "华为乾崑ADS 5 / ADS 5 Pro 大规模量产交付"
+    importance: 4
+    type: product
+    description: "覆盖超20个品牌"
+    impact: "华为智驾规模化验证"
+    suggested_action:
+      stocks: ["002920"]
+      action: "持有"
+
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "小鹏GX Robotaxi带安全员试运营启动（高德平台）"
+    importance: 4
+    type: product
+    description: "中国首个前装量产Robotaxi上线"
+    impact: "验证Robotaxi商业化可行性"
+    suggested_action:
+      stocks: ["002920"]
+      action: "持有"
+
+  # ── H2 小马智行 ──
+  - date: "2026-08"
+    date_precision: month
+    confirmed: false
+    name: "小马智行第七代无人车批量投放（~500台）"
+    importance: 4
+    type: product
+    description: "硬件成本降至27万元/台"
+    impact: "Robotaxi经济性验证"
+    suggested_action:
+      stocks: []
+      action: "观望"
+      reason: "非上市公司，但影响板块情绪"
+
+  # ── Q4 ⭐ Tesla Cybercab ⭐ ──
+  - date: "2026-10"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉目标推送无监督FSD（Cybercab关键前提）"
+    importance: 5
+    type: product
+    description: "无监督FSD是Cybercab商业闭环的前提"
+    impact: "若成功→Robotaxi产业从概念进入现实"
+    suggested_action:
+      stocks: ["002920", "603596", "002703"]
+      action: "加仓"
+      reason: "无监督FSD→全球Robotaxi预期爆发→A股供应链受益"
+
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "Cybercab产能指数级爬坡"
+    importance: 4
+    type: product
+    description: "特斯拉称年底爆炸式增长"
+    suggested_action:
+      stocks: ["002920"]
+      action: "持有"
+
+  # ── 12月 ──
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "中央经济工作会议——自动驾驶/汽车产业表述"
+    importance: 4
+    type: policy
+    description: "汽车产业+人工智能政策定调"
+    impact: "2027年自动驾驶政策方向"
+    suggested_action:
+      stocks: ["002920", "603596"]
+      action: "持有"
+    linked_industries: ["__all__"]
+
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "比亚迪城市领航（城市NOA）渗透率数据"
+    importance: 3
+    type: other
+    description: "智驾平权效果验证"
+    impact: "验证中国智驾渗透率提升速度"
+    suggested_action:
+      stocks: ["603596"]
+      action: "持有"
+      reason: "渗透率提升→执行层（线控制动/转向）需求增长"
+
+monitors:
+  - indicator: "FSD入华后实际体验远低于预期（百公里接管>>华为ADS）"
+    risk_level: medium
+    action: "减仓板块（FSD催化消退）"
+  - indicator: "自动驾驶重大安全事故（伤亡）"
+    risk_level: high
+    action: "清仓板块"
+  - indicator: "美国《自动驾驶法案》立法失败"
+    risk_level: medium
+    action: "减仓（美国Robotaxi预期受挫）"
+  - indicator: "特斯拉高管持续流失影响Cybercab量产"
+    risk_level: medium
+    action: "减仓（供应链预期下调）"
+  - indicator: "智驾价格战侵蚀供应链利润"
+    risk_level: medium
+    action: "减仓执行层标的"

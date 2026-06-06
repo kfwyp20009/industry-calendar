@@ -1,0 +1,53 @@
+sources:
+- id: sina
+  name: 新浪财经
+  url: https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid=2509&k=&num=30&page=1
+  type: json
+  encoding: gbk
+  enabled: true
+  interval: 1800
+  items_path: result.data
+  fields:
+    title: title
+    summary: intro
+    time: ctime
+    url: url
+- id: eastmoney
+  name: 东方财富
+  url: https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&invt=2&fields=f2,f3,f12,f14&secids=1.000001,0.399001,0.399006&cb=jQuery
+  type: json
+  encoding: utf-8
+  enabled: true
+  interval: 1800
+  items_path: data.diff
+  fields:
+    title: f14
+    summary: f14
+    time: ''
+    url: ''
+- id: eastmoney_news
+  name: 东方财富快讯
+  url: https://push2ex.eastmoney.com/getStockNews?code=1.000001&pageindex=0&pagesize=30
+  type: json
+  encoding: utf-8
+  enabled: true
+  interval: 1800
+  items_path: data.list
+  fields:
+    title: title
+    summary: ''
+    time: showtime
+    url: url
+- id: cls
+  name: 财联社电报
+  url: https://www.cls.cn/api/sw?app=CailianpressWeb&os=web&sv=8.4.7
+  type: json
+  encoding: utf-8
+  enabled: true
+  interval: 1800
+  items_path: data.roll_data
+  fields:
+    title: title
+    summary: ''
+    time: ctime
+    url: shareurl

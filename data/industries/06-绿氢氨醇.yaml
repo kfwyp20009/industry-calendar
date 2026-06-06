@@ -1,0 +1,200 @@
+# ============================================================
+# 绿氢氨醇（航运脱碳） — 事件日历数据
+# ============================================================
+industry: "绿氢氨醇"
+description: "IMO碳税是2026年分水岭——10月MEPC 85若通过碳定价→绿甲醇需求确定性大增"
+tags: [能源, 航运, 政策]
+updated: "2026-06-05"
+
+core_stocks:
+  - code: "002202"
+    name: "金风科技"
+    reason: "绿甲醇第一标的，马士基+赫伯罗特长协锁定"
+    sector: "绿色燃料"
+  - code: "000035"
+    name: "中国天楹"
+    reason: "辽源20万吨绿甲醇→100万吨扩产"
+    sector: "绿色燃料"
+  - code: "601012"
+    name: "隆基绿能"
+    reason: "隆基氢能ALK电解槽龙头（市占22%）"
+    sector: "电解槽"
+  - code: "300274"
+    name: "阳光电源"
+    reason: "PEM+ALK双线，产能扩建至3GW"
+    sector: "电解槽"
+  - code: "600481"
+    name: "双良节能"
+    reason: "ALK成本领先，中标阿曼出口"
+    sector: "电解槽"
+  - code: "600150"
+    name: "中国船舶"
+    reason: "间接控制PERIC派瑞氢能（电解槽市占率29%第一）"
+    sector: "电解槽"
+
+events:
+
+  # ── 6月 ──
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "MEPC 83次会议（航运脱碳经济性措施讨论）"
+    importance: 4
+    type: regulation
+    description: "碳税/碳费机制前期讨论"
+    impact: "MEPC 85的前奏"
+    suggested_action:
+      stocks: ["002202", "000035"]
+      action: "埋伏"
+      reason: "MEPC系列会议前布局绿色燃料"
+    linked_industries: []
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "中国电解槽月度招标数据（MW、中标价）"
+    importance: 5
+    type: other
+    description: "月度MW、中标价格趋势"
+    impact: "电解槽板块估值风向标"
+    suggested_action:
+      stocks: ["601012", "300274", "600481"]
+      action: "持有"
+      reason: "招标量增速决定板块方向"
+
+  # ── 7月 ──
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "MAN ES氨发动机ME-LGIA实船测试进展"
+    importance: 5
+    type: technology
+    description: "氨燃料路线商业化时间表"
+    impact: "氨发动机进展→绿色燃料需求端催化剂"
+    suggested_action:
+      stocks: ["600150"]
+      action: "观望"
+
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "绿甲醇/绿氨项目FID（最终投资决定）公告"
+    importance: 5
+    type: other
+    description: "验证绿色燃料供给端扩产节奏"
+    impact: "供给端确定性提升"
+    suggested_action:
+      stocks: ["002202", "000035"]
+      action: "加仓"
+      reason: "FID公告→确认项目进入建设期"
+
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "隆基氢能/阳光电源2026H1电解槽出货量"
+    importance: 5
+    type: earnings
+    description: "出货MW、均价、毛利率"
+    impact: "出货量增速决定电解槽板块估值方向"
+    suggested_action:
+      stocks: ["601012", "300274"]
+      action: "持有"
+      reason: "若出货超预期→板块催化"
+
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "欧盟FuelEU Maritime首年执行数据"
+    importance: 4
+    type: regulation
+    description: "船公司合规成本、燃料选择变化"
+    impact: "验证欧盟航运脱碳政策执行力度"
+    suggested_action:
+      stocks: ["002202"]
+      action: "持有"
+
+  # ── 10月 ⭐ MEPC 85 ──
+  - date: "2026-10"
+    date_precision: month
+    confirmed: false
+    name: "IMO MEPC 85会议（全球航运碳定价机制决议）"
+    importance: 5
+    type: regulation
+    description: "全球航运碳成本从0到正的转折点"
+    impact: "全年航运脱碳最重要事件——若通过→绿甲醇需求确定性大增→绿色燃料板块爆发"
+    suggested_action:
+      stocks: ["002202", "000035", "601012"]
+      action: "加仓"
+      reason: "MEPC前1个月布局，若碳价通过→板块主升浪"
+    linked_industries: []
+
+  # ── 11月 ──
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "全球甲醇/氨燃料船舶订单年度统计"
+    importance: 5
+    type: other
+    description: "需求端增长曲线验证"
+    impact: "验证绿色燃料需求增速"
+    suggested_action:
+      stocks: ["002202"]
+      action: "持有"
+
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "COP31气候大会航运脱碳议题"
+    importance: 4
+    type: policy
+    description: "国际航运脱碳政治背书"
+    impact: "MEPC之外的另一个国际政策催化剂"
+    suggested_action:
+      stocks: ["002202"]
+      action: "持有"
+
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "中国氢能十五五专项规划预研/征求意见"
+    importance: 5
+    type: policy
+    description: "绿氢装机目标、补贴政策"
+    impact: "国内氢能政策定调"
+    suggested_action:
+      stocks: ["601012", "300274"]
+      action: "埋伏"
+      reason: "政策规划→国内绿氢需求预期提升"
+
+  # ── 12月 ──
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "中央经济工作会议——绿色能源表述"
+    importance: 4
+    type: policy
+    description: "双碳/绿色能源定调"
+    suggested_action:
+      stocks: ["002202", "601012"]
+      action: "持有"
+    linked_industries: ["__all__"]
+
+monitors:
+  - indicator: "IMO碳定价机制被大幅削弱或推迟"
+    risk_level: high
+    action: "清仓绿色燃料板块"
+  - indicator: "绿色甲醇长协订单出现重大违约（马士基取消金风订单）"
+    risk_level: high
+    action: "清仓金风科技"
+  - indicator: "氨燃料重大安全事故导致政策大幅收紧"
+    risk_level: high
+    action: "减仓氨燃料相关标的"
+  - indicator: "绿氢成本下降速度显著低于预期"
+    risk_level: medium
+    action: "减仓电解槽板块"
+  - indicator: "船公司大规模取消甲醇/氨船订单（转回LNG）"
+    risk_level: high
+    action: "清仓绿色燃料板块"
+  - indicator: "中国电解槽产能严重过剩导致价格战全行业亏损"
+    risk_level: medium
+    action: "减仓电解槽板块"

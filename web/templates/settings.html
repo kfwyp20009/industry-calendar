@@ -1,0 +1,721 @@
+{% extends "base.html" %}
+{% block title %}- 设置{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-cog me-2"></i>设置</h2>
+    <div class="subtitle">新闻源管理 · 事件检测审核</div>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="settingsTab">
+    <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sources">新闻源</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#detected">待审核事件
+            {% set pending = detected_events|selectattr('status', 'equalto', 'pending')|list %}
+            {% if pending %}<span class="badge bg-danger ms-1">{{ pending|length }}</span>{% endif %}
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#skills">自定义技能</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#keywords">关键词总览</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#llm">大模型配置</button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    {# ── 新闻源 ── #}
+    <div class="tab-pane fade show active" id="sources">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-rss me-1"></i> 新闻源列表</span>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addSourceModal">
+                    <i class="fas fa-plus me-1"></i>添加源
+                </button>
+            </div>
+            <div class="card-body p-0">
+                {% if sources %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>名称</th>
+                                <th>URL</th>
+                                <th>类型</th>
+                                <th>状态</th>
+                                <th style="width:120px">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for src in sources %}
+                            <tr>
+                                <td class="align-middle fw-semibold">{{ src.name }}</td>
+                                <td class="align-middle" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                    <small class="text-muted">{{ src.url[:60] }}{% if src.url|length > 60 %}...{% endif %}</small>
+                                </td>
+                                <td class="align-middle"><span class="badge bg-info text-dark">{{ src.type }}</span></td>
+                                <td class="align-middle">
+                                    {% if src.enabled %}
+                                    <span class="badge bg-success">启用</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">禁用</span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle">
+                                    <button class="btn btn-sm btn-outline-{{ 'warning' if src.enabled else 'success' }} toggle-source"
+                                            data-id="{{ src.id }}">
+                                        {{ '禁用' if src.enabled else '启用' }}
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger delete-source" data-id="{{ src.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">暂无新闻源，请添加</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ── 待审核事件 ── #}
+    <div class="tab-pane fade" id="detected">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-lightbulb me-1"></i> 自动检测事件</span>
+                <span class="text-muted" style="font-size:0.8rem;">系统从新闻中自动提取，审核后可采纳为日历事件</span>
+            </div>
+            <div class="card-body p-0">
+                {% set pending_events = detected_events|selectattr('status', 'equalto', 'pending')|list %}
+                {% set accepted = detected_events|selectattr('status', 'equalto', 'accepted')|list %}
+                {% set rejected = detected_events|selectattr('status', 'equalto', 'rejected')|list %}
+
+                {% set ns = namespace(has_pending=false) %}
+                {% for ev in detected_events %}
+                {% if ev.status == 'pending' %}{% set ns.has_pending = true %}{% endif %}
+                {% endfor %}
+                {% if ns.has_pending %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:80px">日期</th>
+                                <th>事件</th>
+                                <th style="width:100px">行业</th>
+                                <th style="width:70px">置信度</th>
+                                <th style="width:130px">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ev in detected_events %}
+                            {% if ev.status == 'pending' %}
+                            <tr>
+                                <td class="align-middle text-nowrap">{{ ev.date[5:] }}</td>
+                                <td class="align-middle">
+                                    <strong>{{ ev.name[:60] }}{% if ev.name|length > 60 %}...{% endif %}</strong>
+                                    <div class="text-muted" style="font-size:0.75rem;">
+                                        来源: <a href="{{ ev.source_url }}" target="_blank">{{ ev.source_title[:40] }}...</a>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    <span class="badge bg-secondary">{{ ev.industry }}</span>
+                                </td>
+                                <td class="align-middle">
+                                    {% set pct = (ev.confidence * 100)|int %}
+                                    <span class="badge bg-{{ 'success' if pct >= 80 else 'warning' if pct >= 60 else 'info' }}">
+                                        {{ pct }}%
+                                    </span>
+                                </td>
+                                <td class="align-middle">
+                                    <button class="btn btn-sm btn-outline-success accept-event" data-idx="{{ loop.index0 }}">采纳</button>
+                                    <button class="btn btn-sm btn-outline-secondary reject-event" data-idx="{{ loop.index0 }}">忽略</button>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    {% if accepted or rejected %}
+                    暂无待审核事件
+                    {% else %}
+                    暂无检测到的事件，刷新新闻后会自动检测
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if accepted %}
+                <div class="border-top">
+                    <div class="p-3 text-muted fw-semibold" style="font-size:0.85rem;">
+                        已采纳 ({{ accepted|length }})
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ── 技能管理（内置+自定义合并） ── #}
+    <div class="tab-pane fade" id="skills">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-brain me-1"></i> 所有技能
+                    <small class="text-muted ms-2" style="font-size:0.75rem;">共 {{ all_skills_list|length }} 个</small>
+                </span>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+                    <i class="fas fa-plus me-1"></i>新建技能
+                </button>
+            </div>
+            <div class="card-body p-0">
+                {% if all_skills_list %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>技能名称</th>
+                                <th>描述</th>
+                                <th>关键词</th>
+                                <th>行业状态</th>
+                                <th style="width:160px">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in all_skills_list %}
+                            {% set has_industry = s.name in (existing_industry_names or []) %}
+                            <tr>
+                                <td class="align-middle fw-semibold">{{ s.name }}
+                                    {% if s.builtin %}
+                                    <span class="badge bg-secondary ms-1" style="font-size:0.6rem;">内置</span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle text-muted" style="font-size:0.85rem;">{{ s.description }}</td>
+                                <td class="align-middle">
+                                    {% for kw in (s.keywords or [])[:4] %}
+                                    <span class="badge bg-light text-dark me-1" style="font-size:0.7rem;">{{ kw[:12] }}{% if kw|length > 12 %}...{% endif %}</span>
+                                    {% endfor %}
+                                    {% if s.keywords and s.keywords|length > 4 %}
+                                    <span class="badge bg-secondary" style="font-size:0.6rem;">+{{ s.keywords|length - 4 }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle">
+                                    {% if has_industry %}
+                                    <span class="badge bg-success" style="font-size:0.7rem;">已有日历</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark" style="font-size:0.7rem;">未创建</span>
+                                    {% endif %}
+                                </td>
+                                <td class="align-middle" style="white-space:nowrap;">
+                                    {% if not s.builtin %}
+                                    <button class="btn btn-sm btn-outline-primary edit-skill"
+                                            data-id="{{ s.id }}"
+                                            data-name="{{ s.name }}"
+                                            data-keywords="{{ s.keywords | join(',') }}"
+                                            data-description="{{ s.description }}"
+                                            title="编辑关键词">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    {% endif %}
+                                    {% if has_industry %}
+                                    <button class="btn btn-sm btn-outline-info gen-calendar"
+                                            data-name="{{ s.name }}"
+                                            title="用 AI 生成日历事件">
+                                        <i class="fas fa-magic"></i>
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-outline-success create-industry"
+                                            data-name="{{ s.name }}"
+                                            title="创建行业日历">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </button>
+                                    {% endif %}
+                                    {% if s.builtin %}
+                                    <button class="btn btn-sm btn-outline-danger hide-builtin" data-name="{{ s.name }}"
+                                            title="隐藏">
+                                        <i class="fas fa-eye-slash"></i>
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-outline-danger delete-skill" data-id="{{ s.id }}"
+                                            title="删除技能">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    暂无技能。<br>
+                    点击"新建技能"创建一个。
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# 已隐藏的内置技能 #}
+        {% if hidden_builtins %}
+        <div class="card">
+            <div class="card-header text-muted">
+                <i class="fas fa-eye-slash me-1"></i> 已隐藏的内置技能
+            </div>
+            <div class="card-body p-2">
+                <div class="row">
+                    {% for name in hidden_builtins %}
+                    <div class="col-md-3 col-6 mb-2">
+                        <div class="p-2 border rounded" style="font-size:0.85rem;">
+                            <div class="fw-semibold">{{ name }}</div>
+                            <button class="btn btn-sm btn-outline-success restore-builtin mt-1" data-name="{{ name }}">
+                                <i class="fas fa-eye"></i> 恢复
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# ── 关键词总览 ── #}
+    <div class="tab-pane fade" id="keywords">
+        <div class="card">
+            <div class="card-header">关键词总览（内置 + 自定义）</div>
+            <div class="card-body">
+                <p class="text-muted">用于新闻自动匹配分类。自定义技能的关键词会自动合并到此列表中。</p>
+                {% for name, kws in industry_keywords.items() %}
+                <div class="mb-3">
+                    <label class="fw-semibold mb-1">{{ name }}
+                        {% if name in builtin_skills %}
+                        <span class="badge bg-secondary" style="font-size:0.6rem;">内置</span>
+                        {% endif %}
+                    </label>
+                    <div>
+                        {% for kw in kws %}
+                        <span class="badge bg-light text-dark me-1 mb-1" style="font-size:0.8rem;">{{ kw }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {# ── 大模型配置 ── #}
+    <div class="tab-pane fade" id="llm">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-robot me-1"></i> 大模型厂商配置</span>
+                <span class="text-muted" style="font-size:0.8rem;">用于 AI 行业分析报告生成</span>
+            </div>
+            <div class="card-body">
+                {% set llm_config = llm_config or {} %}
+                {% set providers = llm_config.get('providers', {}) %}
+                <form id="llmConfigForm">
+                    {% for key, info in llm.BUILTIN_PROVIDERS.items() %}
+                    {% set cfg = providers.get(key, {}) %}
+                    <div class="mb-4 p-3 border rounded">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <strong class="fs-6">{{ info.name }}</strong>
+                                {% if info.docs_url %}
+                                <a href="{{ info.docs_url }}" target="_blank" class="ms-2" style="font-size:0.75rem;">获取 Key</a>
+                                {% endif %}
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="{{ key }}_enabled"
+                                       id="{{ key }}_enabled" {{ 'checked' if cfg.get('enabled') else '' }}>
+                                <label class="form-check-label" for="{{ key }}_enabled">启用</label>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:0.8rem;">API Key</label>
+                                <input type="password" class="form-control form-control-sm" name="{{ key }}_api_key"
+                                       value="{{ cfg.get('api_key', '') }}" placeholder="sk-...">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label" style="font-size:0.8rem;">接口地址</label>
+                                <input type="text" class="form-control form-control-sm" name="{{ key }}_base_url"
+                                       value="{{ cfg.get('base_url', info.base_url) }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label" style="font-size:0.8rem;">默认模型</label>
+                                <select class="form-select form-select-sm" name="{{ key }}_model">
+                                    {% for m in info.models %}
+                                    <option value="{{ m }}" {{ 'selected' if cfg.get('model', info.default_model) == m else '' }}>{{ m }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="d-flex align-items-center gap-3">
+                        <button type="submit" class="btn btn-primary">保存配置</button>
+                        <span id="llmSaveMsg" class="text-muted" style="font-size:0.85rem;"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ── 添加新闻源弹窗 ── #}
+<div class="modal fade" id="addSourceModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加新闻源</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addSourceForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">名称</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL</label>
+                        <input type="url" class="form-control" name="url" required
+                               placeholder="https://example.com/feed.json">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">类型</label>
+                        <select class="form-select" name="type">
+                            <option value="json">JSON API</option>
+                            <option value="rss">RSS</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">编码</label>
+                        <select class="form-select" name="encoding">
+                            <option value="utf-8">UTF-8</option>
+                            <option value="gbk">GBK</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="jsonFields" style="font-size:0.85rem;">
+                        <label class="form-label">JSON 字段映射 <small class="text-muted">(仅 JSON 类型)</small></label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="text" class="form-control" name="items_path" placeholder="数据路径 (如 result.data)">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control" name="title_field" placeholder="标题字段 (title)">
+                            </div>
+                            <div class="col-6 mt-2">
+                                <input type="text" class="form-control" name="summary_field" placeholder="摘要字段 (intro)">
+                            </div>
+                            <div class="col-6 mt-2">
+                                <input type="text" class="form-control" name="time_field" placeholder="时间字段 (ctime)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{# ── 新建技能弹窗 ── #}
+<div class="modal fade" id="addSkillModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新建技能</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addSkillForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">技能名称</label>
+                        <input type="text" class="form-control" name="name" required
+                               placeholder="如: 量子计算">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">描述</label>
+                        <input type="text" class="form-control" name="description"
+                               placeholder="监控什么内容">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">关键词 <small class="text-muted">(支持中英文逗号分隔)</small></label>
+                        <textarea class="form-control" name="keywords" rows="3" required
+                                  placeholder="量子, 量子比特, 离子阱, 超导"></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="auto_industry" id="autoIndustry" checked>
+                        <label class="form-check-label" for="autoIndustry">自动创建行业日历（空日历，可用 AI 生成事件）</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{# ── 编辑技能弹窗 ── #}
+<div class="modal fade" id="editSkillModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑技能</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editSkillForm">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="editSkillId">
+                    <div class="mb-3">
+                        <label class="form-label">技能名称</label>
+                        <input type="text" class="form-control" name="name" id="editSkillName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">描述</label>
+                        <input type="text" class="form-control" name="description" id="editSkillDescription">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">关键词 <small class="text-muted">(支持中英文逗号分隔)</small></label>
+                        <textarea class="form-control" name="keywords" id="editSkillKeywords" rows="3" required></textarea>
+                        <small class="text-muted" id="editKeywordCount"></small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('addSourceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    doActionAndReload('/api/sources/add', {
+        name: form.get('name'),
+        url: form.get('url'),
+        type: form.get('type'),
+        encoding: form.get('encoding'),
+        items_path: form.get('items_path'),
+        title_field: form.get('title_field') || 'title',
+        summary_field: form.get('summary_field') || 'intro',
+        time_field: form.get('time_field') || 'ctime',
+    }, '✓ 新闻源已添加');
+});
+
+document.querySelectorAll('.toggle-source').forEach(btn => {
+    btn.addEventListener('click', function() {
+        doActionAndReload('/api/sources/toggle', {id: this.dataset.id}, '✓ 状态已切换');
+    });
+});
+
+document.querySelectorAll('.delete-source').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        if (await showConfirm('确定删除此新闻源？')) {
+            doActionAndReload('/api/sources/delete', {id: this.dataset.id}, '✓ 已删除');
+        }
+    });
+});
+
+document.querySelectorAll('.accept-event').forEach(btn => {
+    btn.addEventListener('click', function() {
+        doActionAndReload('/api/events/accept', {idx: parseInt(this.dataset.idx)}, '✓ 事件已采纳');
+    });
+});
+
+document.querySelectorAll('.reject-event').forEach(btn => {
+    btn.addEventListener('click', function() {
+        doActionAndReload('/api/events/reject', {idx: parseInt(this.dataset.idx)}, '✓ 已忽略');
+    });
+});
+
+document.getElementById('addSkillForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addSkillModal'));
+    if (modal) modal.hide();
+    doActionAndReload('/api/skills/add', {
+        name: form.get('name'),
+        description: form.get('description'),
+        keywords: form.get('keywords'),
+        auto_industry: form.get('auto_industry') === 'on',
+    }, '✓ 技能已创建');
+});
+
+// 编辑技能
+document.querySelectorAll('.edit-skill').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('editSkillId').value = this.dataset.id;
+        document.getElementById('editSkillName').value = this.dataset.name;
+        document.getElementById('editSkillDescription').value = this.dataset.description;
+        document.getElementById('editSkillKeywords').value = this.dataset.keywords || '';
+        updateKeywordCount();
+        new bootstrap.Modal(document.getElementById('editSkillModal')).show();
+    });
+});
+
+function updateKeywordCount() {
+    const text = document.getElementById('editSkillKeywords').value;
+    const count = text.split(/[,，、;；]/).filter(k => k.trim()).length;
+    document.getElementById('editKeywordCount').textContent = count + ' 个关键词';
+}
+
+document.getElementById('editSkillKeywords').addEventListener('input', updateKeywordCount);
+
+document.getElementById('editSkillForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editSkillModal'));
+    if (modal) modal.hide();
+    doActionAndReload('/api/skills/update', {
+        id: form.get('id'),
+        name: form.get('name'),
+        description: form.get('description'),
+        keywords: form.get('keywords'),
+    }, '✓ 技能已更新');
+});
+
+document.querySelectorAll('.delete-skill').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        if (await showConfirm('确定删除此技能？（关联的行业日历也会被删除）')) {
+            doActionAndReload('/api/skills/delete', {id: this.dataset.id}, '✓ 技能已删除');
+        }
+    });
+});
+
+// 从技能创建行业日历
+document.querySelectorAll('.create-industry').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const name = this.dataset.name;
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        const result = await doAction('/api/skills/create-industry', {name: name});
+        if (result.ok) {
+            showToast('✓ 行业日历文件已创建', 'success');
+            if (await showConfirm('行业日历文件已创建！是否要用 AI 生成日历事件？')) {
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> AI生成中...';
+                const calResult = await fetch('/api/skills/generate-calendar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({industry: name})
+                }).then(r => r.json());
+                if (calResult.ok) {
+                    showToast('✓ AI 生成了 ' + (calResult.event_count || 0) + ' 个日历事件', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('AI 生成失败: ' + (calResult.error || '请检查 API 配置'), 'error');
+                    setTimeout(() => location.reload(), 1500);
+                }
+            } else {
+                setTimeout(() => location.reload(), 500);
+            }
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-calendar-plus"></i>';
+            setTimeout(() => location.reload(), 1000);
+        }
+    });
+});
+
+// 已有行业日历的技能 → 用 AI 生成事件
+document.querySelectorAll('.gen-calendar').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const name = this.dataset.name;
+        if (await showConfirm('确定用 AI 为"' + name + '"生成日历事件吗？（需要已配置大模型 API）')) {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+            fetch('/api/skills/generate-calendar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({industry: name})
+            }).then(r => r.json()).then(data => {
+                if (data.ok) {
+                    showToast('✓ AI 生成了 ' + (data.event_count || 0) + ' 个日历事件', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('AI 生成失败: ' + (data.error || '请检查 API 配置'), 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-magic"></i>';
+                }
+            });
+        }
+    });
+});
+
+document.querySelectorAll('.hide-builtin').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        if (await showConfirm('确定隐藏此内置技能？可在底部恢复。')) {
+            doActionAndReload('/api/skills/hide', {name: this.dataset.name}, '✓ 已隐藏');
+        }
+    });
+});
+
+document.querySelectorAll('.restore-builtin').forEach(btn => {
+    btn.addEventListener('click', function() {
+        doActionAndReload('/api/skills/restore', {name: this.dataset.name}, '✓ 已恢复');
+    });
+});
+
+document.getElementById('llmConfigForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    const payload = {providers: {}};
+    const prefixMap = {};
+    {% for key in llm.BUILTIN_PROVIDERS.keys() %}
+    prefixMap['{{ key }}'] = true;
+    {% endfor %}
+    for (const [name, val] of form.entries()) {
+        for (const prefix of Object.keys(prefixMap)) {
+            if (name === prefix + '_enabled') {
+                if (!payload.providers[prefix]) payload.providers[prefix] = {};
+                payload.providers[prefix]['enabled'] = true;
+            } else if (name === prefix + '_api_key') {
+                if (!payload.providers[prefix]) payload.providers[prefix] = {};
+                payload.providers[prefix]['api_key'] = val;
+            } else if (name === prefix + '_base_url') {
+                if (!payload.providers[prefix]) payload.providers[prefix] = {};
+                payload.providers[prefix]['base_url'] = val;
+            } else if (name === prefix + '_model') {
+                if (!payload.providers[prefix]) payload.providers[prefix] = {};
+                payload.providers[prefix]['model'] = val;
+            }
+        }
+    }
+    {% for key in llm.BUILTIN_PROVIDERS.keys() %}
+    if (!payload.providers['{{ key }}']) payload.providers['{{ key }}'] = {enabled: false};
+    {% endfor %}
+    fetch('/api/llm/config', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            showToast('✓ LLM 配置已保存', 'success');
+        } else {
+            showToast('保存失败: ' + (data.error || ''), 'error');
+        }
+    });
+});
+</script>
+{% endblock %}

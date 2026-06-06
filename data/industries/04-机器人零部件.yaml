@@ -1,0 +1,178 @@
+# ============================================================
+# 机器人零部件 — 事件日历数据
+# ============================================================
+industry: "机器人零部件"
+description: "特斯拉Optimus是最大β驱动，中国供应链确定性受益，2026看量产定点"
+tags: [制造, 量产, 供应链]
+updated: "2026-06-05"
+
+core_stocks:
+  - code: "688017"
+    name: "绿的谐波"
+    reason: "谐波减速器国产绝对第一，人形机器人关节核心"
+    sector: "减速器"
+  - code: "300124"
+    name: "汇川技术"
+    reason: "伺服国产第一（市占27.6%）"
+    sector: "伺服/电机"
+  - code: "603662"
+    name: "柯力传感"
+    reason: "六维力传感器，进入Tesla验证"
+    sector: "传感器"
+  - code: "603728"
+    name: "鸣志电器"
+    reason: "空心杯电机全球前三，Optimus灵巧手供应商"
+    sector: "电机"
+  - code: "300580"
+    name: "贝斯特"
+    reason: "C0级滚珠丝杠，送样Tesla/华为"
+    sector: "丝杠"
+  - code: "601100"
+    name: "恒立液压"
+    reason: "C3级行星滚柱丝杠唯一国产量产"
+    sector: "丝杠"
+
+events:
+
+  # ── 6月 ──
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉2026 AI Day（Optimus Gen3/量产进度）"
+    importance: 5
+    type: product
+    description: "Optimus Gen3发布/量产时间表/供应链变化"
+    impact: "全年机器人最大催化——关节配置/BOM变化/量产时间表直接决定零部件需求弹性"
+    suggested_action:
+      stocks: ["688017", "603662", "603728", "300580"]
+      action: "加仓"
+      reason: "AI Day是板块最强催化剂，提前1-2周布局"
+    linked_industries: ["具身智能"]
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "绿的谐波2025年报/2026Q1数据"
+    importance: 5
+    type: earnings
+    description: "人形机器人客户收入占比"
+    impact: "验证人形机器人减速器出货量"
+    suggested_action:
+      stocks: ["688017"]
+      action: "持有"
+      reason: "若人形收入占比提升→确认需求拐点"
+
+  # ── 7月 ──
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉Optimus Gen3正式发布（预期）"
+    importance: 5
+    type: product
+    description: "关节数、传感器配置、BOM变化"
+    impact: "全年机器人最大催化"
+    suggested_action:
+      stocks: ["688017", "603662", "603728"]
+      action: "加仓"
+      reason: "Gen3配置决定零部件需求弹性"
+
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "世界机器人大会（北京）"
+    importance: 4
+    type: exhibition
+    description: "人形新品发布、国产技术突破"
+    impact: "国产人形机器人进度验证"
+    suggested_action:
+      stocks: ["300124"]
+      action: "持有"
+    linked_industries: ["具身智能"]
+
+  # ── 9月 ──
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉Optimus供应商大会"
+    importance: 5
+    type: other
+    description: "中国供应商入围名单/定点份额"
+    impact: "板块性行情催化剂——定点公告直接决定标的弹性"
+    suggested_action:
+      stocks: ["688017", "603662", "601100", "603728"]
+      action: "加仓"
+      reason: "供应商大会是全年最重要的供应链催化事件"
+    linked_industries: ["具身智能"]
+
+  # ── 10月 ──
+  - date: "2026-10"
+    date_precision: month
+    confirmed: false
+    name: "三季报密集披露——绿的谐波/汇川/柯力"
+    importance: 4
+    type: earnings
+    description: "人形机器人收入占比变化"
+    impact: "业绩验证行业从概念→订单的转化"
+    suggested_action:
+      stocks: ["688017", "300124", "603662"]
+      action: "持有"
+      reason: "业绩验证期，等待数据"
+
+  # ── 11月 ──
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉Optimus工厂内部部署规模"
+    importance: 5
+    type: product
+    description: "Gen3后的实际部署台数/任务成功率"
+    impact: "Optimus从发布到落地的验证"
+    suggested_action:
+      stocks: ["688017", "603662"]
+      action: "持有"
+      reason: "部署数据决定2027年量产预期"
+
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "全球人形机器人年度交付统计"
+    importance: 5
+    type: other
+    description: "2026是否量产元年"
+    impact: "验证人形机器人产业化进程"
+    suggested_action:
+      stocks: ["688017", "300124"]
+      action: "持有"
+      reason: "千台级交付→产业链确认放量"
+
+  # ── 12月 ──
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "OpenAI/Google新一代VLA模型发布"
+    importance: 5
+    type: product
+    description: "VLA能力边界突破"
+    impact: "影响具身智能技术路线"
+    suggested_action:
+      stocks: []
+      action: "观望"
+      reason: "影响全球AI情绪，间接传导A股"
+    linked_industries: ["具身智能", "AI大模型/应用"]
+
+monitors:
+  - indicator: "Optimus Gen3量产大幅延迟（>12个月）"
+    risk_level: high
+    action: "清仓机器人板块"
+  - indicator: "绿的谐波Optimus送样被否"
+    risk_level: high
+    action: "减仓绿的谐波"
+  - indicator: "特斯拉Optimus供应链全面回流美国"
+    risk_level: high
+    action: "清仓机器人板块"
+  - indicator: "日本HD/Nabtesco大幅降价（价格战）"
+    risk_level: medium
+    action: "减仓谐波减速器标的"
+  - indicator: "人形机器人恶性安全事故"
+    risk_level: high
+    action: "清仓机器人板块"

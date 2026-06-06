@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}- 事件日历{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-calendar-days me-2"></i>事件日历</h2>
+    <div class="subtitle">2026年全年 · 按月份查看各行业事件</div>
+</div>
+
+<!-- 筛选栏 -->
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <div class="filter-bar">
+            <div class="input-group input-group-sm" style="max-width:280px;">
+                <span class="input-group-text bg-transparent"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="calSearch" placeholder="搜索事件..." oninput="filterCalendar()">
+            </div>
+            <select class="form-select form-select-sm" id="calIndustryFilter" onchange="filterCalendar()" style="max-width:160px;">
+                <option value="">所有行业</option>
+                {% for code, ind in industries.items() %}
+                <option value="{{ ind.industry }}">{{ ind.industry }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-select form-select-sm" id="calImportanceFilter" onchange="filterCalendar()" style="max-width:120px;">
+                <option value="">所有重要性</option>
+                <option value="5">★★★★★</option>
+                <option value="4">★★★★</option>
+                <option value="3">★★★</option>
+            </select>
+            <span class="text-muted" style="font-size:0.8rem;" id="calCount"></span>
+        </div>
+    </div>
+</div>
+
+<!-- 月份导航 -->
+<div class="mb-3 text-center">
+    {% for m in months %}
+    <a href="#month-{{ m.num }}" class="month-tab {% if m.is_current %}current{% endif %}">
+        {{ m.name }}
+        <span class="count">({{ m.total }})</span>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- 各月 -->
+{% for m in months %}
+<div id="month-{{ m.num }}" class="card mb-4 {% if m.is_current %}border-primary{% endif %}">
+    <div class="card-header d-flex justify-content-between align-items-center
+        {% if m.is_current %}bg-primary text-white{% endif %}">
+        <span>
+            {{ m.name }}
+            {% if m.is_current %}<span class="now-indicator">本月</span>{% endif %}
+        </span>
+        <span>
+            {% if m.top_count > 0 %}
+            <span class="badge bg-danger me-1">重磅 {{ m.top_count }}</span>
+            {% endif %}
+            <span class="badge bg-secondary">共 {{ m.total }} 事件</span>
+        </span>
+    </div>
+    <div class="card-body p-0">
+        {% if m.events %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:85px">日期</th>
+                        <th style="width:40px"></th>
+                        <th style="width:100px">行业</th>
+                        <th>事件</th>
+                        <th>类型</th>
+                        <th style="width:80px">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in m.events %}
+                    <tr class="{% if ev.importance >= 5 %}table-danger{% elif ev.importance >= 4 %}table-warning{% endif %} cal-event"
+                        data-name="{{ ev.name }}"
+                        data-industry="{{ ev.industry }}"
+                        data-importance="{{ ev.importance }}">
+                        <td class="align-middle text-nowrap">
+                            {% if ev.date_precision == 'month' %}
+                            {{ m.name }}中旬
+                            {% else %}
+                            {{ ev.date[5:10] }}
+                            {% endif %}
+                            {% if ev.confirmed %}
+                            <span class="badge bg-success" style="font-size:0.55rem;">✓</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark" style="font-size:0.55rem;">~</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            <span style="color:{{ get_importance_color(ev.importance) }};font-size:0.75rem;">
+                                {{ get_importance_label(ev.importance) }}
+                            </span>
+                        </td>
+                        <td class="align-middle">{{ ev.industry }}</td>
+                        <td class="align-middle">
+                            <strong>{{ ev.name }}</strong>
+                            <div class="text-muted" style="font-size:0.8rem;">{{ ev.description }}</div>
+                            {% if ev.impact %}
+                            <div class="text-muted" style="font-size:0.75rem;">
+                                <i class="fas fa-arrow-right me-1"></i> {{ ev.impact[:80] }}{% if ev.impact|length > 80 %}...{% endif %}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge bg-info text-dark">{{ ev.type }}</span>
+                        </td>
+                        <td class="align-middle">
+                            {% set act = ev.suggested_action.action if ev.suggested_action else '' %}
+                            {% if act %}
+                            <span class="stock-tag" style="background:{{ get_action_color(act) }}; color:#fff;">
+                                {{ act }}
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-muted">本月无事件</div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterCalendar() {
+    const search = (document.getElementById('calSearch').value || '').toLowerCase();
+    const industry = document.getElementById('calIndustryFilter').value;
+    const importance = document.getElementById('calImportanceFilter').value;
+    let totalVisible = 0;
+    document.querySelectorAll('.cal-event').forEach(el => {
+        const name = (el.dataset.name || '').toLowerCase();
+        const ind = (el.dataset.industry || '');
+        const imp = el.dataset.importance || '';
+        let show = true;
+        if (search && !name.includes(search)) show = false;
+        if (industry && ind !== industry) show = false;
+        if (importance && imp !== importance) show = false;
+        el.style.display = show ? '' : 'none';
+        if (show) totalVisible++;
+    });
+    document.querySelectorAll('[id^="month-"]').forEach(m => {
+        const visible = m.querySelectorAll('.cal-event[style*="display: none"]').length;
+        const total = m.querySelectorAll('.cal-event').length;
+        m.style.display = (visible === total && total > 0) ? 'none' : '';
+    });
+    document.getElementById('calCount').textContent = '显示 ' + totalVisible + ' 个事件';
+}
+</script>
+{% endblock %}

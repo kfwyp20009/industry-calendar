@@ -1,0 +1,167 @@
+# ============================================================
+# 具身智能 — 事件日历数据
+# ============================================================
+industry: "具身智能"
+description: "早期赛道（概念→产品），2026年看点：IPO催化+大模型进步+特斯拉AI Day"
+tags: [AI, 机器人, 技术]
+updated: "2026-06-05"
+
+core_stocks:
+  - code: "IPO"
+    name: "宇树科技"
+    reason: "人形机器人出货量全球第一，科创板IPO"
+    sector: "整机"
+  - code: "9880.HK"
+    name: "优必选"
+    reason: "Walker S系列，港股人形机器人第一股"
+    sector: "整机"
+  - code: "300647"
+    name: "拓斯达"
+    reason: "'小拓'工业人形，拟H股上市"
+    sector: "整机"
+  - code: "300024"
+    name: "机器人"
+    reason: "Reike系列轮式人形"
+    sector: "整机"
+  - code: "688306"
+    name: "均普智能"
+    reason: "'普智未来'品牌，200台进入生产"
+    sector: "整机"
+
+events:
+
+  # ── 6月 ──
+  - date: "2026-06-01"
+    date_precision: day
+    confirmed: true
+    name: "宇树科技科创板IPO上会审议"
+    importance: 5
+    type: ipo
+    description: "全球人形机器人出货第一企业的A股IPO"
+    impact: "若过会→人形机器人板块情绪催化"
+    suggested_action:
+      stocks: ["688017", "688322"]
+      action: "加仓"
+      reason: "宇树供应链标的联动（绿的谐波、奥比中光）"
+    linked_industries: ["机器人零部件"]
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "特斯拉2026 AI Day（Optimus+具身AI进展）"
+    importance: 5
+    type: product
+    description: "VLA模型、量产节奏、供应链"
+    impact: "具身智能+机器人板块同时催化"
+    suggested_action:
+      stocks: ["9880.HK"]
+      action: "持有"
+    linked_industries: ["机器人零部件"]
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "CVPR 2026具身智能/机器人感知论文"
+    importance: 3
+    type: technology
+    description: "前沿算法突破"
+    suggested_action:
+      stocks: []
+      action: "观望"
+
+  - date: "2026-06"
+    date_precision: month
+    confirmed: false
+    name: "Figure AI新一轮融资/估值动态"
+    importance: 4
+    type: other
+    description: "全球具身智能资本热度"
+    impact: "影响板块情绪"
+    suggested_action:
+      stocks: []
+      action: "观望"
+
+  # ── 7月 ──
+  - date: "2026-07"
+    date_precision: month
+    confirmed: false
+    name: "世界机器人大会（北京）"
+    importance: 5
+    type: exhibition
+    description: "国人形新品发布、VLA模型进展"
+    impact: "国产具身智能进展集中展示"
+    suggested_action:
+      stocks: ["300647", "300024", "9880.HK"]
+      action: "持有"
+      reason: "新品发布催化"
+    linked_industries: ["机器人零部件"]
+
+  # ── 9月 ──
+  - date: "2026-09"
+    date_precision: month
+    confirmed: false
+    name: "NVIDIA GTC 2026 Fall"
+    importance: 5
+    type: product
+    description: "Isaac平台更新、机器人基础模型"
+    impact: "全球具身智能技术风向标"
+    suggested_action:
+      stocks: []
+      action: "观望"
+      reason: "技术催化，非直接交易信号"
+    linked_industries: ["AI大模型/应用"]
+
+  # ── 11月 ──
+  - date: "2026-11"
+    date_precision: month
+    confirmed: false
+    name: "全球人形机器人年度交付统计（首个千台级？）"
+    importance: 5
+    type: other
+    description: "2026是否量产元年"
+    impact: "决定行业从概念到量产的时间线"
+    suggested_action:
+      stocks: ["9880.HK"]
+      action: "持有"
+
+  # ── 12月 ──
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "OpenAI/Google/DeepMind新一代VLA模型发布"
+    importance: 5
+    type: product
+    description: "VLA能力边界突破"
+    impact: "影响全球AI情绪，间接传导A股"
+    suggested_action:
+      stocks: []
+      action: "观望"
+    linked_industries: ["AI大模型/应用", "机器人零部件"]
+
+  - date: "2026-12"
+    date_precision: month
+    confirmed: false
+    name: "中国十五五具身智能/机器人专项规划"
+    importance: 5
+    type: policy
+    description: "国家支持方向与资金规模"
+    impact: "政策定调，长期利好"
+    suggested_action:
+      stocks: ["300647", "300024"]
+      action: "埋伏"
+      reason: "国家级规划背书"
+    linked_industries: ["机器人零部件"]
+
+monitors:
+  - indicator: "Optimus Gen3再次大幅延迟（>18个月）"
+    risk_level: high
+    action: "清仓具身+机器人板块"
+  - indicator: "人形机器人恶性安全事故导致暂停部署"
+    risk_level: high
+    action: "清仓板块"
+  - indicator: "一级市场标杆企业破产（Figure/智元/宇树之一）"
+    risk_level: high
+    action: "清仓板块"
+  - indicator: "VLA模型出现能力天花板"
+    risk_level: medium
+    action: "减仓AI+具身标的"

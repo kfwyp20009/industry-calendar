@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}- 核心标的池{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-chart-pie me-2"></i>核心标的池</h2>
+    <div class="subtitle">跨行业统一管理 · {{ stocks|length }} 只核心标的</div>
+</div>
+
+<div class="row g-3">
+    <!-- 概览统计 -->
+    <div class="col-12">
+        <div class="row g-2">
+            {% for ind_name, items in by_industry.items() %}
+            {% set ind_code = industry_code_map.get(ind_name, '') %}
+            <div class="col-md-3 col-6">
+                <a href="/industry/{{ ind_code }}" class="text-decoration-none">
+                <div class="card text-center p-2">
+                    <div class="fw-bold" style="color:var(--text-primary);">{{ ind_name }}</div>
+                    <div class="fs-5 fw-bold text-primary">{{ items|length }}</div>
+                    <div class="text-muted" style="font-size:0.75rem;">只标的</div>
+                </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 按行业分组 -->
+    {% for ind_name, stock_list in by_industry.items() %}
+    <div class="col-md-6">
+        <div class="card h-100">
+            {% set ind_code = industry_code_map.get(ind_name, '') %}
+            <div class="card-header">
+                <a href="/industry/{{ ind_code }}" class="text-decoration-none" style="color:var(--text-primary);">
+                <i class="fas fa-folder me-1"></i> {{ ind_name }}
+                </a>
+                <span class="badge bg-secondary ms-2">{{ stock_list|length }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for s in stock_list %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ s.name }}</strong>
+                                <span class="text-muted ms-2" style="font-size:0.85rem;">{{ s.code }}</span>
+                                <span class="badge bg-light text-dark ms-1" style="font-size:0.7rem;">{{ s.sector }}</span>
+                                {% if s.market %}
+                                <span class="badge bg-info text-dark" style="font-size:0.65rem;">{{ s.market }}</span>
+                                {% endif %}
+                            </div>
+                            {% if s.estimated_pe %}
+                            <span class="text-muted" style="font-size:0.75rem;">PE: {{ s.estimated_pe }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted" style="font-size:0.8rem; margin-top:0.25rem;">{{ s.reason }}</div>
+                        {% if s.key_dates %}
+                        <div class="mt-1">
+                            {% for kd in s.key_dates %}
+                            <span class="badge bg-warning text-dark me-1" style="font-size:0.65rem;">{{ kd }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

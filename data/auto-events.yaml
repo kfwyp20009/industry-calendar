@@ -1,0 +1,41 @@
+detected_events:
+- date: '2026-06-06'
+  name: 午盘：美股继续下滑 纳指重挫600点
+  industry: 半导体/国产替代
+  all_industries:
+  - 半导体/国产替代
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-06/doc-iniakrwk8203781.shtml
+  source_title: 午盘：美股继续下滑 纳指重挫600点
+  confidence: 0.8
+  status: accepted
+  detected_at: 2026-06-06 01:52
+- date: '2026-06-05'
+  name: 搭上光和算力，A股2只地产股股价狂飙100%，去年巨亏超9亿
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/wm/2026-06-06/doc-iniamtiv0907885.shtml
+  source_title: 搭上光和算力，A股2只地产股股价狂飙100%，去年巨亏超9亿
+  confidence: 0.8
+  status: rejected
+  detected_at: 2026-06-06 10:48
+- date: '2026-06-06'
+  name: 6月6日外盘头条：美伊和平谈判仍陷僵局 非农报告提振加息预期 美股遭遇抛售 谷歌与SpaceX达成百亿算力协议
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-06/doc-iniamhua7875052.shtml
+  source_title: 6月6日外盘头条：美伊和平谈判仍陷僵局 非农报告提振加息预期 美股遭遇抛售 谷歌与SpaceX达成百亿算力协议
+  confidence: 0.8
+  status: rejected
+  detected_at: 2026-06-06 10:48
+- date: '2026-06-05'
+  name: 000488，被警示！氢能重磅大会召开在即，低PE+高股息的概念股是这几只
+  industry: 绿氢氨醇
+  all_industries:
+  - 绿氢氨醇
+  source_url: https://finance.sina.com.cn/wm/2026-06-06/doc-iniamxrt0827067.shtml
+  source_title: 000488，被警示！氢能重磅大会召开在即，低PE+高股息的概念股是这几只
+  confidence: 0.85
+  status: pending
+  detected_at: 2026-06-06 13:28
