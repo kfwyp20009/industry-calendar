@@ -276,13 +276,23 @@
             </div>
         </div>
 
-        <!-- 行业 ETF 基准 -->
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-chart-line me-1"></i> 行业 ETF 基准
+        <!-- 实时 ETF 行情 -->
+        <div class="card" id="etf-benchmark-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-chart-line me-1"></i> 行业 ETF 行情
+                    <span id="etf-update-time" class="text-muted" style="font-size:0.65rem;font-weight:normal;display:none;"></span>
+                </span>
+                <div>
+                    <span id="etf-price-status" class="badge bg-secondary me-1" style="font-size:0.55rem;display:none;">盘后</span>
+                    <button class="btn btn-sm btn-outline-primary" onclick="refreshETFQuotes()" id="etfRefreshBtn" style="font-size:0.75rem;">
+                        <i class="fas fa-sync me-1"></i> 刷新
+                    </button>
+                </div>
             </div>
-            <div class="card-body p-2">
-                <div style="font-size:0.75rem;">
+            <div class="card-body p-2" id="etf-quotes-container">
+                <!-- 静态后备（初始渲染） -->
+                <div id="etf-static-fallback" style="font-size:0.75rem;">
                     {% for code, ind in industries.items() %}
                     {% set etf = etf_mapping.get(ind.industry) %}
                     <div class="d-flex justify-content-between align-items-center py-1">
@@ -302,12 +312,64 @@
                         {% endif %}
                     </div>
                     {% endfor %}
+                    <div class="text-muted mt-1" style="font-size:0.6rem;">
+                        <i class="fas fa-info-circle me-1"></i>点击代码查看雪球 · 行情数据加载中...
+                    </div>
                 </div>
-                <div class="text-muted mt-1" style="font-size:0.6rem;">
-                    <i class="fas fa-info-circle me-1"></i>点击 ETF 代码查看雪球行情 · 用作行业板块基准参考
+                <!-- 实时行情容器（JS填充） -->
+                <div id="etf-live-container" style="display:none;font-size:0.75rem;"></div>
+                <!-- 加载状态 -->
+                <div id="etf-loading" style="display:none;" class="text-center py-3">
+                    <span class="text-muted" style="font-size:0.8rem;"><i class="fas fa-spinner fa-spin me-1"></i>行情加载中...</span>
                 </div>
             </div>
         </div>
+
+        <!-- 回测概览 -->
+        {% if backtest_stats and backtest_stats.past_total > 0 %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-rotate-left me-1"></i> 本月回测</span>
+                <a href="/backtest" class="btn btn-sm btn-outline-secondary">查看全部</a>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-around text-center">
+                    <div>
+                        <div class="fw-bold text-success fs-5">{{ backtest_stats.hit }}</div>
+                        <div style="font-size:0.7rem;">验证成功</div>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-warning fs-5">{{ backtest_stats.partial }}</div>
+                        <div style="font-size:0.7rem;">部分验证</div>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-danger fs-5">{{ backtest_stats.miss }}</div>
+                        <div style="font-size:0.7rem;">未验证</div>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-secondary fs-5">{{ backtest_stats.past_total - backtest_stats.hit - backtest_stats.partial - backtest_stats.miss }}</div>
+                        <div style="font-size:0.7rem;">待回测</div>
+                    </div>
+                </div>
+                {% if past_months_backtest %}
+                <hr>
+                <div style="font-size:0.75rem;">
+                    {% for pm in past_months_backtest %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span>{{ pm.label }}</span>
+                        <span>
+                            {% if pm.stats.hit > 0 %}<span class="badge bg-success me-1">✓{{ pm.stats.hit }}</span>{% endif %}
+                            {% if pm.stats.partial > 0 %}<span class="badge bg-warning text-dark me-1">◐{{ pm.stats.partial }}</span>{% endif %}
+                            {% if pm.stats.miss > 0 %}<span class="badge bg-danger me-1">✗{{ pm.stats.miss }}</span>{% endif %}
+                            <span class="badge bg-secondary">{{ pm.stats.total }}</span>
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
 
         <!-- 跨行业联动 -->
         {% if cross_events %}
@@ -425,6 +487,126 @@ function refreshNews() {
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync me-1"></i>刷新'; }
         });
 }
+
+// ── 实时 ETF 行情 ──
+function renderETFQuotes(data) {
+    const container = document.getElementById('etf-live-container');
+    const fallback = document.getElementById('etf-static-fallback');
+    const timeEl = document.getElementById('etf-update-time');
+    const statusEl = document.getElementById('etf-price-status');
+
+    if (!data.ok || !data.quotes || data.total === 0) {
+        fallback.style.display = '';
+        container.style.display = 'none';
+        return;
+    }
+
+    let html = '';
+    data.sorted_industries.forEach(function(indName) {
+        const q = data.quotes[indName];
+        if (!q) return;
+
+        if (!q.api_ok) {
+            html += '<div class="d-flex justify-content-between align-items-center py-1">'
+                + '<span style="font-size:0.75rem;">' + indName + '</span>'
+                + '<span><a href="https://xueqiu.com/S/' + q.exchange + q.code
+                + '" target="_blank" class="text-decoration-none" style="color:var(--text-primary);">'
+                + '<span class="badge bg-light text-dark" style="font-size:0.65rem;">' + q.code + ' ' + q.name
+                + '<i class="fas fa-external-link-alt" style="font-size:0.45rem;opacity:0.5;"></i>'
+                + '</span></a></span></div>';
+            return;
+        }
+
+        const pct = q.change_pct;
+        const price = q.price;
+        const pctStr = (pct !== null && pct !== undefined)
+            ? (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'
+            : '--';
+        const priceStr = (price !== null && price !== undefined)
+            ? price.toFixed(3)
+            : '--';
+        const isUp = pct > 0;
+        const isDown = pct < 0;
+        const colorClass = isUp ? 'text-danger' : (isDown ? 'text-success' : '');
+        const icon = isUp ? 'fa-caret-up' : (isDown ? 'fa-caret-down' : 'fa-minus');
+        const badgeClass = isUp ? 'bg-danger' : (isDown ? 'bg-success' : 'bg-secondary');
+
+        html += '<div class="d-flex justify-content-between align-items-center py-1">'
+            + '<span style="font-size:0.75rem;">' + indName + '</span>'
+            + '<span class="text-end" style="white-space:nowrap;">'
+            + '<span class="me-2 fw-bold ' + colorClass + '" style="font-size:0.8rem;">' + priceStr + '</span>'
+            + '<span class="badge ' + badgeClass + '" style="font-size:0.65rem;min-width:4.2rem;">'
+            + '<i class="fas ' + icon + ' me-1"></i>' + pctStr
+            + '</span>'
+            + ' <a href="https://xueqiu.com/S/' + q.exchange + q.code + '" target="_blank" class="text-decoration-none">'
+            + '<span class="badge bg-light text-dark" style="font-size:0.55rem;">'
+            + q.code
+            + '</span></a>'
+            + '</span></div>';
+    });
+
+    container.innerHTML = html;
+    container.style.display = '';
+    fallback.style.display = 'none';
+
+    if (data.updated_at) {
+        timeEl.textContent = '· ' + data.updated_at;
+        timeEl.style.display = 'inline';
+    }
+
+    const now = new Date();
+    const cstMinutes = (now.getUTCHours() + 8) * 60 + now.getUTCMinutes();
+    const isOpen = cstMinutes >= 565 && cstMinutes <= 905;
+    statusEl.style.display = isOpen ? 'none' : 'inline';
+}
+
+function loadETFQuotes() {
+    const loading = document.getElementById('etf-loading');
+    const btn = document.getElementById('etfRefreshBtn');
+    if (loading) loading.style.display = '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>加载中'; }
+
+    fetch('/api/etf-quotes')
+        .then(r => r.json())
+        .then(function(data) {
+            if (loading) loading.style.display = 'none';
+            renderETFQuotes(data);
+        })
+        .catch(function() {
+            if (loading) loading.style.display = 'none';
+        })
+        .finally(function() {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync me-1"></i> 刷新'; }
+        });
+}
+
+function refreshETFQuotes() {
+    const loading = document.getElementById('etf-loading');
+    const btn = document.getElementById('etfRefreshBtn');
+    if (loading) loading.style.display = '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>刷新中'; }
+    const fallback = document.getElementById('etf-static-fallback');
+    if (fallback) fallback.style.display = 'none';
+    const container = document.getElementById('etf-live-container');
+    if (container) container.style.display = 'none';
+
+    fetch('/api/etf-quotes?force=1')
+        .then(r => r.json())
+        .then(function(data) {
+            if (loading) loading.style.display = 'none';
+            renderETFQuotes(data);
+        })
+        .catch(function() {
+            if (loading) loading.style.display = 'none';
+        })
+        .finally(function() {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync me-1"></i> 刷新'; }
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(loadETFQuotes, 300);
+});
 </script>
 
 {% endblock %}

@@ -95,6 +95,13 @@ industries:
   tags:
   - 量子
   - 量子计算机
+- id: '13'
+  name: 绿色能源
+  enabled: true
+  tags:
+  - 风力发电
+  - 太阳能发电
+  - 绿色电力
 delivery:
   primary_channel: telegram
   fallback_channel: feishu

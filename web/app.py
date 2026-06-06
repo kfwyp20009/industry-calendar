@@ -11,6 +11,7 @@ import news
 import skills
 import llm
 import followed
+import quotes
 
 app = Flask(__name__)
 
@@ -48,6 +49,10 @@ def load_all_industries():
                     ev_date = ev.get("date", "")
                     ev["is_current_month"] = ev_date.startswith(month_str) if ev_date else False
                 industries[code] = data
+        # 为所有行业事件添加回测上下文
+        enrich_events_with_backtest(
+            [ev for ind in industries.values() for ev in ind.get("events", [])]
+        )
     return industries
 
 
@@ -93,6 +98,48 @@ def get_upcoming_events(industries, days=14):
 
 def get_importance_color(imp):
     return {5: "#dc3545", 4: "#fd7e14", 3: "#ffc107", 2: "#6c757d", 1: "#adb5bd"}.get(imp, "#6c757d")
+
+
+def is_past_event(ev_date_str):
+    """检查事件日期是否已过"""
+    if not ev_date_str:
+        return False
+    try:
+        ev_date = datetime.strptime(ev_date_str[:10], "%Y-%m-%d").date()
+        return ev_date < date.today()
+    except (ValueError, IndexError):
+        return False
+
+
+def get_backtest_badge(backtest):
+    """获取回测状态标签"""
+    if not backtest:
+        return None
+    status = backtest.get("status", "")
+    badges = {
+        "hit": {"label": "✓ 验证成功", "class": "bg-success"},
+        "partial": {"label": "◐ 部分验证", "class": "bg-warning text-dark"},
+        "miss": {"label": "✗ 未验证", "class": "bg-danger"},
+        "unknown": {"label": "? 待验证", "class": "bg-secondary"},
+    }
+    return badges.get(status, None)
+
+
+def enrich_events_with_backtest(events):
+    """为事件列表添加回测上下文"""
+    now = date.today()
+    for ev in events:
+        ev_date_str = ev.get("date", "")
+        try:
+            ev_date = datetime.strptime(ev_date_str[:10], "%Y-%m-%d").date() if ev_date_str else None
+            ev["is_past"] = ev_date is not None and ev_date < now if ev_date else False
+        except (ValueError, IndexError):
+            ev["is_past"] = False
+        if ev.get("backtest"):
+            badge = get_backtest_badge(ev["backtest"])
+            if badge:
+                ev["backtest_badge"] = badge
+    return events
 
 
 def get_importance_label(imp):
@@ -177,6 +224,48 @@ def dashboard():
     detected_events = news.load_detected_events()
     pending_count = len([e for e in detected_events if e.get("status") == "pending"])
 
+    # 回测统计
+    backtest_stats = {"hit": 0, "partial": 0, "miss": 0, "unknown": 0, "past_total": 0}
+    for ev in current_month_events:
+        if ev.get("is_past"):
+            backtest_stats["past_total"] += 1
+            bt = ev.get("backtest", {})
+            s = bt.get("status", "unknown")
+            backtest_stats[s] = backtest_stats.get(s, 0) + 1
+
+    # 跨月份回测统计（仅取最近3个月以提升性能）
+    past_months_backtest = []
+    current_year = now.year
+    for offset in range(1, 4):
+        pm = now.month - offset
+        py = current_year
+        while pm < 1:
+            pm += 12
+            py -= 1
+        if py < current_year:
+            break
+        month_str = f"{py}-{pm:02d}"
+        month_events = []
+        for code, ind in industries.items():
+            for ev in ind.get("events", []):
+                if ev.get("date", "").startswith(month_str) and ev.get("is_past"):
+                    month_events.append({
+                        **ev,
+                        "industry": ind["industry"],
+                        "industry_code": code,
+                    })
+        if month_events:
+            month_stats = {"hit": 0, "partial": 0, "miss": 0, "unknown": 0, "total": len(month_events)}
+            for ev in month_events:
+                bt = ev.get("backtest", {})
+                s = bt.get("status", "unknown")
+                month_stats[s] = month_stats.get(s, 0) + 1
+            past_months_backtest.append({
+                "month": pm,
+                "label": f"{pm}月",
+                "stats": month_stats,
+            })
+
     return render_template(
         "dashboard.html",
         now=now,
@@ -191,6 +280,8 @@ def dashboard():
         get_importance_color=get_importance_color,
         get_importance_label=get_importance_label,
         get_action_color=get_action_color,
+        backtest_stats=backtest_stats,
+        past_months_backtest=past_months_backtest,
     )
 
 
@@ -234,6 +325,43 @@ def calendar():
         "calendar.html",
         now=now,
         months=months,
+        get_importance_color=get_importance_color,
+        get_importance_label=get_importance_label,
+        get_action_color=get_action_color,
+    )
+
+
+@app.route("/backtest")
+def backtest_page():
+    """回测总览页面"""
+    industries = load_all_industries()
+    now = date.today()
+
+    # 聚合所有已过去且有回测数据的事件
+    all_backtested = []
+    for code, ind in industries.items():
+        for ev in ind.get("events", []):
+            if ev.get("backtest") and ev.get("is_past"):
+                all_backtested.append({
+                    **ev,
+                    "industry": ind["industry"],
+                    "industry_code": code,
+                })
+    all_backtested.sort(key=lambda e: e.get("date", ""), reverse=True)
+
+    # 统计
+    stats = {"hit": 0, "partial": 0, "miss": 0, "unknown": 0, "past_total": 0, "verified": 0}
+    for ev in all_backtested:
+        s = ev.get("backtest", {}).get("status", "unknown")
+        stats[s] = stats.get(s, 0) + 1
+    stats["past_total"] = len(all_backtested)
+    stats["verified"] = stats["hit"] + stats["partial"] + stats["miss"]
+
+    return render_template(
+        "backtest.html",
+        now=now,
+        events=all_backtested,
+        stats=stats,
         get_importance_color=get_importance_color,
         get_importance_label=get_importance_label,
         get_action_color=get_action_color,
@@ -376,6 +504,16 @@ def api_news():
     """新闻刷新接口"""
     items = news.get_news(force_refresh=True)
     return jsonify({"count": len(items), "items": items[:30]})
+
+
+@app.route("/api/etf-quotes")
+def api_etf_quotes():
+    """实时 ETF 行情接口"""
+    etf_data = load_yaml(ETF_FILE)
+    etf_mapping = etf_data.get("mapping", {}) if etf_data else {}
+    force = request.args.get("force", "0") == "1"
+    result = quotes.get_quotes(etf_mapping, force_refresh=force)
+    return jsonify({"ok": True, **result})
 
 
 # ── 设置页面 ──
@@ -557,6 +695,14 @@ def api_update_event():
         if val is not None:
             event[key] = val
 
+    # 如果前端传入了独立的 backtest 字段，单独处理
+    if "backtest" in data:
+        if data["backtest"] is not None:
+            event["backtest"] = data["backtest"]
+            event["backtest"]["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        else:
+            event.pop("backtest", None)
+
     ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
     _save_industry_data(fpath, ind_data)
     return jsonify({"ok": True})
@@ -618,6 +764,52 @@ def api_delete_event():
     return jsonify({"ok": True})
 
 
+# ── 回测数据 API ──
+
+@app.route("/api/backtest/update", methods=["POST"])
+def api_update_backtest():
+    """更新一个事件的回测数据"""
+    data = request.get_json()
+    industry = data.get("industry")
+    idx = data.get("idx")
+    backtest = data.get("backtest", {})
+
+    if industry is None or idx is None:
+        return jsonify({"ok": False, "error": "缺少 industry 或 idx"}), 400
+    if not backtest or "status" not in backtest:
+        return jsonify({"ok": False, "error": "回测数据缺少 status"}), 400
+
+    fpath, ind_data = _find_industry_file(industry)
+    if not fpath:
+        return jsonify({"ok": False, "error": f"未找到行业 '{industry}'"}), 404
+
+    events = ind_data.get("events", [])
+    if idx < 0 or idx >= len(events):
+        return jsonify({"ok": False, "error": "事件索引无效"}), 400
+
+    events[idx]["backtest"] = backtest
+    events[idx]["backtest"]["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
+    _save_industry_data(fpath, ind_data)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/backtest/stats")
+def api_backtest_stats():
+    """回测统计汇总"""
+    industries = load_all_industries()
+    stats = {"hit": 0, "partial": 0, "miss": 0, "unknown": 0, "total": 0, "past_total": 0}
+    for ind in industries.values():
+        for ev in ind.get("events", []):
+            if ev.get("is_past"):
+                stats["past_total"] += 1
+                bt = ev.get("backtest", {})
+                s = bt.get("status", "unknown")
+                stats[s] = stats.get(s, 0) + 1
+    stats["total"] = stats["hit"] + stats["partial"] + stats["miss"] + stats["unknown"]
+    return jsonify({"ok": True, "stats": stats})
+
+
 # ── 技能管理 API ──
 
 @app.route("/api/skills/add", methods=["POST"])
@@ -650,6 +842,11 @@ def api_add_skill():
         ind_ok, ind_msg, ind_file = skills.create_industry_file(name, keywords, description)
         if ind_ok:
             industry_result = {"file": ind_file}
+            # 同步 ETF 映射 + 跨行业联动
+            etf_code = data.get("etf_code", "")
+            etf_name = data.get("etf_name", "")
+            skills.sync_etf_mapping(name, etf_code, etf_name)
+            skills.sync_cross_industry(name)
         else:
             industry_result = {"info": ind_msg}
 
@@ -680,8 +877,27 @@ def api_update_skill():
 
 @app.route("/api/skills/delete", methods=["POST"])
 def api_delete_skill():
+    """删除技能 → 同步清理所有关联数据"""
     data = request.get_json()
+
+    # 先查出技能名称，用于后续清理
+    skill_id = data["id"]
+    skill_name = None
+    for s in skills.load_custom_skills()[0]:
+        if s.get("id") == skill_id:
+            skill_name = s["name"]
+            break
+
+    # 删除技能 + 行业文件 + config
     skills.delete_skill(data["id"])
+
+    # 清理关联数据
+    if skill_name:
+        skills.remove_from_etf_mapping(skill_name)
+        skills.remove_from_cross_industry(skill_name)
+        skills.remove_from_portfolio(skill_name)
+        skills.remove_from_followed(skill_name)
+
     return jsonify({"ok": True})
 
 
@@ -717,6 +933,10 @@ def api_create_skill_industry():
     description = skill_info.get("description", "")
 
     ind_ok, ind_msg, ind_file = skills.create_industry_file(name, keywords, description)
+    if ind_ok:
+        # 同步 ETF 映射 + 跨行业联动
+        skills.sync_etf_mapping(name)
+        skills.sync_cross_industry(name)
     return jsonify({
         "ok": ind_ok,
         "error": None if ind_ok else ind_msg,
@@ -816,7 +1036,7 @@ def api_follow_toggle():
 
 @app.route("/api/follow/quick-add", methods=["POST"])
 def api_follow_quick_add():
-    """快速新增行业并自动关注"""
+    """快速新增行业 → 自动同步所有关联数据"""
     data = request.get_json()
     if not data or not data.get("name") or not data.get("keywords"):
         return jsonify({"ok": False, "error": "名称和关键词不能为空"}), 400
@@ -831,15 +1051,32 @@ def api_follow_quick_add():
     if not ok and "已存在" not in msg:
         return jsonify({"ok": False, "error": msg})
 
-    # 2. 创建 industry YAML 文件
+    # 2. 创建 industry YAML 文件（空骨架）
     ind_ok, ind_msg, ind_file = skills.create_industry_file(name, keywords, description=data.get("description", ""))
     if not ind_ok and "已存在" not in ind_msg:
         return jsonify({"ok": False, "error": f"行业创建失败: {ind_msg}"})
 
-    # 3. 关注该行业
+    # 3. 同步 ETF 映射（有代码则写入，无则留占位）
+    etf_code = data.get("etf_code", "")
+    etf_name = data.get("etf_name", "")
+    skills.sync_etf_mapping(name, etf_code, etf_name)
+
+    # 4. 同步跨行业联动（空矩阵行）
+    skills.sync_cross_industry(name)
+
+    # 5. 关注该行业
     followed.follow(name)
 
-    return jsonify({"ok": True, "name": name, "followed": True})
+    # 6. 是否自动生成日历事件（前端在收到响应后异步触发）
+    auto_calendar = data.get("auto_calendar", True)
+
+    return jsonify({
+        "ok": True,
+        "name": name,
+        "followed": True,
+        "auto_calendar": auto_calendar,
+        "industry_file": ind_file,
+    })
 
 
 # ── 智能分析 ──

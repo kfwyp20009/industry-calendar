@@ -44,6 +44,12 @@ events:
       action: "加仓"
       reason: "宇树供应链标的联动（绿的谐波、奥比中光）"
     linked_industries: ["机器人零部件"]
+    backtest:
+      status: hit
+      actual_impact: "宇树科技顺利过会，人形机器人板块当日+3.2%，绿的谐波+5.1%"
+      price_change: "+5.1%"
+      etf_change: "+2.8%"
+      notes: "IPO过会符合预期，供应链标的涨幅更大，提前埋伏策略有效"
 
   - date: "2026-06"
     date_precision: month

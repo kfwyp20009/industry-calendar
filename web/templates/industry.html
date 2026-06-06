@@ -155,6 +155,20 @@
                                         {% endfor %}
                                     </div>
                                     {% endif %}
+                                    {% if ev.is_past %}
+                                    {% if ev.backtest_badge %}
+                                    <div class="mt-1">
+                                        <span class="badge {{ ev.backtest_badge.class }}" style="font-size:0.6rem;">{{ ev.backtest_badge.label }}</span>
+                                        {% if ev.backtest and ev.backtest.price_change %}
+                                        <span class="{% if ev.backtest.price_change.startswith('+') %}text-danger{% else %}text-success{% endif %}" style="font-size:0.7rem;">
+                                            {{ ev.backtest.price_change }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    {% else %}
+                                    <div class="mt-1"><span class="badge bg-secondary" style="font-size:0.6rem;">待回测</span></div>
+                                    {% endif %}
+                                    {% endif %}
                                 </td>
                                 <td class="align-middle">
                                     <span class="badge bg-info text-dark" style="font-size:0.7rem;">{{ ev.type }}</span>
@@ -296,6 +310,42 @@
                             </select>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="hasBacktest" onchange="toggleBacktestFields()">
+                            <label class="form-check-label">添加回测数据（仅过去事件）</label>
+                        </div>
+                    </div>
+                    <div id="backtestFields" style="display:none;">
+                        <hr>
+                        <div class="mb-2 fw-semibold" style="font-size:0.85rem;"><i class="fas fa-rotate-left me-1"></i>回测数据</div>
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size:0.8rem;">验证状态</label>
+                            <select class="form-select form-select-sm" name="bt_status" id="btStatus">
+                                <option value="hit">✓ 验证成功</option>
+                                <option value="partial">◐ 部分验证</option>
+                                <option value="miss">✗ 未验证</option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label class="form-label" style="font-size:0.8rem;">标的涨幅</label>
+                                <input type="text" class="form-control form-control-sm" name="bt_price" id="btPrice" placeholder="如 +5.1%">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label" style="font-size:0.8rem;">ETF 涨幅</label>
+                                <input type="text" class="form-control form-control-sm" name="bt_etf" id="btEtf" placeholder="如 +2.8%">
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size:0.8rem;">实际影响</label>
+                            <textarea class="form-control form-control-sm" name="bt_impact" id="btImpact" rows="2" placeholder="事件实际发生后的影响..."></textarea>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" style="font-size:0.8rem;">复盘笔记</label>
+                            <textarea class="form-control form-control-sm" name="bt_notes" id="btNotes" rows="2" placeholder="验证了什么？下次怎么改进？"></textarea>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" id="deleteEventBtn" onclick="deleteCurrentEvent()">
@@ -316,6 +366,11 @@
 var INDUSTRY_NAME = '{{ ind.industry }}';
 var _editIdx = -1;
 
+function toggleBacktestFields() {
+    document.getElementById('backtestFields').style.display =
+        document.getElementById('hasBacktest').checked ? '' : 'none';
+}
+
 function openEditEvent(idx) {
     _editIdx = idx;
     document.getElementById('eventModalTitle').textContent = '编辑事件';
@@ -332,6 +387,16 @@ function openEditEvent(idx) {
     document.getElementById('eventDescription').value = e.description || '';
     document.getElementById('eventImpact').value = e.impact || '';
     document.getElementById('eventAction').value = (e.suggested_action && e.suggested_action.action) || '';
+    // 回测数据
+    var bt = e.backtest || {};
+    var hasBt = bt.status ? true : false;
+    document.getElementById('hasBacktest').checked = hasBt;
+    document.getElementById('backtestFields').style.display = hasBt ? '' : 'none';
+    document.getElementById('btStatus').value = bt.status || 'hit';
+    document.getElementById('btPrice').value = bt.price_change || '';
+    document.getElementById('btEtf').value = bt.etf_change || '';
+    document.getElementById('btImpact').value = bt.actual_impact || '';
+    document.getElementById('btNotes').value = bt.notes || '';
     new bootstrap.Modal(document.getElementById('eventEditModal')).show();
 }
 
@@ -375,11 +440,22 @@ document.getElementById('eventEditForm').addEventListener('submit', function(e) 
         doActionAndReload('/api/events/add', payload, '✓ 事件已添加');
     } else {
         var idx = parseInt(form.get('idx'));
-        doActionAndReload('/api/events/update', {
+        var updatePayload = {
             industry: INDUSTRY_NAME,
             idx: idx,
             fields: payload
-        }, '✓ 事件已更新');
+        };
+        // 保存回测数据
+        if (document.getElementById('hasBacktest').checked) {
+            updatePayload.backtest = {
+                status: form.get('bt_status'),
+                price_change: form.get('bt_price'),
+                etf_change: form.get('bt_etf'),
+                actual_impact: form.get('bt_impact'),
+                notes: form.get('bt_notes'),
+            };
+        }
+        doActionAndReload('/api/events/update', updatePayload, '✓ 事件已更新');
     }
 });
 

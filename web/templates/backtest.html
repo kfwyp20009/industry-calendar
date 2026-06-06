@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}- 事件回测{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h2><i class="fas fa-rotate-left me-2"></i>事件回测</h2>
+    <div class="subtitle">已过去事件的验证记录 · 复盘催化剂的真实影响</div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold">{{ stats.past_total }}</div>
+            <div class="text-muted">已回测事件</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3 border-success">
+            <div class="fs-3 fw-bold text-success">{{ stats.hit }}</div>
+            <div class="text-muted">✓ 验证成功</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3 border-warning">
+            <div class="fs-3 fw-bold text-warning">{{ stats.partial }}</div>
+            <div class="text-muted">◐ 部分验证</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3 border-danger">
+            <div class="fs-3 fw-bold text-danger">{{ stats.miss }}</div>
+            <div class="text-muted">✗ 未验证</div>
+        </div>
+    </div>
+</div>
+
+<!-- 准确率 -->
+{% if stats.verified > 0 %}
+{% set accuracy = ((stats.hit + stats.partial) / stats.verified * 100)|round(1) %}
+<div class="alert alert-info d-flex justify-content-between align-items-center py-2">
+    <span><i class="fas fa-chart-line me-2"></i> 事件验证准确率：<strong>{{ accuracy }}%</strong></span>
+    <small class="text-muted">基于 {{ stats.verified }} 个已验证事件</small>
+</div>
+{% endif %}
+
+<!-- 回测事件列表 -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-list me-1"></i> 回测记录
+    </div>
+    <div class="card-body p-0">
+        {% if events %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>日期</th>
+                        <th>行业</th>
+                        <th>事件</th>
+                        <th>验证</th>
+                        <th>涨幅</th>
+                        <th>复盘</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in events %}
+                    <tr>
+                        <td class="align-middle text-nowrap" style="font-size:0.85rem;">
+                            {{ ev.date[:10] }}
+                        </td>
+                        <td class="align-middle">
+                            <a href="/industry/{{ ev.industry_code }}" class="text-decoration-none">
+                                <span class="badge bg-secondary">{{ ev.industry }}</span>
+                            </a>
+                        </td>
+                        <td class="align-middle">
+                            <strong>{{ ev.name }}</strong>
+                        </td>
+                        <td class="align-middle">
+                            {% set bt = ev.backtest or {} %}
+                            {% set s = bt.get('status', 'unknown') %}
+                            {% if s == 'hit' %}
+                            <span class="badge bg-success">✓ 验证成功</span>
+                            {% elif s == 'partial' %}
+                            <span class="badge bg-warning text-dark">◐ 部分验证</span>
+                            {% elif s == 'miss' %}
+                            <span class="badge bg-danger">✗ 未验证</span>
+                            {% else %}
+                            <span class="badge bg-secondary">? 待验证</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            {% if bt.get('price_change') %}
+                            <span class="fw-bold {% if bt.price_change.startswith('+') %}text-danger{% else %}text-success{% endif %}">
+                                {{ bt.price_change }}
+                            </span>
+                            {% if bt.get('etf_change') %}
+                            <div style="font-size:0.65rem;" class="text-muted">ETF {{ bt.etf_change }}</div>
+                            {% endif %}
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle" style="max-width:300px;">
+                            {% if bt.get('notes') %}
+                            <div style="font-size:0.8rem;">{{ bt.notes }}</div>
+                            {% endif %}
+                            {% if bt.get('actual_impact') %}
+                            <div class="text-muted" style="font-size:0.7rem;">{{ bt.actual_impact[:80] }}</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-4 text-center text-muted">
+            <i class="fas fa-rotate-left me-2"></i>暂无回测数据
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

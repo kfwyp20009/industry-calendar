@@ -66,6 +66,12 @@ events:
       stocks: ["002230"]
       action: "加仓"
       reason: "星火X2若超预期→科大讯飞估值重估"
+    backtest:
+      status: hit
+      actual_impact: "星火X2通用能力对标GPT-4.5，科大讯飞连续3日累计+8.7%，国产算力路线获确认"
+      price_change: "+8.7%"
+      etf_change: "+4.2%"
+      notes: "全国产算力路线里程碑事件，提前5天埋伏效果最佳"
 
   # ── 3月 ──
   - date: "2026-03"
@@ -106,6 +112,12 @@ events:
       stocks: ["688111", "002230"]
       action: "加仓"
       reason: "AI付费模式验证→AI应用板块估值重估"
+    backtest:
+      status: hit
+      actual_impact: "豆包付费上线后首周付费用户超50万，验证C端付费逻辑，AI应用板块整体+4.5%"
+      price_change: "+4.5%"
+      etf_change: "+3.1%"
+      notes: "C端付费拐点确认，板块估值中枢上移"
 
   - date: "2026-05-13"
     date_precision: day

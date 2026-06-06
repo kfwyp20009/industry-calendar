@@ -1,0 +1,71 @@
+caches:
+  771cef9bf5aa9743:
+    content: "```yaml\ncore_stocks:\n  - code: \"601012\"\n    name: \"隆基绿能\"\n  \
+      \  sector: \"太阳能\"\n    reason: \"全球单晶硅片龙头，技术领先\"\n  - code: \"300274\"\n  \
+      \  name: \"阳光电源\"\n    sector: \"太阳能\"\n    reason: \"逆变器及储能系统全球龙头\"\n  - code:\
+      \ \"600900\"\n    name: \"长江电力\"\n    sector: \"绿色电力\"\n    reason: \"水电龙头，绿电运营商标杆\"\
+      \n  - code: \"002202\"\n    name: \"金风科技\"\n    sector: \"风力发电\"\n    reason:\
+      \ \"国内风电整机龙头，市占率高\"\n  - code: \"688599\"\n    name: \"天合光能\"\n    sector: \"\
+      太阳能\"\n    reason: \"组件出货全球前三，分布式领先\"\n\nevents:\n  - date: \"2026-01-15\"\n\
+      \    date_precision: day\n    name: \"2025年全年光伏装机数据发布\"\n    importance: 4\n\
+      \    type: policy\n    description: \"国家能源局发布2025年光伏新增装机量，验证行业增速\"\n    confirmed:\
+      \ false\n    suggested_action:\n      stocks: [\"601012\", \"300274\", \"688599\"\
+      ]\n      action: \"埋伏\"\n\n  - date: \"2026-02\"\n    date_precision: month\n\
+      \    name: \"欧盟碳边境调节机制(CBAM)细则更新\"\n    importance: 5\n    type: regulation\n\
+      \    description: \"欧盟可能进一步明确绿色电力证书认可规则，利好绿电出口企业\"\n    confirmed: false\n \
+      \   suggested_action:\n      stocks: [\"600900\", \"601012\"]\n      action:\
+      \ \"加仓\"\n\n  - date: \"2026-03-10\"\n    date_precision: day\n    name: \"\
+      全国两会绿色能源提案集中讨论\"\n    importance: 5\n    type: policy\n    description: \"两会期间将审议‘十五五’能源规划草案，明确风光装机目标\"\
+      \n    confirmed: false\n    suggested_action:\n      stocks: [\"002202\", \"\
+      300274\"]\n      action: \"加仓\"\n\n  - date: \"2026-04\"\n    date_precision:\
+      \ month\n    name: \"2026年一季度光伏产业链价格博弈\"\n    importance: 3\n    type: product\n\
+      \    description: \"硅料、硅片价格波动影响行业利润，关注龙头企业成本控制\"\n    confirmed: false\n   \
+      \ suggested_action:\n      stocks: [\"601012\", \"688599\"]\n      action: \"\
+      观望\"\n\n  - date: \"2026-05-20\"\n    date_precision: day\n    name: \"SNEC上海光伏展\"\
+      \n    importance: 4\n    type: exhibition\n    description: \"全球最大光伏展，新技术（HJT、钙钛矿）及新品发布密集期\"\
+      \n    confirmed: false\n    suggested_action:\n      stocks: [\"601012\", \"\
+      300274\", \"688599\"]\n      action: \"埋伏\"\n\n  - date: \"2026-06\"\n    date_precision:\
+      \ month\n    name: \"海上风电竞配结果公布\"\n    importance: 5\n    type: policy\n   \
+      \ description: \"广东、江苏等省份公布2026年海上风电项目竞配结果，影响装机预期\"\n    confirmed: false\n\
+      \    suggested_action:\n      stocks: [\"002202\"]\n      action: \"加仓\"\n\n\
+      \  - date: \"2026-07\"\n    date_precision: month\n    name: \"2026年半年报业绩预告密集期\"\
+      \n    importance: 4\n    type: earnings\n    description: \"绿色能源企业披露半年报，重点关注利润增速及海外营收占比\"\
+      \n    confirmed: false\n    suggested_action:\n      stocks: [\"601012\", \"\
+      300274\", \"600900\"]\n      action: \"持有\"\n\n  - date: \"2026-08-15\"\n  \
+      \  date_precision: day\n    name: \"美国对华光伏双反复审结果\"\n    importance: 5\n    type:\
+      \ regulation\n    description: \"美国商务部公布新一轮反倾销/反补贴税率，影响中国组件出口\"\n    confirmed:\
+      \ false\n    suggested_action:\n      stocks: [\"688599\", \"601012\"]\n   \
+      \   action: \"减仓\"\n\n  - date: \"2026-09\"\n    date_precision: month\n   \
+      \ name: \"国家能源局发布《可再生能源电力消纳保障机制》修订稿\"\n    importance: 4\n    type: policy\n\
+      \    description: \"提升绿电消纳权重，利好绿电运营商及储能配套\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"600900\", \"300274\"]\n      action: \"加仓\"\n\n  - date: \"\
+      2026-10-10\"\n    date_precision: day\n    name: \"2026年北京国际风能大会\"\n    importance:\
+      \ 3\n    type: exhibition\n    description: \"展示大兆瓦风机、漂浮式风电等前沿技术，行业风向标\"\n \
+      \   confirmed: false\n    suggested_action:\n      stocks: [\"002202\"]\n  \
+      \    action: \"埋伏\"\n\n  - date: \"2026-11\"\n    date_precision: month\n  \
+      \  name: \"COP31气候大会（假设在巴西举行）\"\n    importance: 4\n    type: policy\n    description:\
+      \ \"全球气候目标更新，可能推动可再生能源装机目标上调\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"601012\", \"002202\"]\n      action: \"持有\"\n\n  - date: \"\
+      2026-12\"\n    date_precision: month\n    name: \"2027年光伏组件集采招标启动\"\n    importance:\
+      \ 3\n    type: product\n    description: \"央企年度集采规模超100GW，价格及技术路线影响行业格局\"\n\
+      \    confirmed: false\n    suggested_action:\n      stocks: [\"688599\", \"\
+      601012\"]\n      action: \"埋伏\"\n\n  - date: \"2026-01-20\"\n    date_precision:\
+      \ day\n    name: \"特斯拉储能超级工厂投产仪式\"\n    importance: 4\n    type: technology\n\
+      \    description: \"特斯拉上海储能工厂正式投产，带动储能产业链需求\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"300274\"]\n      action: \"加仓\"\n\n  - date: \"2026-03-25\"\
+      \n    date_precision: day\n    name: \"钙钛矿光伏组件量产突破发布会\"\n    importance: 4\n\
+      \    type: technology\n    description: \"头部企业宣布钙钛矿组件效率突破26%并启动GW级产线\"\n   \
+      \ confirmed: false\n    suggested_action:\n      stocks: [\"601012\"]\n    \
+      \  action: \"埋伏\"\n\n  - date: \"2026-06-30\"\n    date_precision: day\n   \
+      \ name: \"2026年上半年风电新增装机数据\"\n    importance: 3\n    type: policy\n    description:\
+      \ \"国家能源局公布1-6月风电并网数据，验证陆风/海风增速\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"002202\"]\n      action: \"持有\"\n\nmonitors:\n  - indicator:\
+      \ \"光伏硅料价格指数\"\n    risk_level: high\n    action: \"硅料价格大幅波动时，减仓中游组件及电池片标的\"\
+      \n  - indicator: \"中美贸易政策（关税/反倾销）\"\n    risk_level: high\n    action: \"若美国加征关税，立即减仓出口占比高的光伏企业\"\
+      \n  - indicator: \"电网消纳能力及弃风弃光率\"\n    risk_level: medium\n    action: \"弃风弃光率上升时，减仓纯运营商，加仓储能标的\"\
+      \n```"
+    industry: 绿色能源
+    provider: deepseek
+    extra: ''
+    created: 2026-06-06T23:57
+    expires: 2026-06-07T23:57

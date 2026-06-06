@@ -49,3 +49,74 @@ detected_events:
   confidence: 0.85
   status: pending
   detected_at: 2026-06-06 16:35
+- date: '2026-06-05'
+  name: 去年60亿收购被否，华峰化学重启关联交易，尤氏家族两块资产再闯股东大会 | 长三角资本局
+  industry: 数字人民币
+  all_industries:
+  - 数字人民币
+  source_url: https://finance.sina.com.cn/stock/csjzbj/2026-06-06/doc-inianqpn7311487.shtml
+  source_title: 去年60亿收购被否，华峰化学重启关联交易，尤氏家族两块资产再闯股东大会 | 长三角资本局
+  confidence: 0.8
+  status: pending
+  detected_at: 2026-06-06 19:49
+- date: '2026-06-04'
+  name: 线缆材料公司追逐算力风口，杭州高新服务器项目仍待落地 | 长三角资本局
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/stock/csjzbj/2026-06-06/doc-inianqpn7310862.shtml
+  source_title: 线缆材料公司追逐算力风口，杭州高新服务器项目仍待落地 | 长三角资本局
+  confidence: 0.7
+  status: pending
+  detected_at: 2026-06-06 19:49
+- date: '2026-06-06'
+  name: 特锐德发布算力中心高压交直流预制舱供电站“算电岛”
+  industry: 6G通信
+  all_industries:
+  - 6G通信
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/china/gncj/2026-06-06/doc-iniankfm8624654.shtml
+  source_title: 特锐德发布算力中心高压交直流预制舱供电站“算电岛”
+  confidence: 0.85
+  status: pending
+  detected_at: 2026-06-06 19:49
+- date: '2026-06-06'
+  name: 知情人士：美国政府考虑入股人工智能企业
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-06/doc-iniankfp0649997.shtml
+  source_title: 知情人士：美国政府考虑入股人工智能企业
+  confidence: 0.7
+  status: pending
+  detected_at: 2026-06-06 19:49
+- date: '2026-06-06'
+  name: 间氨基苯酚商品报价动态（2026-06-06）
+  industry: 绿氢氨醇
+  all_industries:
+  - 绿氢氨醇
+  source_url: https://finance.sina.com.cn/money/future/nyzx/2026-06-06/doc-iniankfp0655738.shtml
+  source_title: 间氨基苯酚商品报价动态（2026-06-06）
+  confidence: 0.7
+  status: pending
+  detected_at: 2026-06-06 21:52
+- date: '2026-06-06'
+  name: 一甲氨基甲酰氯商品报价动态（2026-06-06）
+  industry: 绿氢氨醇
+  all_industries:
+  - 绿氢氨醇
+  source_url: https://finance.sina.com.cn/money/future/nyzx/2026-06-06/doc-iniankfp0655542.shtml
+  source_title: 一甲氨基甲酰氯商品报价动态（2026-06-06）
+  confidence: 0.7
+  status: pending
+  detected_at: 2026-06-06 21:52
+- date: '2026-06-06'
+  name: 二甲氨基甲酰氯商品报价动态（2026-06-06）
+  industry: 绿氢氨醇
+  all_industries:
+  - 绿氢氨醇
+  source_url: https://finance.sina.com.cn/money/future/nyzx/2026-06-06/doc-iniankfp0654511.shtml
+  source_title: 二甲氨基甲酰氯商品报价动态（2026-06-06）
+  confidence: 0.7
+  status: pending
+  detected_at: 2026-06-06 21:52

@@ -86,7 +86,7 @@
                 <div class="d-flex gap-1" style="height:20px;">
                     {% for m in ind.months %}
                     <div class="flex-fill" title="{{ m.name }}: {{ m.count }}事件"
-                         style="background:{% if m.count > 0 %}rgba(220,53,69,{{ 0.1 * m.count }}){% else %}#f0f0f0{% endif %};
+                         style="background:{% if m.count > 0 %}rgba(220,53,69,{{ 0.1 * m.count }}){% else %}var(--border-color){% endif %};
                                 border-radius:2px;">
                     </div>
                     {% endfor %}

@@ -1,18 +1,21 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>行业投资日历 {% block title %}{% endblock %}</title>
+    <script>document.documentElement.setAttribute('data-theme','light');</script>
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
         :root {
+            /* ── 常规模式（Light） ── */
             --bg-body: #f5f6fa;
             --bg-card: #ffffff;
+            --bg-secondary: #f0f2f5;
             --text-primary: #1a1a2e;
-            --text-muted: #6c757d;
-            --border-color: rgba(0,0,0,0.06);
+            --text-muted: #6b7280;
+            --border-color: #e2e4ea;
             --sidebar-gradient: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
             --sidebar-text: rgba(255,255,255,0.7);
             --sidebar-text-hover: #fff;
@@ -21,20 +24,20 @@
             --shadow-hover: 0 4px 16px rgba(0,0,0,0.1);
             --table-stripe: rgba(0,0,0,0.02);
             --ns-importance-height: 0;
-        }
-        [data-theme="dark"] {
-            --bg-body: #0d0d1a;
-            --bg-card: #1a1a2e;
-            --text-primary: #e2e8f0;
-            --text-muted: #94a3b8;
-            --border-color: rgba(255,255,255,0.06);
-            --sidebar-gradient: linear-gradient(180deg, #080812 0%, #0d0d1a 100%);
-            --sidebar-text: rgba(255,255,255,0.5);
-            --sidebar-text-hover: #e2e8f0;
-            --sidebar-hover-bg: rgba(255,255,255,0.06);
-            --shadow: 0 2px 8px rgba(0,0,0,0.3);
-            --shadow-hover: 0 4px 16px rgba(0,0,0,0.4);
-            --table-stripe: rgba(255,255,255,0.02);
+            --color-primary: #2563eb;
+            --color-accent: #7c3aed;
+            --color-success: #16a34a;
+            --color-danger: #dc2626;
+            --color-warning: #f59e0b;
+            /* Bootstrap 主色覆盖 */
+            --bs-primary: #2563eb;
+            --bs-primary-rgb: 37, 99, 235;
+            --bs-success: #16a34a;
+            --bs-success-rgb: 22, 163, 74;
+            --bs-danger: #dc2626;
+            --bs-danger-rgb: 220, 38, 54;
+            --bs-warning: #f59e0b;
+            --bs-warning-rgb: 245, 158, 11;
         }
         body {
             font-size: 14px;
@@ -45,7 +48,7 @@
         .wrapper { display: flex; }
         .sidebar {
             width: 220px;
-            min-height: 100vh;
+            height: 100vh;
             background: var(--sidebar-gradient);
             color: #fff;
             position: fixed;
@@ -124,20 +127,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .sidebar .theme-toggle {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: rgba(255,255,255,0.6);
-            border-radius: 6px;
-            padding: 0.3rem 0.6rem;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-        .sidebar .theme-toggle:hover {
-            color: #fff;
-            border-color: rgba(255,255,255,0.4);
         }
         .main-content {
             margin-left: 220px;
@@ -288,6 +277,7 @@
 
         .table { color: var(--text-primary); }
         .table-light { background: var(--table-stripe); color: var(--text-primary); }
+
         .table-hover tbody tr:hover { background: var(--table-stripe); }
         .table-danger { background: rgba(220,53,69,0.08) !important; }
         .table-warning { background: rgba(255,193,7,0.08) !important; }
@@ -368,16 +358,6 @@
         }
         .mobile-header .hamburger:active { background: rgba(255,255,255,0.1); }
         .mobile-header .mobile-brand { font-weight: 700; font-size: 0.95rem; }
-        .mobile-header .theme-toggle-mobile {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.7);
-            font-size: 1.1rem;
-            cursor: pointer;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-        }
-
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -522,10 +502,7 @@
 <nav class="mobile-header">
     <button class="hamburger" onclick="toggleMobileSidebar()" aria-label="菜单">☰</button>
     <span class="mobile-brand">行业投资日历</span>
-    <button class="theme-toggle-mobile" onclick="toggleTheme()" id="mobileThemeBtn" title="切换主题">
-        <i class="fas fa-moon"></i>
-    </button>
-</nav>
+    </nav>
 <!-- Sidebar Overlay -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
 <div class="wrapper">
@@ -582,15 +559,15 @@
             <a class="nav-item {% if active_page == 'linkage' %}active{% endif %}" href="/linkage">
                 <i class="fas fa-project-diagram"></i> 联动地图
             </a>
+            <a class="nav-item {% if active_page == 'backtest' %}active{% endif %}" href="/backtest">
+                <i class="fas fa-rotate-left"></i> 事件回测
+            </a>
             <div class="nav-section">系统</div>
             <a class="nav-item {% if active_page == 'settings' %}active{% endif %}" href="/settings">
                 <i class="fas fa-cog"></i> 设置
             </a>
         </div>
         <div class="sidebar-footer">
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换主题">
-                <i class="fas fa-moon" id="themeIcon"></i>
-            </button>
             <span style="font-size:0.65rem;opacity:0.4;">v1.0</span>
         </div>
     </nav>
@@ -677,6 +654,27 @@
                         <label class="form-label">描述 <small class="text-muted">(可选)</small></label>
                         <input type="text" class="form-control" name="description" placeholder="监控什么内容">
                     </div>
+                    <div class="border-top pt-3 mb-3">
+                        <h6 class="text-muted mb-2">📊 ETF 行情配置 <small class="text-muted">(可选)</small></h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">ETF 代码</label>
+                                <input type="text" class="form-control" name="etf_code" placeholder="如: 515050">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">ETF 名称</label>
+                                <input type="text" class="form-control" name="etf_name" placeholder="如: 通信ETF">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="auto_calendar" id="autoCalendar" checked>
+                            <label class="form-check-label" for="autoCalendar">
+                                自动生成日历事件 <small class="text-muted">(通过 AI 生成全年催化事件)</small>
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
@@ -708,12 +706,6 @@ window.addEventListener('resize', function() {
     }
 });
 
-(function syncMobileTheme() {
-    const saved = localStorage.getItem('theme') || 'light';
-    const icon = document.getElementById('mobileThemeBtn')?.querySelector('i');
-    if (icon) icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-})();
-
 // ── Toast 系统 ──
 function showToast(message, type) {
     type = type || 'info';
@@ -730,22 +722,6 @@ function showToast(message, type) {
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
-
-// ── 黑暗模式 ──
-function toggleTheme() {
-    const html = document.documentElement;
-    const current = html.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    document.getElementById('themeIcon').className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-}
-(function initTheme() {
-    const saved = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', saved);
-    const icon = document.getElementById('themeIcon');
-    if (icon) icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-})();
 
 // ── 侧边栏行业折叠 ──
 function toggleIndustries() {
@@ -882,16 +858,46 @@ document.getElementById('quickAddForm').addEventListener('submit', function(e) {
             name: form.get('name'),
             keywords: form.get('keywords'),
             description: form.get('description'),
+            etf_code: form.get('etf_code'),
+            etf_name: form.get('etf_name'),
+            auto_calendar: form.get('auto_calendar') === 'on',
         })
     }).then(r => r.json()).then(data => {
         if (data.ok) {
             showToast('✓ 已创建并关注 "' + data.name + '"', 'success');
-            setTimeout(() => location.reload(), 800);
+            // 自动生成日历事件
+            if (data.auto_calendar && data.name) {
+                generateCalendarForIndustry(data.name);
+            } else {
+                setTimeout(() => location.reload(), 800);
+            }
         } else {
             showToast(data.error || '创建失败', 'error');
         }
     });
 });
+
+// ── 自动生成日历事件（创建行业后异步触发）──
+function generateCalendarForIndustry(industryName) {
+    showToast('⏳ 正在为 "' + industryName + '" 生成日历事件...', 'info');
+    fetch('/api/skills/generate-calendar', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            industry: industryName,
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            showToast('✓ 已生成 ' + (data.event_count || 0) + ' 个日历事件', 'success');
+        } else {
+            showToast(data.error || '日历生成失败，可稍后手动生成', 'warning');
+        }
+        setTimeout(() => location.reload(), 1200);
+    }).catch(() => {
+        showToast('日历生成服务暂不可用，请稍后重试', 'warning');
+        setTimeout(() => location.reload(), 800);
+    });
+}
 </script>
 {% block scripts %}{% endblock %}
 </body>

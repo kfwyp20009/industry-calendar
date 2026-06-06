@@ -1,0 +1,217 @@
+industry: 绿色能源
+description: 自定义行业：绿色能源（基于技能自动创建）
+tags:
+- 风力发电
+- 太阳能发电
+- 绿色电力
+updated: '2026-06-06'
+core_stocks:
+- code: '601012'
+  name: 隆基绿能
+  sector: 太阳能
+  reason: 全球单晶硅片龙头，技术领先
+- code: '300274'
+  name: 阳光电源
+  sector: 太阳能
+  reason: 逆变器及储能系统全球龙头
+- code: '600900'
+  name: 长江电力
+  sector: 绿色电力
+  reason: 水电龙头，绿电运营商标杆
+- code: '002202'
+  name: 金风科技
+  sector: 风力发电
+  reason: 国内风电整机龙头，市占率高
+- code: '688599'
+  name: 天合光能
+  sector: 太阳能
+  reason: 组件出货全球前三，分布式领先
+events:
+- date: '2026-01-15'
+  date_precision: day
+  name: 2025年全年光伏装机数据发布
+  importance: 4
+  type: policy
+  description: 国家能源局发布2025年光伏新增装机量，验证行业增速
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '601012'
+    - '300274'
+    - '688599'
+    action: 埋伏
+- date: 2026-02
+  date_precision: month
+  name: 欧盟碳边境调节机制(CBAM)细则更新
+  importance: 5
+  type: regulation
+  description: 欧盟可能进一步明确绿色电力证书认可规则，利好绿电出口企业
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600900'
+    - '601012'
+    action: 加仓
+- date: '2026-03-10'
+  date_precision: day
+  name: 全国两会绿色能源提案集中讨论
+  importance: 5
+  type: policy
+  description: 两会期间将审议‘十五五’能源规划草案，明确风光装机目标
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '002202'
+    - '300274'
+    action: 加仓
+- date: 2026-04
+  date_precision: month
+  name: 2026年一季度光伏产业链价格博弈
+  importance: 3
+  type: product
+  description: 硅料、硅片价格波动影响行业利润，关注龙头企业成本控制
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '601012'
+    - '688599'
+    action: 观望
+- date: '2026-05-20'
+  date_precision: day
+  name: SNEC上海光伏展
+  importance: 4
+  type: exhibition
+  description: 全球最大光伏展，新技术（HJT、钙钛矿）及新品发布密集期
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '601012'
+    - '300274'
+    - '688599'
+    action: 埋伏
+- date: 2026-06
+  date_precision: month
+  name: 海上风电竞配结果公布
+  importance: 5
+  type: policy
+  description: 广东、江苏等省份公布2026年海上风电项目竞配结果，影响装机预期
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '002202'
+    action: 加仓
+- date: 2026-07
+  date_precision: month
+  name: 2026年半年报业绩预告密集期
+  importance: 4
+  type: earnings
+  description: 绿色能源企业披露半年报，重点关注利润增速及海外营收占比
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '601012'
+    - '300274'
+    - '600900'
+    action: 持有
+- date: '2026-08-15'
+  date_precision: day
+  name: 美国对华光伏双反复审结果
+  importance: 5
+  type: regulation
+  description: 美国商务部公布新一轮反倾销/反补贴税率，影响中国组件出口
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '688599'
+    - '601012'
+    action: 减仓
+- date: 2026-09
+  date_precision: month
+  name: 国家能源局发布《可再生能源电力消纳保障机制》修订稿
+  importance: 4
+  type: policy
+  description: 提升绿电消纳权重，利好绿电运营商及储能配套
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600900'
+    - '300274'
+    action: 加仓
+- date: '2026-10-10'
+  date_precision: day
+  name: 2026年北京国际风能大会
+  importance: 3
+  type: exhibition
+  description: 展示大兆瓦风机、漂浮式风电等前沿技术，行业风向标
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '002202'
+    action: 埋伏
+- date: 2026-11
+  date_precision: month
+  name: COP31气候大会（假设在巴西举行）
+  importance: 4
+  type: policy
+  description: 全球气候目标更新，可能推动可再生能源装机目标上调
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '601012'
+    - '002202'
+    action: 持有
+- date: 2026-12
+  date_precision: month
+  name: 2027年光伏组件集采招标启动
+  importance: 3
+  type: product
+  description: 央企年度集采规模超100GW，价格及技术路线影响行业格局
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '688599'
+    - '601012'
+    action: 埋伏
+- date: '2026-01-20'
+  date_precision: day
+  name: 特斯拉储能超级工厂投产仪式
+  importance: 4
+  type: technology
+  description: 特斯拉上海储能工厂正式投产，带动储能产业链需求
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '300274'
+    action: 加仓
+- date: '2026-03-25'
+  date_precision: day
+  name: 钙钛矿光伏组件量产突破发布会
+  importance: 4
+  type: technology
+  description: 头部企业宣布钙钛矿组件效率突破26%并启动GW级产线
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '601012'
+    action: 埋伏
+- date: '2026-06-30'
+  date_precision: day
+  name: 2026年上半年风电新增装机数据
+  importance: 3
+  type: policy
+  description: 国家能源局公布1-6月风电并网数据，验证陆风/海风增速
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '002202'
+    action: 持有
+monitors:
+- indicator: 光伏硅料价格指数
+  risk_level: high
+  action: 硅料价格大幅波动时，减仓中游组件及电池片标的
+- indicator: 中美贸易政策（关税/反倾销）
+  risk_level: high
+  action: 若美国加征关税，立即减仓出口占比高的光伏企业
+- indicator: 电网消纳能力及弃风弃光率
+  risk_level: medium
+  action: 弃风弃光率上升时，减仓纯运营商，加仓储能标的

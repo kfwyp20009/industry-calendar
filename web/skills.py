@@ -1,6 +1,7 @@
 """技能系统 — 用户可自定义监控任意行业/话题"""
 
 import os
+import json
 import time
 from datetime import datetime
 
@@ -8,6 +9,12 @@ import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_FILE = os.path.join(BASE_DIR, "data", "skills", "custom.yaml")
+
+# 关联数据文件路径
+ETF_MAPPING_FILE = os.path.join(BASE_DIR, "data", "etf_mapping.yaml")
+CROSS_INDUSTRY_FILE = os.path.join(BASE_DIR, "data", "cross-industry.yaml")
+PORTFOLIO_FILE = os.path.join(BASE_DIR, "data", "stocks", "portfolio.yaml")
+FOLLOWED_FILE = os.path.join(BASE_DIR, "data", "followed.json")
 
 # 内置行业技能（不可删除）
 BUILTIN_SKILLS = {
@@ -331,5 +338,108 @@ def is_custom_skill_industry(name):
         if s["name"] == name:
             return True
     return False
+
+
+# ═══════════════════════════════════════════════════════════════
+# 行业关联数据同步（新增/删除行业时同步更新以下文件）
+# ═══════════════════════════════════════════════════════════════
+
+def _load_yaml(path):
+    if not os.path.exists(path):
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def _save_yaml(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        yaml.dump(data, f, allow_unicode=True, sort_keys=False)
+
+
+def sync_etf_mapping(industry_name, etf_code="", etf_name=""):
+    """新增行业时同步 ETF 映射（提供代码则写入，否则留占位）"""
+    data = _load_yaml(ETF_MAPPING_FILE)
+    mapping = data.setdefault("mapping", {})
+    if industry_name not in mapping:
+        note = ""
+        if not etf_code:
+            note = f"自定义行业：{industry_name}（请核实并填入ETF代码）"
+        elif not etf_name:
+            etf_name = f"{industry_name}ETF"
+        mapping[industry_name] = {
+            "code": etf_code,
+            "name": etf_name,
+            "exchange": "SH",
+            "type": "自定义",
+            "note": note,
+        }
+    data["updated"] = datetime.now().strftime("%Y-%m-%d")
+    _save_yaml(ETF_MAPPING_FILE, data)
+
+
+def remove_from_etf_mapping(industry_name):
+    """删除行业时清理 ETF 映射"""
+    data = _load_yaml(ETF_MAPPING_FILE)
+    if industry_name in data.get("mapping", {}):
+        del data["mapping"][industry_name]
+        data["updated"] = datetime.now().strftime("%Y-%m-%d")
+        _save_yaml(ETF_MAPPING_FILE, data)
+
+
+def sync_cross_industry(industry_name, tags=None):
+    """新增行业时同步跨行业联动（添加空关联矩阵行）"""
+    data = _load_yaml(CROSS_INDUSTRY_FILE)
+    affinity = data.setdefault("affinity_matrix", {})
+    if industry_name not in affinity:
+        affinity[industry_name] = {}
+    data["updated"] = datetime.now().strftime("%Y-%m-%d")
+    _save_yaml(CROSS_INDUSTRY_FILE, data)
+
+
+def remove_from_cross_industry(industry_name):
+    """删除行业时从联动数据清理（矩阵行/列 + 联动事件）"""
+    data = _load_yaml(CROSS_INDUSTRY_FILE)
+    # 删除该行业的矩阵行
+    if industry_name in data.get("affinity_matrix", {}):
+        del data["affinity_matrix"][industry_name]
+    # 从其他行业的矩阵行中删除对该行业的引用
+    for row_name in list(data.get("affinity_matrix", {})):
+        if industry_name in data["affinity_matrix"][row_name]:
+            del data["affinity_matrix"][row_name][industry_name]
+    # 删除包含该行业的联动事件
+    if "cross_events" in data:
+        data["cross_events"] = [
+            e for e in data["cross_events"]
+            if industry_name not in e.get("industries", [])
+        ]
+    data["updated"] = datetime.now().strftime("%Y-%m-%d")
+    _save_yaml(CROSS_INDUSTRY_FILE, data)
+
+
+def remove_from_portfolio(industry_name):
+    """删除行业时清理组合池中该行业的标的"""
+    data = _load_yaml(PORTFOLIO_FILE)
+    if "stocks" in data:
+        old_len = len(data["stocks"])
+        data["stocks"] = [s for s in data["stocks"] if s.get("industry") != industry_name]
+        if len(data["stocks"]) != old_len:
+            data["updated"] = datetime.now().strftime("%Y-%m-%d")
+            _save_yaml(PORTFOLIO_FILE, data)
+
+
+def remove_from_followed(industry_name):
+    """删除行业时取消关注"""
+    try:
+        if not os.path.exists(FOLLOWED_FILE):
+            return
+        with open(FOLLOWED_FILE, "r", encoding="utf-8") as f:
+            names = json.load(f)
+        if isinstance(names, list) and industry_name in names:
+            names.remove(industry_name)
+            with open(FOLLOWED_FILE, "w", encoding="utf-8") as f:
+                json.dump(names, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
 

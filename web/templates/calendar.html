@@ -98,10 +98,22 @@
                         <td class="align-middle">{{ ev.industry }}</td>
                         <td class="align-middle">
                             <strong>{{ ev.name }}</strong>
+                            {% if ev.is_past %}
+                                {% if ev.backtest_badge %}
+                                <span class="badge {{ ev.backtest_badge.class }}" style="font-size:0.6rem;">{{ ev.backtest_badge.label }}</span>
+                                {% else %}
+                                <span class="badge bg-secondary" style="font-size:0.6rem;">待回测</span>
+                                {% endif %}
+                            {% endif %}
                             <div class="text-muted" style="font-size:0.8rem;">{{ ev.description }}</div>
                             {% if ev.impact %}
                             <div class="text-muted" style="font-size:0.75rem;">
                                 <i class="fas fa-arrow-right me-1"></i> {{ ev.impact[:80] }}{% if ev.impact|length > 80 %}...{% endif %}
+                            </div>
+                            {% endif %}
+                            {% if ev.backtest and ev.backtest.notes %}
+                            <div class="mt-1" style="font-size:0.75rem;color:var(--text-muted);">
+                                <i class="fas fa-rotate-left me-1"></i> {{ ev.backtest.notes[:60] }}
                             </div>
                             {% endif %}
                         </td>
@@ -114,6 +126,13 @@
                             <span class="stock-tag" style="background:{{ get_action_color(act) }}; color:#fff;">
                                 {{ act }}
                             </span>
+                            {% endif %}
+                            {% if ev.backtest and ev.backtest.price_change %}
+                            <div style="font-size:0.65rem;margin-top:2px;">
+                                <span class="{% if ev.backtest.price_change.startswith('+') %}text-danger{% else %}text-success{% endif %}">
+                                    {{ ev.backtest.price_change }}
+                                </span>
+                            </div>
                             {% endif %}
                         </td>
                     </tr>
@@ -132,6 +151,20 @@
 
 {% block scripts %}
 <script>
+// 默认滚动到当前月
+document.addEventListener('DOMContentLoaded', function() {
+    const currentMonth = document.querySelector('.month-tab.current');
+    if (currentMonth) {
+        const href = currentMonth.getAttribute('href');
+        if (href) {
+            setTimeout(function() {
+                const target = document.querySelector(href);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 200);
+        }
+    }
+});
+
 function filterCalendar() {
     const search = (document.getElementById('calSearch').value || '').toLowerCase();
     const industry = document.getElementById('calIndustryFilter').value;

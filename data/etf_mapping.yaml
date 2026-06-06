@@ -1,88 +1,80 @@
-# 行业 → ETF 映射
-# 用于仪表盘 "行业 vs 大盘" 对比展示
-updated: "2026-06-06"
-
+updated: '2026-06-06'
 mapping:
-  "6G通信":
-    code: "515050"
-    name: "通信ETF"
-    exchange: "SH"
-    type: "行业"
-    note: "覆盖5G/6G通信设备、运营商，与6G主题高度重合"
-
-  "低空经济":
-    code: "512660"
-    name: "军工ETF"
-    exchange: "SH"
-    type: "行业"
-    note: "低空经济/eVTOL与国防军工供应链高度重叠"
-
-  "卫星互联网":
-    code: "512660"
-    name: "军工ETF"
-    exchange: "SH"
-    type: "行业"
-    note: "卫星制造+地面设备，军工ETF卫星成分股占比~15%"
-
-  "机器人零部件":
-    code: "562500"
-    name: "机器人ETF"
-    exchange: "SH"
-    type: "主题"
-    note: "覆盖减速器、伺服、控制器，与零部件方向一致"
-
-  "具身智能":
-    code: "562500"
-    name: "机器人ETF"
-    exchange: "SH"
-    type: "主题"
-    note: "具身智能主要映射机器人产业链"
-
-  "绿氢氨醇":
-    code: "516160"
-    name: "新能源ETF"
-    exchange: "SH"
-    type: "行业"
-    note: "覆盖风光氢储，绿氢为子方向"
-
-  "数字人民币":
-    code: "159851"
-    name: "金融科技ETF"
-    exchange: "SZ"
-    type: "主题"
-    note: "覆盖银行IT、支付、加密，数币为子方向"
-
-  "AI大模型/应用":
-    code: "515070"
-    name: "AI智能ETF"
-    exchange: "SH"
-    type: "主题"
-    note: "覆盖算力+大模型+应用，是泛AI方向最直接工具"
-
-  "半导体/国产替代":
-    code: "512480"
-    name: "半导体ETF"
-    exchange: "SH"
-    type: "行业"
-    note: "覆盖设备、设计、封测，国产替代主线"
-
-  "商业航天":
-    code: "512660"
-    name: "军工ETF"
-    exchange: "SH"
-    type: "行业"
-    note: "商业航天与军工发射产业链高度重合"
-
-  "自动驾驶/L4":
-    code: "515250"
-    name: "智能汽车ETF"
-    exchange: "SH"
-    type: "主题"
-    note: "覆盖智驾方案商、域控、传感器"
-
-  "量子计算":
-    code: "516200"
-    name: "计算机ETF"
-    exchange: "SH"
-    type: "行业"
-    note: "量子计算目前无独立ETF，计算机ETF含量子概念股"
+  6G通信:
+    code: '515050'
+    name: 通信ETF
+    exchange: SH
+    type: 行业
+    note: 覆盖5G/6G通信设备、运营商，与6G主题高度重合
+  低空经济:
+    code: '512660'
+    name: 军工ETF
+    exchange: SH
+    type: 行业
+    note: 低空经济/eVTOL与国防军工供应链高度重叠
+  卫星互联网:
+    code: '512660'
+    name: 军工ETF
+    exchange: SH
+    type: 行业
+    note: 卫星制造+地面设备，军工ETF卫星成分股占比~15%
+  机器人零部件:
+    code: '562500'
+    name: 机器人ETF
+    exchange: SH
+    type: 主题
+    note: 覆盖减速器、伺服、控制器，与零部件方向一致
+  具身智能:
+    code: '562500'
+    name: 机器人ETF
+    exchange: SH
+    type: 主题
+    note: 具身智能主要映射机器人产业链
+  绿氢氨醇:
+    code: '516160'
+    name: 新能源ETF
+    exchange: SH
+    type: 行业
+    note: 覆盖风光氢储，绿氢为子方向
+  数字人民币:
+    code: '159851'
+    name: 金融科技ETF
+    exchange: SZ
+    type: 主题
+    note: 覆盖银行IT、支付、加密，数币为子方向
+  AI大模型/应用:
+    code: '515070'
+    name: AI智能ETF
+    exchange: SH
+    type: 主题
+    note: 覆盖算力+大模型+应用，是泛AI方向最直接工具
+  半导体/国产替代:
+    code: '512480'
+    name: 半导体ETF
+    exchange: SH
+    type: 行业
+    note: 覆盖设备、设计、封测，国产替代主线
+  商业航天:
+    code: '512660'
+    name: 军工ETF
+    exchange: SH
+    type: 行业
+    note: 商业航天与军工发射产业链高度重合
+  自动驾驶/L4:
+    code: '515250'
+    name: 智能汽车ETF
+    exchange: SH
+    type: 主题
+    note: 覆盖智驾方案商、域控、传感器
+  量子计算:
+    code: '516200'
+    name: 计算机ETF
+    exchange: SH
+    type: 行业
+    note: 量子计算目前无独立ETF，计算机ETF含量子概念股
+  绿色能源:
+    code: ''
+    name: ''
+    exchange: SH
+    type: 自定义
+    note: 自定义行业：绿色能源（请核实并填入ETF代码）
