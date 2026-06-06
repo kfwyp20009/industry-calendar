@@ -2,7 +2,10 @@
 
 import os
 import json
+import re
 import time
+import hashlib
+from datetime import datetime, timedelta
 from urllib.request import Request, urlopen
 from urllib.error import URLError
 
@@ -10,6 +13,9 @@ import yaml
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_FILE = os.path.join(BASE_DIR, "data", "llm_config.yaml")
+CACHE_FILE = os.path.join(BASE_DIR, "data", "analysis_cache.yaml")
+PROMPTS_FILE = os.path.join(BASE_DIR, "data", "prompts.yaml")
+CACHE_TTL_HOURS = 24
 
 # 内置厂商定义
 BUILTIN_PROVIDERS = {
@@ -77,11 +83,97 @@ def save_config(config):
         yaml.dump(config, f, allow_unicode=True, sort_keys=False)
 
 
+# ── 分析结果缓存 ──
+
+def _cache_key(industry, provider, extra=""):
+    """生成缓存键（MD5）"""
+    raw = f"{industry}|{provider}|{extra}"
+    return hashlib.md5(raw.encode()).hexdigest()[:16]
+
+
+def _get_cached(key):
+    """读取缓存，过期返回 None"""
+    if not os.path.exists(CACHE_FILE):
+        return None
+    with open(CACHE_FILE, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    entry = data.get("caches", {}).get(key)
+    if not entry:
+        return None
+    expires = entry.get("expires")
+    if expires and datetime.now() > datetime.fromisoformat(expires):
+        return None
+    return entry.get("content")
+
+
+def _save_cache(key, content, industry, provider, extra=""):
+    """写入缓存"""
+    os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
+    cache = {}
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            cache = yaml.safe_load(f) or {}
+    if "caches" not in cache:
+        cache["caches"] = {}
+    cache["caches"][key] = {
+        "content": content,
+        "industry": industry,
+        "provider": provider,
+        "extra": extra,
+        "created": datetime.now().isoformat(timespec="minutes"),
+        "expires": (datetime.now() + timedelta(hours=CACHE_TTL_HOURS)).isoformat(timespec="minutes"),
+    }
+    with open(CACHE_FILE, "w", encoding="utf-8") as f:
+        yaml.dump(cache, f, allow_unicode=True, sort_keys=False)
+
+
 def get_enabled_providers():
     """获取已启用的厂商列表"""
     config = load_config()
     providers = config.get("providers", {})
     return [(key, info) for key, info in providers.items() if info.get("enabled")]
+
+
+# ── Prompt 模板管理 ──
+
+def load_prompts():
+    """加载 Prompt 模板配置"""
+    if not os.path.exists(PROMPTS_FILE):
+        return {"presets": {}}
+    with open(PROMPTS_FILE, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {"presets": {}}
+
+
+def get_preset_prompt(preset_key, prompt_type):
+    """获取指定预设的 Prompt 文本，fallback 到内置默认"""
+    prompts_data = load_prompts()
+    presets = prompts_data.get("presets", {})
+    if preset_key in presets:
+        text = presets[preset_key].get(prompt_type, "")
+        if text:
+            return text
+    # fallback
+    if prompt_type == "industry_report":
+        return INDUSTRY_REPORT_PROMPT
+    elif prompt_type == "calendar_generation":
+        return CALENDAR_GENERATION_PROMPT
+    return ""
+
+
+def get_available_presets():
+    """获取可用的预设列表"""
+    prompts_data = load_prompts()
+    presets = prompts_data.get("presets", {})
+    result = {}
+    for key, info in presets.items():
+        result[key] = {
+            "name": info.get("name", key),
+            "description": info.get("description", ""),
+        }
+    # 确保至少返回标准预设
+    if "standard" not in result:
+        result["standard"] = {"name": "标准分析", "description": "默认的结构化分析报告"}
+    return result
 
 
 def call_llm(prompt, provider_key="deepseek", model=None, temperature=0.7, max_tokens=4096):
@@ -245,28 +337,107 @@ monitors:
 """
 
 
-def generate_industry_report(industry, provider_key=None, model=None):
-    """生成行业分析报告"""
+# ── 内置示例报告（无 API Key 时展示） ──
+
+MOCK_INDUSTRY_REPORT = """### 行业概况
+光伏行业当前处于产能出清与技术迭代并行期。2025年全球光伏新增装机预计达600GW，中国占比超50%，但全产业链产能过剩导致价格战持续，行业整体利润率承压。
+
+### 核心驱动因素
+1. **全球能源转型加速** — 巴黎协定目标倒逼各国提高可再生能源占比，光伏发电成本已低于煤电，经济性驱动装机需求持续增长
+2. **技术迭代（TOPCon/HJT/BC）** — N型电池技术快速取代PERC，TOPCon 2025年市占率预计超70%，BC电池在分布式场景渗透率提升
+3. **电网消纳与储能配套** — 特高压建设+新型储能政策推动"光伏+储能"模式，缓解弃光率问题
+4. **国际贸易壁垒** — 美国反规避、欧盟碳边境调节机制影响出口格局，东南亚产能布局成为龙头标配
+5. **产能出清节奏** — 2024-2025年行业亏损加速落后产能退出，龙头市占率提升，行业集中度（CR5）有望从45%提升至60%
+
+### 产业链结构
+上游（硅料/硅片）→ 中游（电池片/组件）→ 下游（逆变器/电站运营/储能）。当前利润分布：上游硅料环节盈利触底，中游组件环节亏损面扩大，下游电站受益于组件降价IRR提升，逆变器环节受益于海外需求增长。
+
+### 关键标的
+- **隆基绿能（601012）** — BC电池技术领先，分布式渠道优势显著，资金储备充足穿越周期
+- **阳光电源（300274）** — 逆变器全球份额第一，储能系统集成业务高速增长
+- **晶科能源（688223）** — N型TOPCon出货量全球第一，海外产能布局领先
+- **通威股份（600438）** — 硅料+电池双龙头，成本优势明显，行业出清后充分受益
+- **迈为股份（300751）** — HJT整线设备龙头，受益于下一代技术路线投资
+
+### 近期催化剂
+- **2026年Q2** — 工信部新一轮《光伏制造行业规范条件》发布，有望进一步提高准入门槛，加速落后产能退出
+- **2026年年中** — 美国对东南亚光伏关税豁免到期后政策明朗化
+- **2026年下半年** — 国内十四五规划收官年抢装效应显现
+- **欧洲夏季能源高峰** — 能源安全议题拉升海外订单预期
+
+### 风险提示
+1. 产能出清速度不及预期，行业亏损持续时间超预期
+2. 海外贸易壁垒升级，关税成本侵蚀企业利润
+3. 技术路线切换风险（钙钛矿等下一代技术对现有产能的颠覆）
+
+---
+> ⚠️ *此为内置示例报告。要生成真实行业分析，请在[设置页面](/settings)中配置大模型 API Key 并启用至少一个厂商。*"""
+
+
+def generate_industry_report(industry, provider_key=None, model=None, extra_instructions="", force_refresh=False, custom_prompt=None):
+    """生成行业分析报告（带缓存）"""
     if provider_key is None:
         config = load_config()
         provider_key = config.get("default_provider", "deepseek")
 
-    prompt = INDUSTRY_REPORT_PROMPT.format(industry=industry)
-    return call_llm(prompt, provider_key=provider_key, model=model, temperature=0.3, max_tokens=4096)
+    # 检查缓存（仅在不使用自定义 prompt 时生效）
+    if not custom_prompt and not force_refresh:
+        key = _cache_key(industry, provider_key, extra_instructions)
+        cached = _get_cached(key)
+        if cached:
+            return {"ok": True, "content": cached, "cached": True}
+
+    if custom_prompt:
+        prompt = custom_prompt.format(industry=industry)
+    else:
+        prompt = INDUSTRY_REPORT_PROMPT.format(industry=industry)
+    if extra_instructions:
+        prompt += f"\n\n## 额外关注点\n{extra_instructions}"
+    result = call_llm(prompt, provider_key=provider_key, model=model, temperature=0.3, max_tokens=4096)
+
+    if result.get("ok") and not custom_prompt:
+        _save_cache(_cache_key(industry, provider_key, extra_instructions),
+                     result["content"], industry, provider_key, extra_instructions)
+    return result
 
 
-def generate_calendar_events(industry_name, description="", keywords=None, provider_key=None, model=None):
-    """生成行业日历事件"""
+def generate_calendar_events(industry_name, description="", keywords=None, provider_key=None, model=None, extra_instructions="", force_refresh=False, custom_prompt=None):
+    """生成行业日历事件（带缓存）"""
     if provider_key is None:
         config = load_config()
         provider_key = config.get("default_provider", "deepseek")
 
     kw_str = "、".join(keywords) if keywords else "无"
-    prompt = CALENDAR_GENERATION_PROMPT.format(
-        industry=industry_name,
-        description=description or f"{industry_name}行业",
-        keywords=kw_str,
-    )
+
+    if custom_prompt:
+        prompt = custom_prompt.format(
+            industry=industry_name,
+            description=description or f"{industry_name}行业",
+            keywords=kw_str,
+        )
+    else:
+        prompt = CALENDAR_GENERATION_PROMPT.format(
+            industry=industry_name,
+            description=description or f"{industry_name}行业",
+            keywords=kw_str,
+        )
+    if extra_instructions:
+        prompt += f"\n\n## 额外关注点\n{extra_instructions}"
+
+    # 检查缓存（仅在不使用自定义 prompt 时生效）
+    if not custom_prompt and not force_refresh:
+        key = _cache_key(industry_name, provider_key, extra_instructions)
+        cached = _get_cached(key)
+        if cached:
+            try:
+                yaml_match = re.search(r"```(?:yaml)?\s*\n(.*?)```", cached, re.DOTALL)
+                yaml_str = yaml_match.group(1) if yaml_match else cached
+                parsed = yaml.safe_load(yaml_str)
+                if parsed and "events" in parsed:
+                    return {"ok": True, "content": parsed, "raw": cached, "cached": True}
+            except Exception:
+                pass
+
     result = call_llm(prompt, provider_key=provider_key, model=model, temperature=0.4, max_tokens=8192)
 
     if not result.get("ok"):
@@ -274,7 +445,6 @@ def generate_calendar_events(industry_name, description="", keywords=None, provi
 
     # 尝试从返回中提取 YAML
     content = result["content"]
-    import re
     yaml_match = re.search(r"```(?:yaml)?\s*\n(.*?)```", content, re.DOTALL)
     if yaml_match:
         yaml_str = yaml_match.group(1)
@@ -282,9 +452,11 @@ def generate_calendar_events(industry_name, description="", keywords=None, provi
         yaml_str = content
 
     try:
-        import yaml as yaml_lib
-        parsed = yaml_lib.safe_load(yaml_str)
+        parsed = yaml.safe_load(yaml_str)
         if parsed and "events" in parsed:
+            if not custom_prompt:
+                _save_cache(_cache_key(industry_name, provider_key, extra_instructions),
+                             content, industry_name, provider_key, extra_instructions)
             return {"ok": True, "content": parsed, "raw": content}
         else:
             return {"ok": True, "content": {"events": [], "monitors": []}, "raw": content,

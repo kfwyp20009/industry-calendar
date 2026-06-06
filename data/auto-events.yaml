@@ -39,3 +39,13 @@ detected_events:
   confidence: 0.85
   status: pending
   detected_at: 2026-06-06 13:28
+- date: '2026-06-06'
+  name: 吴清：中小机构不要拼规模要拼特色，走出特色化、精品化路线
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/stock/marketresearch/2026-06-06/doc-iniancxs7513903.shtml
+  source_title: 吴清：中小机构不要拼规模要拼特色，走出特色化、精品化路线
+  confidence: 0.85
+  status: pending
+  detected_at: 2026-06-06 16:35

@@ -1,0 +1,212 @@
+# LLM Prompt 模板配置
+presets:
+  standard:
+    name: 标准分析
+    description: 默认的结构化分析报告
+    industry_report: |
+      你是一位资深行业投资分析师。请对以下行业进行深度分析，输出结构化报告。
+
+      ## 行业名称
+      {industry}
+
+      ## 要求
+      1. 请基于公开信息和行业常识进行分析
+      2. 输出格式为 Markdown，包含以下板块：
+         - **行业概况**（1-2 句话概述行业现状）
+         - **核心驱动因素**（列出 3-5 个关键驱动因素）
+         - **产业链结构**（简要描述上下游）
+         - **关键标的**（列出 3-5 家核心公司，含简短理由）
+         - **近期催化剂**（未来 3-6 个月可能的事件）
+         - **风险提示**（2-3 个主要风险）
+      3. 语言简洁专业，数据尽量具体
+      4. 不构成投资建议
+
+      请开始分析。
+    calendar_generation: |
+      你是一位资深的行业研究专家。请为以下行业生成 2026 年全年的投资日历事件。
+
+      ## 行业名称
+      {industry}
+
+      ## 行业简介
+      {description}
+
+      ## 关键词
+      {keywords}
+
+      ## 输出要求
+      请输出 YAML 格式的日历数据，格式如下（只输出 YAML，不要额外说明）：
+
+      ```yaml
+      core_stocks:
+        - code: "000063"
+          name: "公司名称"
+          sector: "细分领域"
+          reason: "入选理由（20字以内）"
+
+      events:
+        - date: "2026-01"
+          date_precision: month
+          name: "事件名称"
+          importance: 4
+          type: policy/product/regulation/ipo/earnings/exhibition/technology/other
+          description: "事件简要描述"
+          confirmed: false
+          suggested_action:
+            stocks: []
+            action: "持有/加仓/减仓/埋伏/观望"
+
+      monitors:
+        - indicator: "需要监控的风险指标"
+          risk_level: high/medium
+          action: "对应操作建议"
+      ```
+
+      ## 具体要求
+      1. 每个月至少 1-2 个事件，全年至少 15 个事件
+      2. 重要性 5 级的事件 3-5 个（板块级催化）
+      3. 日期尽量具体，已知事件用精确日期，预期事件用月份
+      4. 事件类型包括：政策发布、产品发布、重要会议、财报、IPO、技术突破等
+      5. 如果这个行业很新或很小众，可以合理推断可能的事件节点
+      6. core_stocks 至少列出 3-5 只核心标的，包含 A 股代码（6位）或美股代码
+      7. 至少包含 2-3 个风险监控指标
+      8. 所有输出必须是合法的 YAML 格式
+
+  brief:
+    name: 简要快评
+    description: 精简版快速分析，300字以内
+    industry_report: |
+      你是一位资深行业投资分析师。请对以下行业进行简要分析。
+
+      ## 行业名称
+      {industry}
+
+      ## 要求
+      1. 输出格式为 Markdown
+      2. 只需包含以下板块：
+         - **行业概况**（1句话）
+         - **核心驱动因素**（2-3个）
+         - **关键标的**（2-3只核心公司）
+         - **近期催化**（1-2个事件）
+      3. 控制篇幅，语言精炼
+      4. 不构成投资建议
+
+      请开始分析。
+    calendar_generation: |
+      你是一位资深的行业研究专家。请为以下行业生成 2026 年投资日历事件（精简版）。
+
+      ## 行业名称
+      {industry}
+
+      ## 行业简介
+      {description}
+
+      ## 关键词
+      {keywords}
+
+      ## 输出要求
+      请输出 YAML 格式的日历数据，格式如下（只输出 YAML，不要额外说明）：
+
+      ```yaml
+      core_stocks:
+        - code: "000063"
+          name: "公司名称"
+          sector: "细分领域"
+          reason: "入选理由"
+
+      events:
+        - date: "2026-01"
+          date_precision: month
+          name: "事件名称"
+          importance: 4
+          type: policy/product/regulation/ipo/earnings/exhibition/technology/other
+          description: "事件简要描述"
+          confirmed: false
+
+      monitors:
+        - indicator: "风险指标"
+          risk_level: high/medium
+          action: "操作建议"
+      ```
+
+      ## 具体要求
+      1. 全年至少 8 个核心事件，集中在最重要的时间节点
+      2. 重要性 5 级的事件至少 2 个
+      3. core_stocks 至少列出 3 只核心标的
+      4. 至少包含 2 个风险监控指标
+      5. 所有输出必须是合法的 YAML 格式
+
+  deep:
+    name: 深度研究
+    description: 深度长文分析，800字以上
+    industry_report: |
+      你是一位资深行业投资分析师，擅长撰写深度研究报告。请对以下行业进行深度分析。
+
+      ## 行业名称
+      {industry}
+
+      ## 要求
+      1. 请基于公开信息和行业常识进行分析
+      2. 输出格式为 Markdown，包含以下板块：
+         - **行业概况**（当前规模、发展阶段、主要特征）
+         - **核心驱动因素**（列出 3-5 个关键驱动因素，每个附带简要分析）
+         - **产业链结构**（描述上下游，标注价值分布）
+         - **竞争格局**（市场集中度、进入壁垒、主要参与者）
+         - **关键标的**（列出 3-5 家核心公司，含理由和关注点）
+         - **近期催化剂**（未来 3-6 个月可能的事件及影响评估）
+         - **风险提示**（2-3 个主要风险及可能的触发条件）
+      3. 数据尽量具体，引用可靠来源
+      4. 不少于 800 字
+      5. 不构成投资建议
+
+      请开始分析。
+    calendar_generation: |
+      你是一位资深的行业研究专家，擅长深度前瞻性研究。请为以下行业生成 2026 年全年的投资日历事件（深度版）。
+
+      ## 行业名称
+      {industry}
+
+      ## 行业简介
+      {description}
+
+      ## 关键词
+      {keywords}
+
+      ## 输出要求
+      请输出 YAML 格式的日历数据，格式如下（只输出 YAML，不要额外说明）：
+
+      ```yaml
+      core_stocks:
+        - code: "000063"
+          name: "公司名称"
+          sector: "细分领域"
+          reason: "入选理由（20字以内）"
+
+      events:
+        - date: "2026-01"
+          date_precision: month
+          name: "事件名称"
+          importance: 4
+          type: policy/product/regulation/ipo/earnings/exhibition/technology/other
+          description: "事件简要描述"
+          impact: "潜在影响分析"
+          confirmed: false
+          suggested_action:
+            stocks: []
+            action: "持有/加仓/减仓/埋伏/观望"
+
+      monitors:
+        - indicator: "需要监控的风险指标"
+          risk_level: high/medium
+          action: "对应操作建议"
+          threshold: "触发阈值"
+      ```
+
+      ## 具体要求
+      1. 每个月至少 2-3 个事件，全年至少 20 个事件
+      2. 重要性 5 级的事件 4-6 个，给出具体影响分析
+      3. 日期尽量具体，已确认事件用精确日期
+      4. 事件类型覆盖：政策发布、产品发布、重要会议、财报、IPO、技术突破、海外映射等
+      5. core_stocks 至少列出 5 只核心标的
+      6. 至少包含 3 个风险监控指标，包含触发阈值
+      7. 所有输出必须是合法的 YAML 格式

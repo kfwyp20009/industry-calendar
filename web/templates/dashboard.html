@@ -276,6 +276,39 @@
             </div>
         </div>
 
+        <!-- 行业 ETF 基准 -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-line me-1"></i> 行业 ETF 基准
+            </div>
+            <div class="card-body p-2">
+                <div style="font-size:0.75rem;">
+                    {% for code, ind in industries.items() %}
+                    {% set etf = etf_mapping.get(ind.industry) %}
+                    <div class="d-flex justify-content-between align-items-center py-1">
+                        <span>{{ ind.industry }}</span>
+                        {% if etf %}
+                        <span>
+                            <a href="https://xueqiu.com/S/{{ etf.exchange }}{{ etf.code }}" target="_blank" rel="noopener"
+                               class="text-decoration-none" style="color:var(--text-primary);">
+                                <span class="badge bg-light text-dark" style="font-size:0.7rem;">
+                                    {{ etf.code }} {{ etf.name }}
+                                    <i class="fas fa-external-link-alt" style="font-size:0.5rem;opacity:0.5;"></i>
+                                </span>
+                            </a>
+                        </span>
+                        {% else %}
+                        <span class="text-muted" style="font-size:0.6rem;">—</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-muted mt-1" style="font-size:0.6rem;">
+                    <i class="fas fa-info-circle me-1"></i>点击 ETF 代码查看雪球行情 · 用作行业板块基准参考
+                </div>
+            </div>
+        </div>
+
         <!-- 跨行业联动 -->
         {% if cross_events %}
         <div class="card">

@@ -83,6 +83,18 @@ def toggle_source(src_id, enabled=None):
     save_sources(sources)
 
 
+def update_source(src_id, fields):
+    """更新新闻源的指定字段"""
+    sources = load_sources()
+    for s in sources:
+        if s["id"] == src_id:
+            for key, val in fields.items():
+                if val is not None:
+                    s[key] = val
+            break
+    save_sources(sources)
+
+
 # ── 新闻抓取 ──
 
 def fetch_from_source(source):
@@ -256,7 +268,7 @@ def detect_events_from_news(news_items):
         m = re.search(r"(\d{1,2})月(\d{1,2})(?:日|号)?", text)
         if m:
             month, day = int(m.group(1)), int(m.group(2))
-            date_match = f"2026-{month:02d}-{day:02d}"
+            date_match = f"{date.today().year}-{month:02d}-{day:02d}"
 
         if not date_match:
             continue
@@ -322,8 +334,28 @@ def load_detected_events():
     return data.get("detected_events", [])
 
 
+INDUSTRIES_DIR = os.path.join(BASE_DIR, "data", "industries")
+
+
+def _find_industry_file(industry_name):
+    """按行业名查找对应的数据文件路径"""
+    if not os.path.isdir(INDUSTRIES_DIR):
+        return None, None
+    for fname in sorted(os.listdir(INDUSTRIES_DIR)):
+        if fname.endswith(".yaml"):
+            fpath = os.path.join(INDUSTRIES_DIR, fname)
+            with open(fpath, "r", encoding="utf-8") as f:
+                try:
+                    data = yaml.safe_load(f) or {}
+                    if data.get("industry") == industry_name:
+                        return fpath, data
+                except Exception:
+                    continue
+    return None, None
+
+
 def accept_event(event_idx):
-    """接受检测到的事件（标记为已确认）"""
+    """接受检测到的事件（标记为已确认，不写入行业 YAML）"""
     events = load_detected_events()
     if 0 <= event_idx < len(events):
         events[event_idx]["status"] = "accepted"
@@ -331,6 +363,57 @@ def accept_event(event_idx):
             yaml.dump({"detected_events": events}, f, allow_unicode=True, sort_keys=False)
         return True
     return False
+
+
+def accept_event_with_details(event_idx, fields):
+    """接受事件并写入对应行业的 YAML 文件（带用户确认的参数）"""
+    events = load_detected_events()
+    if not (0 <= event_idx < len(events)):
+        return False, "事件索引无效"
+    detected = events[event_idx]
+    if detected["status"] != "pending":
+        return False, "事件已被处理"
+
+    industry_name = detected["industry"]
+
+    # 找到行业 YAML 文件
+    fpath, ind_data = _find_industry_file(industry_name)
+    if not fpath:
+        return False, f"未找到行业 '{industry_name}' 的数据文件"
+
+    # 构造事件
+    new_event = {
+        "date": fields.get("date", detected["date"]),
+        "date_precision": fields.get("date_precision", "day"),
+        "confirmed": fields.get("confirmed", True),
+        "name": fields.get("name", detected["name"]),
+        "importance": fields.get("importance", 3),
+        "type": fields.get("type", "other"),
+        "description": fields.get("description", detected.get("source_title", "")),
+    }
+    if fields.get("impact"):
+        new_event["impact"] = fields["impact"]
+    action = fields.get("action")
+    if action:
+        new_event["suggested_action"] = {"stocks": [], "action": action}
+
+    # 去重追加
+    existing = ind_data.get("events", [])
+    existing_keys = {(e.get("name", ""), e.get("date", "")) for e in existing}
+    key = (new_event["name"], new_event["date"])
+    if key not in existing_keys:
+        existing.append(new_event)
+        ind_data["events"] = existing
+        ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
+        with open(fpath, "w", encoding="utf-8") as f:
+            yaml.dump(ind_data, f, allow_unicode=True, sort_keys=False)
+
+    # 标记已采纳
+    detected["status"] = "accepted"
+    with open(AUTO_EVENTS_FILE, "w", encoding="utf-8") as f:
+        yaml.dump({"detected_events": events}, f, allow_unicode=True, sort_keys=False)
+
+    return True, "事件已写入行业日历"
 
 
 def reject_event(event_idx):

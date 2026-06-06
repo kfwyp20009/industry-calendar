@@ -19,6 +19,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data", "industries")
 CROSS_FILE = os.path.join(BASE_DIR, "data", "cross-industry.yaml")
 PORTFOLIO_FILE = os.path.join(BASE_DIR, "data", "stocks", "portfolio.yaml")
+ETF_FILE = os.path.join(BASE_DIR, "data", "etf_mapping.yaml")
 
 # ── 数据加载 ──
 def load_yaml(path):
@@ -112,6 +113,19 @@ def get_action_color(action):
     return colors.get(action, "#6c757d")
 
 
+def get_stock_url(code):
+    """根据股票代码生成雪球链接"""
+    if not code:
+        return "#"
+    if code.endswith(".US"):
+        return f"https://xueqiu.com/S/{code.replace('.US','')}"
+    if code.startswith("6"):
+        return f"https://xueqiu.com/S/SH{code}"
+    if code.startswith(("0", "3")):
+        return f"https://xueqiu.com/S/SZ{code}"
+    return f"https://xueqiu.com/S/{code}"
+
+
 # ── 全局上下文 ──
 @app.context_processor
 def inject_globals():
@@ -120,10 +134,12 @@ def inject_globals():
     followed_names = followed.init_followed(all_names)
     return dict(
         industries=all_industries,
+        now=date.today(),
         llm=llm,
         llm_config=llm.load_config(),
         followed_names=followed_names,
         is_followed=followed.is_followed,
+        get_stock_url=get_stock_url,
     )
 
 
@@ -150,6 +166,10 @@ def dashboard():
     month_str = f"{now.year}-{now.month:02d}"
     current_cross = [e for e in cross_events if e.get("date", "").startswith(month_str)]
 
+    # 行业 ETF 映射
+    etf_data = load_yaml(ETF_FILE)
+    etf_mapping = etf_data.get("mapping", {}) if etf_data else {}
+
     # 行业新闻
     news_items = news.get_news()
 
@@ -167,6 +187,7 @@ def dashboard():
         cross_events=current_cross,
         news_items=news_items,
         pending_count=pending_count,
+        etf_mapping=etf_mapping,
         get_importance_color=get_importance_color,
         get_importance_label=get_importance_label,
         get_action_color=get_action_color,
@@ -192,7 +213,7 @@ def calendar():
     # 构建月度数据结构
     months = []
     for m in range(1, 13):
-        month_str = f"2026-{m:02d}"
+        month_str = f"{now.year}-{m:02d}"
         month_events = [e for e in all_events if e.get("date", "").startswith(month_str)]
         month_events.sort(key=lambda e: e.get("date", ""))
         # 按重要性分组
@@ -236,7 +257,7 @@ def panorama():
             "months": [],
         }
         for m in range(1, 13):
-            month_str = f"2026-{m:02d}"
+            month_str = f"{now.year}-{m:02d}"
             m_events = [e for e in ind.get("events", []) if e.get("date", "").startswith(month_str)]
             top = [e for e in m_events if e.get("importance", 0) >= 4]
             row["months"].append({
@@ -444,11 +465,40 @@ def api_delete_source():
     return jsonify({"ok": True})
 
 
+@app.route("/api/sources/update", methods=["POST"])
+def api_update_source():
+    """更新新闻源字段"""
+    data = request.get_json()
+    if not data or not data.get("id"):
+        return jsonify({"ok": False, "error": "缺少源ID"}), 400
+    upd = {}
+    for key in ["name", "url", "type", "encoding", "enabled"]:
+        if key in data:
+            upd[key] = data[key]
+    if data.get("items_path"):
+        upd["items_path"] = data["items_path"]
+    fields = {}
+    if data.get("title_field"):
+        fields["title"] = data["title_field"]
+    if data.get("summary_field"):
+        fields["summary"] = data["summary_field"]
+    if data.get("time_field"):
+        fields["time"] = data["time_field"]
+    if fields:
+        upd["fields"] = fields
+    news.update_source(data["id"], upd)
+    return jsonify({"ok": True})
+
+
 # ── 事件审核 API ──
 
 @app.route("/api/events/accept", methods=["POST"])
 def api_accept_event():
     data = request.get_json()
+    # 如果携带了事件字段参数，走带详情写入
+    if data and data.get("fields"):
+        ok, msg = news.accept_event_with_details(data["idx"], data["fields"])
+        return jsonify({"ok": ok, "error": None if ok else msg})
     news.accept_event(data["idx"])
     return jsonify({"ok": True})
 
@@ -725,7 +775,12 @@ def api_generate_skill_calendar():
         if cal_data.get("monitors"):
             ind_data["monitors"] = cal_data.get("monitors", [])
         if cal_data.get("core_stocks"):
-            ind_data["core_stocks"] = cal_data["core_stocks"]
+            existing = ind_data.get("core_stocks", [])
+            existing_codes = {s.get("code") for s in existing}
+            for s in cal_data["core_stocks"]:
+                if s.get("code") not in existing_codes:
+                    existing.append(s)
+            ind_data["core_stocks"] = existing
         ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
 
         with open(target_file, "w", encoding="utf-8") as f:
@@ -792,11 +847,21 @@ def api_follow_quick_add():
 @app.route("/analysis")
 def analysis_page():
     enabled_providers = llm.get_enabled_providers()
+    presets = llm.get_available_presets()
+    # 加载各预设的完整文本，转为 JSON 供前端使用
+    prompt_texts = {}
+    for key in presets:
+        prompt_texts[key] = {
+            "industry_report": llm.get_preset_prompt(key, "industry_report"),
+            "calendar_generation": llm.get_preset_prompt(key, "calendar_generation"),
+        }
     return render_template(
         "analysis.html",
         active_page="analysis",
         enabled_providers=enabled_providers,
         custom_skills=skills.load_custom_skills()[0],
+        prompt_presets=presets,
+        prompt_texts=prompt_texts,
     )
 
 
@@ -810,20 +875,33 @@ def api_generate_report():
     provider = data.get("provider") or llm.load_config().get("default_provider", "deepseek")
     extra = data.get("extra_instructions", "")
     save_to_calendar = data.get("save_to_calendar", False)
+    custom_prompt = data.get("custom_prompt", "")
+
+    # 检查是否有可用的 LLM 厂商
+    enabled = llm.get_enabled_providers()
+    provider_cfg = llm.load_config().get("providers", {}).get(provider, {})
+    has_api_key = provider_cfg.get("api_key") or provider == "ollama"
+    if not enabled or not has_api_key:
+        return jsonify({
+            "ok": True,
+            "content": llm.MOCK_INDUSTRY_REPORT,
+            "mock": True,
+            "warning": "未配置有效的 API Key，展示示例报告。请在设置中配置大模型。",
+        })
 
     if save_to_calendar:
-        return _generate_and_save_events(industry, provider, extra)
+        return _generate_and_save_events(industry, provider, extra, custom_prompt)
 
-    # 原有逻辑：生成文本报告
-    prompt = llm.INDUSTRY_REPORT_PROMPT.format(industry=industry)
-    if extra:
-        prompt += f"\n\n## 额外关注点\n{extra}"
-
-    result = llm.call_llm(prompt, provider_key=provider, temperature=0.3, max_tokens=4096)
+    result = llm.generate_industry_report(
+        industry=industry,
+        provider_key=provider,
+        extra_instructions=extra,
+        custom_prompt=custom_prompt,
+    )
     return jsonify(result)
 
 
-def _generate_and_save_events(industry, provider, extra):
+def _generate_and_save_events(industry, provider, extra, custom_prompt=""):
     """生成日历事件并写入行业 YAML 文件"""
     fpath, ind_data = _find_industry_file(industry)
     if not fpath:
@@ -839,6 +917,8 @@ def _generate_and_save_events(industry, provider, extra):
         description=description,
         keywords=tags,
         provider_key=provider,
+        extra_instructions=extra,
+        custom_prompt=custom_prompt,
     )
     if not result.get("ok"):
         return jsonify(result)
@@ -873,9 +953,14 @@ def _generate_and_save_events(industry, provider, extra):
                 existing_inds.add(m.get("indicator"))
         ind_data["monitors"] = existing_monitors
 
-    # 合并 core_stocks（仅当生成结果不为空时覆盖）
+    # 合并 core_stocks（按 code 去重）
     if content.get("core_stocks"):
-        ind_data["core_stocks"] = content["core_stocks"]
+        existing = ind_data.get("core_stocks", [])
+        existing_codes = {s.get("code") for s in existing}
+        for s in content["core_stocks"]:
+            if s.get("code") not in existing_codes:
+                existing.append(s)
+        ind_data["core_stocks"] = existing
 
     ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
     _save_industry_data(fpath, ind_data)

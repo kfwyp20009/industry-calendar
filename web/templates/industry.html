@@ -40,7 +40,12 @@
                     {% for s in ind.core_stocks %}
                     {% set ps = portfolio_map.get(s.code, {}) %}
                     <div class="list-group-item">
-                        <div class="fw-bold">{{ s.code }} · {{ s.name }}
+                        <div class="fw-bold">
+                            <a href="{{ get_stock_url(s.code) }}" target="_blank" rel="noopener"
+                               class="text-decoration-none" style="color:var(--text-primary);">
+                                {{ s.code }} · {{ s.name }}
+                                <i class="fas fa-external-link-alt" style="font-size:0.6rem;opacity:0.5;"></i>
+                            </a>
                             {% if ps.get('market') %}
                             <span class="badge bg-info text-dark" style="font-size:0.6rem;">{{ ps.market }}</span>
                             {% endif %}
@@ -90,7 +95,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <span><i class="fas fa-calendar me-1"></i> 2026年事件日历</span>
+                <span><i class="fas fa-calendar me-1"></i> {{ now.year }}年事件日历</span>
                 <span>
                     <span class="badge bg-danger">★★★★★ {{ ind.events|selectattr('importance', '>=', 5)|list|length }}</span>
                     <span class="badge bg-warning text-dark">★★★★ {{ ind.events|selectattr('importance', '==', 4)|list|length }}</span>
@@ -319,7 +324,7 @@ function openEditEvent(idx) {
     var ev = {{ ind.events | tojson }};
     var e = ev[idx];
     document.getElementById('eventName').value = e.name || '';
-    document.getElementById('eventDate').value = e.date || '2026-';
+    document.getElementById('eventDate').value = e.date || '{{ now.year }}-';
     document.getElementById('eventPrecision').value = e.date_precision || 'month';
     document.getElementById('eventImportance').value = e.importance || 3;
     document.getElementById('eventType').value = e.type || 'other';
@@ -336,7 +341,7 @@ function openAddEvent() {
     document.getElementById('eventIdx').value = '';
     document.getElementById('deleteEventBtn').style.display = 'none';
     document.getElementById('eventName').value = '';
-    document.getElementById('eventDate').value = '2026-';
+    document.getElementById('eventDate').value = '{{ now.year }}-';
     document.getElementById('eventPrecision').value = 'month';
     document.getElementById('eventImportance').value = '3';
     document.getElementById('eventType').value = 'other';

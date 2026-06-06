@@ -69,6 +69,31 @@
                                   placeholder="如：重点关注政策面影响"></textarea>
                     </div>
 
+                    <div class="mb-3">
+                        <a class="text-decoration-none" data-bs-toggle="collapse" href="#advancedOptions" role="button" style="color:var(--text-primary);">
+                            <i class="fas fa-cog me-1"></i> 高级选项
+                            <i class="fas fa-chevron-down" style="font-size:0.7rem;"></i>
+                        </a>
+                        <div class="collapse mt-2 border rounded p-3" id="advancedOptions" style="background:var(--bg-secondary, #f8f9fa);">
+                            <div class="mb-2">
+                                <label class="form-label">预设模板</label>
+                                <select class="form-select" id="promptPreset" onchange="switchPreset()">
+                                    {% for key, p in prompt_presets.items() %}
+                                    <option value="{{ key }}">{{ p.name }} — {{ p.description }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">
+                                    Prompt 模板 <small class="text-muted">(可编辑)</small>
+                                </label>
+                                <button type="button" class="btn btn-sm btn-outline-secondary mb-1" onclick="resetPrompt()">恢复默认</button>
+                                <textarea class="form-control font-monospace" name="custom_prompt" id="customPrompt"
+                                          rows="6" style="font-size:0.8rem;">{{ llm.INDUSTRY_REPORT_PROMPT }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" name="save_to_calendar" id="saveToCalendar">
                         <label class="form-check-label" for="saveToCalendar">
@@ -112,6 +137,29 @@
 
 {% block scripts %}
 <script>
+var PROMPT_TEXTS = {{ prompt_texts | tojson }};
+var CURRENT_PRESET = 'standard';
+
+function switchPreset() {
+    var key = document.getElementById('promptPreset').value;
+    CURRENT_PRESET = key;
+    var textarea = document.getElementById('customPrompt');
+    var isCalendar = document.getElementById('saveToCalendar').checked;
+    var prompts = PROMPT_TEXTS[key];
+    if (!prompts) return;
+    var text = isCalendar ? (prompts.calendar_generation || prompts.industry_report) : prompts.industry_report;
+    if (text) textarea.value = text;
+}
+
+function resetPrompt() {
+    document.getElementById('promptPreset').value = CURRENT_PRESET;
+    switchPreset();
+}
+
+document.getElementById('saveToCalendar')?.addEventListener('change', function() {
+    switchPreset();
+});
+
 function selectAll(checked) {
     document.querySelectorAll('.industry-check').forEach(cb => cb.checked = checked);
     updateSelectedCount();
@@ -141,6 +189,7 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
     var provider = form.get('provider');
     var extra = form.get('extra_instructions') || '';
     var saveToCalendar = form.get('save_to_calendar') === 'on';
+    var customPrompt = document.getElementById('customPrompt').value.trim();
 
     var btn = document.getElementById('generateBtn');
     var status = document.getElementById('reportStatus');
@@ -164,13 +213,18 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
                 provider: provider,
                 extra_instructions: extra,
                 save_to_calendar: saveToCalendar,
+                custom_prompt: customPrompt,
             })
         }).then(r => r.json()).then(function(data) {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-magic me-1"></i> 生成分析报告';
             if (data.ok) {
                 status.textContent = '✓ 完成';
-                renderReport(data.content, content);
+                if (data.mock) {
+                    content.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle me-1"></i>' + (data.warning || '示例报告') + '</div>' + renderReportText(data.content);
+                } else {
+                    renderReport(data.content, content);
+                }
                 if (data.saved) showToast('报告已写入行业日历', 'success');
             } else {
                 status.textContent = '✗ 失败';
@@ -208,12 +262,13 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
                     provider: provider,
                     extra_instructions: extra,
                     save_to_calendar: saveToCalendar,
+                custom_prompt: customPrompt,
                 })
             }).then(r => r.json()).then(function(data) {
                 results.push({industry: ind, result: data});
                 var statusEl = document.getElementById('batch-status-' + idx);
                 if (data.ok) {
-                    statusEl.textContent = '✓ 完成';
+                    statusEl.textContent = '✓ 完成' + (data.mock ? ' (示例)' : '');
                     statusEl.className = 'text-success';
                 } else {
                     statusEl.textContent = '✗ ' + (data.error || '失败');
@@ -222,7 +277,8 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
                 // Show latest report
                 if (data.ok && data.content) {
                     var header = '<h5 class="text-primary mt-3">—— ' + ind + ' ——</h5>';
-                    content.innerHTML = header + renderReportText(data.content);
+                    var mockNotice = data.mock ? '<div class="alert alert-info py-1" style="font-size:0.85rem;">' + (data.warning || '示例报告') + '</div>' : '';
+                    content.innerHTML = header + mockNotice + renderReportText(data.content);
                 }
                 idx++;
                 generateNext();

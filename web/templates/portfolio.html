@@ -43,8 +43,12 @@
                     <div class="list-group-item">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <strong>{{ s.name }}</strong>
-                                <span class="text-muted ms-2" style="font-size:0.85rem;">{{ s.code }}</span>
+                                <a href="{{ get_stock_url(s.code) }}" target="_blank" rel="noopener"
+                                   class="text-decoration-none" style="color:var(--text-primary);">
+                                    <strong>{{ s.name }}</strong>
+                                    <span class="text-muted ms-2" style="font-size:0.85rem;">{{ s.code }}</span>
+                                    <i class="fas fa-external-link-alt" style="font-size:0.55rem;opacity:0.4;"></i>
+                                </a>
                                 <span class="badge bg-light text-dark ms-1" style="font-size:0.7rem;">{{ s.sector }}</span>
                                 {% if s.market %}
                                 <span class="badge bg-info text-dark" style="font-size:0.65rem;">{{ s.market }}</span>

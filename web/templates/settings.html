@@ -71,6 +71,18 @@
                                             data-id="{{ src.id }}">
                                         {{ '禁用' if src.enabled else '启用' }}
                                     </button>
+                                    <button class="btn btn-sm btn-outline-info edit-source"
+                                            data-id="{{ src.id }}"
+                                            data-name="{{ src.name }}"
+                                            data-url="{{ src.url }}"
+                                            data-type="{{ src.type }}"
+                                            data-encoding="{{ src.encoding }}"
+                                            data-items_path="{{ src.items_path or '' }}"
+                                            data-title_field="{{ (src.fields or {}).get('title', '') }}"
+                                            data-summary_field="{{ (src.fields or {}).get('summary', '') }}"
+                                            data-time_field="{{ (src.fields or {}).get('time', '') }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
                                     <button class="btn btn-sm btn-outline-danger delete-source" data-id="{{ src.id }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -136,7 +148,11 @@
                                     </span>
                                 </td>
                                 <td class="align-middle">
-                                    <button class="btn btn-sm btn-outline-success accept-event" data-idx="{{ loop.index0 }}">采纳</button>
+                                    <button class="btn btn-sm btn-outline-success accept-event" data-idx="{{ loop.index0 }}"
+                                            data-date="{{ ev.date }}"
+                                            data-name="{{ ev.name }}"
+                                            data-industry="{{ ev.industry }}"
+                                            data-source="{{ ev.source_title }}">采纳</button>
                                     <button class="btn btn-sm btn-outline-secondary reject-event" data-idx="{{ loop.index0 }}">忽略</button>
                                 </td>
                             </tr>
@@ -372,6 +388,68 @@
     </div>
 </div>
 
+{# ── 编辑新闻源弹窗 ── #}
+<div class="modal fade" id="editSourceModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑新闻源</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editSourceForm">
+                <input type="hidden" name="id" id="editSourceId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">名称</label>
+                        <input type="text" class="form-control" name="name" id="editSourceName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL</label>
+                        <input type="url" class="form-control" name="url" id="editSourceUrl" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">类型</label>
+                            <select class="form-select" name="type" id="editSourceType">
+                                <option value="json">JSON API</option>
+                                <option value="rss">RSS</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">编码</label>
+                            <select class="form-select" name="encoding" id="editSourceEncoding">
+                                <option value="utf-8">UTF-8</option>
+                                <option value="gbk">GBK</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3" style="font-size:0.85rem;">
+                        <label class="form-label">JSON 字段映射 <small class="text-muted">(仅 JSON 类型)</small></label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="text" class="form-control" name="items_path" id="editSourceItemsPath" placeholder="数据路径 (如 result.data)">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control" name="title_field" id="editSourceTitleField" placeholder="标题字段 (title)">
+                            </div>
+                            <div class="col-6 mt-2">
+                                <input type="text" class="form-control" name="summary_field" id="editSourceSummaryField" placeholder="摘要字段 (intro)">
+                            </div>
+                            <div class="col-6 mt-2">
+                                <input type="text" class="form-control" name="time_field" id="editSourceTimeField" placeholder="时间字段 (ctime)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {# ── 添加新闻源弹窗 ── #}
 <div class="modal fade" id="addSourceModal">
     <div class="modal-dialog">
@@ -431,6 +509,98 @@
         </div>
     </div>
 </div>
+
+{# ── 采纳事件确认弹窗 ── #}
+<div class="modal fade" id="acceptEventModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认采纳事件</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="acceptEventForm">
+                <input type="hidden" name="idx" id="acceptIdx">
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <label class="form-label">行业</label>
+                        <input type="text" class="form-control" id="acceptIndustry" readonly style="background:var(--table-stripe);">
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-8">
+                            <label class="form-label">事件名称</label>
+                            <input type="text" class="form-control" name="name" id="acceptName" required>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">日期</label>
+                            <input type="text" class="form-control" name="date" id="acceptDate" required placeholder="2026-06-15">
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <label class="form-label">重要性</label>
+                            <select class="form-select" name="importance">
+                                <option value="5">★★★★★ 板块级</option>
+                                <option value="4">★★★★ 龙头行情</option>
+                                <option value="3" selected>★★★ 短期脉冲</option>
+                                <option value="2">★★ 局部影响</option>
+                                <option value="1">★ 噪声</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">类型</label>
+                            <select class="form-select" name="type">
+                                <option value="policy">政策</option>
+                                <option value="product">产品发布</option>
+                                <option value="regulation">监管</option>
+                                <option value="ipo">IPO</option>
+                                <option value="earnings">财报</option>
+                                <option value="exhibition">展会</option>
+                                <option value="technology">技术突破</option>
+                                <option value="other" selected>其他</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label">确认状态</label>
+                            <select class="form-select" name="confirmed">
+                                <option value="true" selected>已确认</option>
+                                <option value="false">待确认</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">描述 <small class="text-muted">(来源新闻标题)</small></label>
+                        <textarea class="form-control" name="description" id="acceptDescription" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">影响分析 <small class="text-muted">(可选)</small></label>
+                        <textarea class="form-control" name="impact" rows="2" placeholder="预计对市场/行业的影响..."></textarea>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">操作建议 <small class="text-muted">(可选)</small></label>
+                            <select class="form-select" name="action">
+                                <option value="">--</option>
+                                <option value="加仓">加仓</option>
+                                <option value="建仓">建仓</option>
+                                <option value="埋伏">埋伏</option>
+                                <option value="波段">波段</option>
+                                <option value="持有">持有</option>
+                                <option value="观望">观望</option>
+                                <option value="减仓">减仓</option>
+                                <option value="清仓">清仓</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i>确认写入</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {# ── 新建技能弹窗 ── #}
 <div class="modal fade" id="addSkillModal">
     <div class="modal-dialog">
@@ -536,10 +706,70 @@ document.querySelectorAll('.delete-source').forEach(btn => {
     });
 });
 
+// 编辑新闻源
+document.querySelectorAll('.edit-source').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('editSourceId').value = this.dataset.id;
+        document.getElementById('editSourceName').value = this.dataset.name;
+        document.getElementById('editSourceUrl').value = this.dataset.url;
+        document.getElementById('editSourceType').value = this.dataset.type;
+        document.getElementById('editSourceEncoding').value = this.dataset.encoding;
+        document.getElementById('editSourceItemsPath').value = this.dataset.items_path || '';
+        document.getElementById('editSourceTitleField').value = this.dataset.title_field || '';
+        document.getElementById('editSourceSummaryField').value = this.dataset.summary_field || '';
+        document.getElementById('editSourceTimeField').value = this.dataset.time_field || '';
+        new bootstrap.Modal(document.getElementById('editSourceModal')).show();
+    });
+});
+
+document.getElementById('editSourceForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editSourceModal'));
+    if (modal) modal.hide();
+    doActionAndReload('/api/sources/update', {
+        id: form.get('id'),
+        name: form.get('name'),
+        url: form.get('url'),
+        type: form.get('type'),
+        encoding: form.get('encoding'),
+        items_path: form.get('items_path'),
+        title_field: form.get('title_field') || 'title',
+        summary_field: form.get('summary_field') || 'intro',
+        time_field: form.get('time_field') || 'ctime',
+    }, '✓ 新闻源已更新');
+});
+
 document.querySelectorAll('.accept-event').forEach(btn => {
     btn.addEventListener('click', function() {
-        doActionAndReload('/api/events/accept', {idx: parseInt(this.dataset.idx)}, '✓ 事件已采纳');
+        document.getElementById('acceptIdx').value = this.dataset.idx;
+        document.getElementById('acceptIndustry').value = this.dataset.industry;
+        document.getElementById('acceptName').value = this.dataset.name;
+        document.getElementById('acceptDate').value = this.dataset.date;
+        document.getElementById('acceptDescription').value = this.dataset.source;
+        new bootstrap.Modal(document.getElementById('acceptEventModal')).show();
     });
+});
+
+document.getElementById('acceptEventForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('acceptEventModal'));
+    if (modal) modal.hide();
+    doActionAndReload('/api/events/accept', {
+        idx: parseInt(form.get('idx')),
+        fields: {
+            name: form.get('name'),
+            date: form.get('date'),
+            date_precision: 'day',
+            importance: parseInt(form.get('importance')) || 3,
+            type: form.get('type'),
+            confirmed: form.get('confirmed') === 'true',
+            description: form.get('description'),
+            impact: form.get('impact'),
+            action: form.get('action') || undefined,
+        }
+    }, '✓ 事件已采纳并写入日历');
 });
 
 document.querySelectorAll('.reject-event').forEach(btn => {
