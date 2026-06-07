@@ -4,6 +4,8 @@
 
 > 行业的股价上涨往往有催化剂事件——政策出台、技术突破、重要会议、产品发布。本系统帮你把未来一年各行业已知的催化事件梳理成日历，看清节奏，提前布局。
 
+![仪表盘概览](docs/screenshots/dashboard.jpg)
+
 ---
 
 ## 快速开始
@@ -62,6 +64,8 @@ Windows 用户也可直接双击 `start.bat`，Mac/Linux 用户双击 `start.sh`
 
 ### 事件日历
 
+![事件日历视图](docs/screenshots/calendar.jpg)
+
 **入口：** 导航栏 → `事件日历`
 
 按月展示所有行业全部事件的日历视图。
@@ -106,6 +110,8 @@ Windows 用户也可直接双击 `start.bat`，Mac/Linux 用户双击 `start.sh`
 ---
 
 ### 行业详情
+
+![行业详情页面](docs/screenshots/industry-detail.jpg)
 
 **入口：** 点击仪表盘的热度行业 / 导航栏 → `行业详情`（需要先选择行业）
 
@@ -163,6 +169,8 @@ Windows 用户也可直接双击 `start.bat`，Mac/Linux 用户双击 `start.sh`
 ---
 
 ### 联动分析
+
+![跨行业联动图谱](docs/screenshots/cross-industry.jpg)
 
 **入口：** 导航栏 → `联动分析`
 
