@@ -566,6 +566,9 @@
             <a class="nav-item {% if active_page == 'settings' %}active{% endif %}" href="/settings">
                 <i class="fas fa-cog"></i> 设置
             </a>
+            <a class="nav-item" href="#" onclick="openExportModal(); return false;">
+                <i class="fas fa-upload"></i> 导出日历
+            </a>
         </div>
         <div class="sidebar-footer">
             <span style="font-size:0.65rem;opacity:0.4;">v1.0</span>
@@ -686,6 +689,87 @@
 </div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+
+<!-- Export ICS Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-calendar-export me-2"></i>导出日历</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">将行业事件导出到 iPhone 日历或其他日历 App。</p>
+
+                <!-- 方法一：下载文件 -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-download me-1"></i> 方式一：下载 ICS 文件
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">下载后发送到手机，打开即可导入日历。</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="/export/calendar.ics" class="btn btn-outline-primary btn-sm" download>
+                                <i class="fas fa-file-export me-1"></i>导出全部行业
+                            </a>
+                            <div class="input-group input-group-sm" style="max-width:220px;">
+                                <select class="form-select" id="exportIndustrySelect">
+                                    <option value="">— 选择单个行业 —</option>
+                                    {% for code, ind in (industries or {}).items() %}
+                                    <option value="{{ code }}">{{ ind.industry }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-outline-secondary" onclick="exportSingleIndustry()">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 方法二：订阅日历 -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-sync-alt me-1"></i> 方式二：订阅日历（自动同步）
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">
+                            将下方地址添加到 iPhone 日历订阅，之后系统事件更新后手机自动同步。
+                        </p>
+                        <div class="mb-2" id="subscribeUrlSection">
+                            <label class="form-label small fw-semibold">订阅地址：</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" id="subscribeUrl" readonly
+                                       value="{{ request.scheme }}://{{ request.host }}/export/subscribe.ics">
+                                <button class="btn btn-outline-secondary" onclick="copySubscribeUrl()">
+                                    <i class="fas fa-copy"></i> 复制
+                                </button>
+                            </div>
+                        </div>
+                        <div class="alert alert-info small mb-0 py-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>iPhone 设置方法：</strong><br>
+                            设置 → App → 日历 → 账户 → 添加账户 → 其他 → 添加订阅日历，粘贴上方地址。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提示 -->
+                <div class="alert alert-warning small py-2 mb-0">
+                    <i class="fas fa-lightbulb me-1"></i>
+                    <strong>局域网访问：</strong>
+                    如果手机和电脑在同一个 WiFi 下，把地址中的 <code>localhost</code> 换成电脑的局域网 IP（如 <code>192.168.1.100</code>）。
+                    Windows 上用 <code>ipconfig</code> 查看。
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
 <script>
 // ── 移动端侧边栏 ──
 function toggleMobileSidebar() {
@@ -844,6 +928,36 @@ function openQuickAddModalFromManage() {
     const m = bootstrap.Modal.getInstance(document.getElementById('manageFollowModal'));
     if (m) m.hide();
     setTimeout(() => openQuickAddModal(), 300);
+}
+
+// ── 导出日历 ──
+function openExportModal() {
+    // 刷新订阅地址（考虑当前域名）
+    const urlInput = document.getElementById('subscribeUrl');
+    if (urlInput) {
+        const currentUrl = window.location.origin;
+        urlInput.value = currentUrl + '/export/subscribe.ics';
+    }
+    new bootstrap.Modal(document.getElementById('exportModal')).show();
+}
+
+function exportSingleIndustry() {
+    const code = document.getElementById('exportIndustrySelect').value;
+    if (!code) { showToast('请先选择一个行业', 'warning'); return; }
+    window.open('/export/calendar.ics?industry=' + code, '_blank');
+}
+
+function copySubscribeUrl() {
+    const input = document.getElementById('subscribeUrl');
+    if (!input) return;
+    input.select();
+    navigator.clipboard.writeText(input.value).then(() => {
+        showToast('✓ 订阅地址已复制', 'success');
+    }).catch(() => {
+        // fallback for older browsers
+        document.execCommand('copy');
+        showToast('✓ 订阅地址已复制', 'success');
+    });
 }
 
 document.getElementById('quickAddForm').addEventListener('submit', function(e) {
