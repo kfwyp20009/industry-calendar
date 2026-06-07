@@ -66,6 +66,7 @@ def load_all_industries():
                 code = fname.replace(".yaml", "")
                 data["_code"] = code
                 data["_file"] = fname
+                data["_filepath"] = os.path.join(DATA_DIR, fname)
                 # 标记当月事件
                 now = date.today()
                 month_str = f"{now.year}-{now.month:02d}"
@@ -80,38 +81,43 @@ def load_all_industries():
 
 
 def get_recent_updates(industries, since_days=7):
-    """对比行业 updated 字段，找出最近有更新的行业"""
+    """找出最近有更新的行业（优先用 YAML updated 字段，兜底用文件 mtime）"""
     today = date.today()
     from datetime import timedelta as _td
     cutoff = today - _td(days=since_days)
     recent = []
     for code, ind in industries.items():
+        # 先用 YAML 头部 updated 字段
         updated_str = ind.get("updated", "")
-        if not updated_str:
-            continue
-        try:
-            updated_date = datetime.strptime(updated_str[:10], "%Y-%m-%d").date()
-        except (ValueError, IndexError):
-            continue
-        if updated_date >= cutoff:
+        if updated_str:
+            try:
+                updated_date = datetime.strptime(updated_str[:10], "%Y-%m-%d").date()
+            except (ValueError, IndexError):
+                updated_date = None
+        else:
+            updated_date = None
+
+        # 兜底：用文件修改时间
+        if not updated_date or updated_date < cutoff:
+            fpath = ind.get("_filepath", "")
+            if fpath and os.path.exists(fpath):
+                mtime = os.path.getmtime(fpath)
+                file_mtime = datetime.fromtimestamp(mtime).date()
+                if file_mtime > updated_date if updated_date else file_mtime >= cutoff:
+                    updated_date = file_mtime
+
+        if updated_date and updated_date >= cutoff:
             upcoming = [ev for ev in ind.get("events", [])
                        if ev.get("date", "") >= today.strftime("%Y-%m-%d")]
             recent.append({
                 "code": code,
                 "industry": ind.get("industry", code),
-                "updated": updated_str[:10],
+                "updated": updated_date.strftime("%Y-%m-%d"),
                 "event_count": len(ind.get("events", [])),
                 "upcoming_count": len(upcoming),
             })
     recent.sort(key=lambda x: x["updated"], reverse=True)
     return recent
-
-
-    # 为所有行业事件添加回测上下文
-    enrich_events_with_backtest(
-        [ev for ind in industries.values() for ev in ind.get("events", [])]
-    )
-    return industries
 
 
 def get_current_month_events(industries):
