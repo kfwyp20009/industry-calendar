@@ -1,190 +1,203 @@
-# ============================================================
-# 卫星互联网 — 事件日历数据
-# ============================================================
-industry: "卫星互联网"
-description: "密集组网年，GW+千帆双星座持续发射，业绩开始兑现"
-tags: [基建, 国防, 通信]
-updated: "2026-06-05"
-
+industry: 卫星互联网
+description: 密集组网年，GW+千帆双星座持续发射，业绩开始兑现
+tags:
+- 基建
+- 国防
+- 通信
+updated: '2026-06-05'
 core_stocks:
-  - code: "600879"
-    name: "航天电子"
-    reason: "卫星计算机市占90%+，综合龙头"
-    sector: "卫星制造"
-  - code: "600118"
-    name: "中国卫星"
-    reason: "小卫星制造市占60%+，海南超级工厂"
-    sector: "卫星制造"
-  - code: "300762"
-    name: "上海瀚讯"
-    reason: "千帆G60星座独家载荷供应商"
-    sector: "卫星载荷"
-  - code: "001270"
-    name: "铖昌科技"
-    reason: "星载T/R芯片国产市占>70%"
-    sector: "星载芯片"
-  - code: "688375"
-    name: "国博电子"
-    reason: "T/R组件国产龙头"
-    sector: "星载芯片"
-  - code: "688270"
-    name: "臻镭科技"
-    reason: "DBF芯片（相控阵大脑）"
-    sector: "星载芯片"
-  - code: "601698"
-    name: "中国卫通"
-    reason: "中国唯一自主卫星运营商"
-    sector: "运营"
-
+- code: '600879'
+  name: 航天电子
+  reason: 卫星计算机市占90%+，综合龙头
+  sector: 卫星制造
+  market: A股
+  estimated_pe: 30-40x
+  key_dates:
+  - GW发射(6月)
+  - 可回收首飞(7月)
+  - 十五五规划(11月)
+- code: '600118'
+  name: 中国卫星
+  reason: 小卫星制造市占60%+，海南超级工厂
+  sector: 卫星制造
+- code: '300762'
+  name: 上海瀚讯
+  reason: 千帆G60星座独家载荷供应商
+  sector: 卫星载荷
+- code: '001270'
+  name: 铖昌科技
+  reason: 星载T/R芯片国产市占>70%
+  sector: 星载芯片
+  market: A股
+  estimated_pe: 50-65x
+  key_dates:
+  - 千帆发射(每月)
+  - GW发射(6月)
+  - 三季报(10月)
+- code: '688375'
+  name: 国博电子
+  reason: T/R组件国产龙头
+  sector: 星载芯片
+- code: '688270'
+  name: 臻镭科技
+  reason: DBF芯片（相控阵大脑）
+  sector: 星载芯片
+- code: '601698'
+  name: 中国卫通
+  reason: 中国唯一自主卫星运营商
+  sector: 运营
 events:
-
-  # ── 6月 ──
-  - date: "2026-06-10"
-    date_precision: day
-    confirmed: false
-    name: "千帆星座第11批次发射（一箭18星）"
-    importance: 4
-    type: other
-    description: "持续组网，月度发射节奏验证"
-    impact: "组网正常化，板块情绪催化"
-    suggested_action:
-      stocks: ["001270", "688270", "688387"]
-      action: "持有"
-      reason: "发射成功则持有，失败则减仓"
-
-  - date: "2026-06"
-    date_precision: month
-    confirmed: false
-    name: "GW星座第二批卫星发射（CZ-5B/CZ-8）"
-    importance: 5
-    type: other
-    description: "GW星座加速组网"
-    impact: "千帆之外，GW星座是第二大催化"
-    suggested_action:
-      stocks: ["600879", "600118", "300762"]
-      action: "加仓"
-      reason: "GW若如期发射→中国卫星互联网双线推进确认"
-
-  - date: "2026-06"
-    date_precision: month
-    confirmed: false
-    name: "SpaceX星舰第五/六次试飞"
-    importance: 4
-    type: technology
-    description: "可回收进展对比"
-    impact: "影响可回收火箭主题情绪"
-    suggested_action:
-      stocks: []
-      action: "观望"
-      reason: "情绪影响，非直接交易信号"
-
-  # ── 7月 ──
-  - date: "2026-07"
-    date_precision: month
-    confirmed: false
-    name: "GW星座一期首批常态化运营测试"
-    importance: 5
-    type: technology
-    description: "中国卫星互联网从建设到运营的转折点"
-    impact: "标志性事件——卫星互联网进入运营阶段"
-    suggested_action:
-      stocks: ["600879", "601698", "001270"]
-      action: "加仓"
-      reason: "里程碑事件，运营逻辑激活"
-
-  - date: "2026-07"
-    date_precision: month
-    confirmed: false
-    name: "长征十二号可回收火箭首飞（预期）"
-    importance: 5
-    type: technology
-    description: "决定中国低轨部署成本的革命性突破"
-    impact: "若成功→卫星制造成本下降预期→全产业链利好"
-    suggested_action:
-      stocks: ["600879"]
-      action: "加仓"
-      reason: "可回收成功→发射成本降→星座建设加速"
-
-  - date: "2026-07"
-    date_precision: month
-    confirmed: false
-    name: "华力创通/海格通信相控阵终端出货"
-    importance: 5
-    type: product
-    description: "终端成本下降→消费级卫星通信拐点"
-    impact: "消费级卫星通信商业化开端"
-    suggested_action:
-      stocks: ["001270"]
-      action: "持有"
-      reason: "终端放量→T/R芯片需求增加"
-
-  # ── 8月 ──
-  - date: "2026-08"
-    date_precision: month
-    confirmed: false
-    name: "Amazon Kuiper首批运营卫星发射"
-    importance: 4
-    type: other
-    description: "全球竞争格局变化"
-    impact: "Kuiper若成功→中国加速追赶预期"
-    suggested_action:
-      stocks: []
-      action: "观望"
-      reason: "全球格局变化，非直接交易信号"
-
-  # ── 11月 ──
-  - date: "2026-11"
-    date_precision: month
-    confirmed: false
-    name: "千帆星座年度冲刺（第21-22批次发射）"
-    importance: 4
-    type: other
-    description: "全年发射目标完成率"
-    impact: "全年组网节奏验证"
-    suggested_action:
-      stocks: ["001270", "688270"]
-      action: "持有"
-
-  - date: "2026-11"
-    date_precision: month
-    confirmed: false
-    name: "卫星互联网入列十五五专项规划"
-    importance: 5
-    type: policy
-    description: "国家重大工程保障"
-    impact: "长期确定性再确认"
-    suggested_action:
-      stocks: ["600879", "600118", "001270"]
-      action: "加仓"
-      reason: "国家级规划背书→长期资金流入"
-
-  # ── 12月 ──
-  - date: "2026-12"
-    date_precision: month
-    confirmed: false
-    name: "中央经济工作会议——航天/卫星表述"
-    importance: 4
-    type: policy
-    description: "航天产业政策定调"
-    impact: "2027年政策方向"
-    suggested_action:
-      stocks: ["600879", "600118"]
-      action: "持有"
-    linked_industries: ["__all__"]
-
+- date: '2026-06-10'
+  date_precision: day
+  confirmed: false
+  name: 千帆星座第11批次发射（一箭18星）
+  importance: 4
+  type: other
+  description: 持续组网，月度发射节奏验证
+  impact: 组网正常化，板块情绪催化
+  suggested_action:
+    stocks:
+    - '001270'
+    - '688270'
+    - '688387'
+    action: 持有
+    reason: 发射成功则持有，失败则减仓
+- date: 2026-06
+  date_precision: month
+  confirmed: false
+  name: GW星座第二批卫星发射（CZ-5B/CZ-8）
+  importance: 5
+  type: other
+  description: GW星座加速组网
+  impact: 千帆之外，GW星座是第二大催化
+  suggested_action:
+    stocks:
+    - '600879'
+    - '600118'
+    - '300762'
+    action: 加仓
+    reason: GW若如期发射→中国卫星互联网双线推进确认
+- date: 2026-06
+  date_precision: month
+  confirmed: false
+  name: SpaceX星舰第五/六次试飞
+  importance: 4
+  type: technology
+  description: 可回收进展对比
+  impact: 影响可回收火箭主题情绪
+  suggested_action:
+    stocks: []
+    action: 观望
+    reason: 情绪影响，非直接交易信号
+- date: 2026-07
+  date_precision: month
+  confirmed: false
+  name: GW星座一期首批常态化运营测试
+  importance: 5
+  type: technology
+  description: 中国卫星互联网从建设到运营的转折点
+  impact: 标志性事件——卫星互联网进入运营阶段
+  suggested_action:
+    stocks:
+    - '600879'
+    - '601698'
+    - '001270'
+    action: 加仓
+    reason: 里程碑事件，运营逻辑激活
+- date: 2026-07
+  date_precision: month
+  confirmed: false
+  name: 长征十二号可回收火箭首飞（预期）
+  importance: 5
+  type: technology
+  description: 决定中国低轨部署成本的革命性突破
+  impact: 若成功→卫星制造成本下降预期→全产业链利好
+  suggested_action:
+    stocks:
+    - '600879'
+    action: 加仓
+    reason: 可回收成功→发射成本降→星座建设加速
+- date: 2026-07
+  date_precision: month
+  confirmed: false
+  name: 华力创通/海格通信相控阵终端出货
+  importance: 5
+  type: product
+  description: 终端成本下降→消费级卫星通信拐点
+  impact: 消费级卫星通信商业化开端
+  suggested_action:
+    stocks:
+    - '001270'
+    action: 持有
+    reason: 终端放量→T/R芯片需求增加
+- date: 2026-08
+  date_precision: month
+  confirmed: false
+  name: Amazon Kuiper首批运营卫星发射
+  importance: 4
+  type: other
+  description: 全球竞争格局变化
+  impact: Kuiper若成功→中国加速追赶预期
+  suggested_action:
+    stocks: []
+    action: 观望
+    reason: 全球格局变化，非直接交易信号
+- date: 2026-11
+  date_precision: month
+  confirmed: false
+  name: 千帆星座年度冲刺（第21-22批次发射）
+  importance: 4
+  type: other
+  description: 全年发射目标完成率
+  impact: 全年组网节奏验证
+  suggested_action:
+    stocks:
+    - '001270'
+    - '688270'
+    action: 持有
+- date: 2026-11
+  date_precision: month
+  confirmed: false
+  name: 卫星互联网入列十五五专项规划
+  importance: 5
+  type: policy
+  description: 国家重大工程保障
+  impact: 长期确定性再确认
+  suggested_action:
+    stocks:
+    - '600879'
+    - '600118'
+    - '001270'
+    action: 加仓
+    reason: 国家级规划背书→长期资金流入
+- date: 2026-12
+  date_precision: month
+  confirmed: false
+  name: 中央经济工作会议——航天/卫星表述
+  importance: 4
+  type: policy
+  description: 航天产业政策定调
+  impact: 2027年政策方向
+  suggested_action:
+    stocks:
+    - '600879'
+    - '600118'
+    action: 持有
+  linked_industries:
+  - __all__
 monitors:
-  - indicator: "GW/千帆组网严重落后时间表（>12个月）"
-    risk_level: high
-    action: "清仓卫星板块"
-  - indicator: "长征十二号可回收火箭研发失败"
-    risk_level: medium
-    action: "减仓航天板块"
-  - indicator: "重大发射事故（多星损失导致审查暂停）"
-    risk_level: high
-    action: "减仓卫星板块"
-  - indicator: "Starlink获准进入中国市场"
-    risk_level: medium
-    action: "重新评估卫星板块估值"
-  - indicator: "卫星互联网终端成本下降不及预期"
-    risk_level: medium
-    action: "减仓消费级卫星标的"
+- indicator: GW/千帆组网严重落后时间表（>12个月）
+  risk_level: high
+  action: 清仓卫星板块
+- indicator: 长征十二号可回收火箭研发失败
+  risk_level: medium
+  action: 减仓航天板块
+- indicator: 重大发射事故（多星损失导致审查暂停）
+  risk_level: high
+  action: 减仓卫星板块
+- indicator: Starlink获准进入中国市场
+  risk_level: medium
+  action: 重新评估卫星板块估值
+- indicator: 卫星互联网终端成本下降不及预期
+  risk_level: medium
+  action: 减仓消费级卫星标的

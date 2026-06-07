@@ -16,3 +16,10 @@ skills:
   created: 2026-06-06 23:57
 updated: 2026-06-06 23:57
 hidden_builtins: []
+builtin_overrides:
+  6G通信:
+    keywords:
+    - 6G
+    - 5G-A
+    - 3GPP
+    - 通信标准

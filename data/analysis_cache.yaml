@@ -69,3 +69,121 @@ caches:
     extra: ''
     created: 2026-06-06T23:57
     expires: 2026-06-07T23:57
+  0e60b7ac18d2a628:
+    content: "<think>用户要求我作为行业研究专家，为\"低空经济\"行业生成2026年全年的投资日历事件。\n\n让我分析一下：\n1. 行业：低空经济（eVTOL、无人机、通用航空等）\n\
+      2. 2026年主线：eVTOL取证 + 基建招标\n3. 关键词：政策、基建、交通\n\n我需要：\n- 列出3-5只核心标的（A股为主）\n- 生成至少15个事件（每月1-2个）\n\
+      - 其中3-5个重要性5级事件\n- 包含2-3个风险监控指标\n- 输出合法YAML格式\n\n让我思考低空经济2026年可能的事件节点：\n\n**核心标的（A股）：**\n\
+      - 万丰奥威（002085）- eVTOL\n- 卧龙电驱（600580）- 电机\n- 中直股份（600038）- 直升机\n- 航天宏图（688066）-\
+      \ 遥感/无人机\n- 纵横股份（688070）- 工业无人机\n- 山河智能（002097）- 无人机\n- 森麒麟（002984）- 轮胎（可能涉及）\n\
+      - 中科星图（688568）- 空管\n\n**事件节点思考：**\n\n1月：\n- 民航局年度工作会议（可能会提到低空经济规划）\n- 地方两会可能涉及低空经济议题\n\
+      \n\n- 2月期间，亿航智能EH216-S可能获得生产许可证，基建招标启动信号出现。3月两会正式召开，低空经济政策预期升温，民航局可能发布适航审定相关政策。4月上海车展或无人机展展示新产品，eVTOL取证进展需要跟进。5月多个重要事件集中，包括国际无人机展、全国旅游发展大会等。\n\
+      \n6月，低空经济示范城市评选公布，夏季达沃斯论坛讨论相关议题，深圳、广州等城市开放低空空域。7月无人机物流配送政策试点扩大，相关标准规范陆续发布。8月亿航智能等企业发布财报，披露eVTOL订单情况。9月北京服贸会展示低空经济成果，无人机应用场景拓展。10月\n\
+      \n珠海航展是航空领域最重要的展览活动，会发布重要订单和政策。11月eVTOL获证进展继续公布，适航认证取得突破。12月年终总结会议部署次年计划。\n\n\
+      这些事件构成了低空经济发展的完整时间线，涵盖了政策、展会、订单、技术认证等多个维度的进展。\n\n现在梳理关键事件的时间节点：\n\n**重要性5级事件：**\n\
+      1. 2026-03 全国两会 - 低空经济可能写入政府工作报告\n2. 2026-06 低空经济示范区获批\n3. 2026-10 珠海航展 - 重要订单和政策\n\
+      4. 2026-11 eVTOL取证进展\n5. 2026-03 民\n\n航局适航审定政策发布\n\n需要扩展至每月至少2个事件，全年保持15个以上。重新规划时间表：\n\
+      \n1月：\n- 2026-01 民航局年度工作会议\n- 2026-01 地方两会低空经济议题\n\n2月：\n- 2026-02 eVTOL取证进展\n\
+      - 2026-02 地方低空规划发布\n\n3月：\n- 2026-03 全国两会\n- 2026-03 民航局适航政策\n\n4月：\n- 2026-04\
+      \ 国际无人机展\n- 2026-04 基建招标启动\n\n5月：\n- 2026-05 中国国际通用航空展\n- 2026-05 低空经济产业发展大会\n\
+      \n6月：\n- 2026-06 低空经济示范区批复\n- 2026-06 夏季达沃斯\n\n7月：\n- 2026-07 无人机物流配送政策\n- 2026-07\
+      \ 低空经济标准发布\n\n8月：\n- 2026-08 财报季\n- 2026-08 空管系统招标\n\n9月：\n- 2026-09 北京服贸会\n\
+      - 2026-09 eVTOL飞行测试\n\n10月：\n- 2026-10 珠海航展\n- 2026-10 重要订单公告\n\n11月：\n- 2026-11\
+      \ 取证进展\n- 2026-11 年底政策加码\n\n12月：\n- 2026-12 年终会议\n- 2026-12 次年规划\n\n共26个事件，涵盖政策、展会、取证、订单等多个关键节点。\n\
+      \n核心关注领域包括eVTOL整机制造商如万丰奥威、中直股份、亿航智能，电机驱动系统供应商卧龙电驱、森麒麟，以及无人机领域代表纵横股份、山河智能和航天宏图。\n\
+      \n此外还需跟踪适航证审批进度、低空基础设施建设招标规模、eVTOL订单转化情况、地方空域开放试点范围和无人机商业化运营许可等关键指标。\n\n政策变动风险需要关注国际认证进展对国内审批节奏的影响，同时留意安全事故可能引发的监管收紧。资金层面则要监测主题投资的轮动趋势和融资成本变化。\n\
+      \n继续补充事件信息：深圳作为首批低空经济示范城市发布具体规划，预计3-4月间亿航EH216-S完成生产许可认证。同时考虑将关键公司的财报节点纳入追踪范围，包括万丰奥威的年报和一季报（分别在4月和5月），以及卧龙电驱的中报（8月）和三季报（10月）。国际层面，迪拜eVTOL展和巴黎奥运会的无人机应用展示也值得关注。\n\
+      \n继续列举行业会议和展会：5月深圳举办低空经济高峰论坛，6月上海进行eVTOL飞行演示，7月民航局发布无人机适航标准，8月无\n\n人机物流配送政策扩大试点，同期卧龙电驱等核心标的发布中报。9月北京服贸会展示低空经济成果，10月亿航智能在珠海航展公布订单进展，11月eVTOL取证新消息流出，12月全国民航工作会议部署次年规划。\n\
+      \n继续补充相关会议和事件，包括深圳低空经济示范区公布、民航局政策发布、eVTOL取证进展和珠海航展等关键节点。核心标的涉及万丰奥威等企业，事件时间跨度从1月到12月，涵盖政策、展会、取证等多个维度。\n\
+      \n风险监控聚焦适航证发放进度、基建招标规模和订单转化情况，对政策变化和资金轮动风险进行跟踪。\n\n需要补充更多预期事件以完善年度时间线。关键节点包括深圳低空经济示范区获批、民航局适航政策发布、eVTOL取证进展、珠海航展重要订单、财报披露以及地方两会政策等，这些将构成全年的投资参考框架。\n\
+      </think>\n\n```yaml\ncore_stocks:\n  - code: \"002085\"\n    name: \"万丰奥威\"\n\
+      \    sector: \"eVTOL整机\"\n    reason: \"eVTOL取证主线标的\"\n  - code: \"600038\"\n\
+      \    name: \"中直股份\"\n    sector: \"直升机/eVTOL\"\n    reason: \"航空工业集团核心平台\"\n\
+      \  - code: \"600580\"\n    name: \"卧龙电驱\"\n    sector: \"电机驱动\"\n    reason:\
+      \ \"eVTOL动力系统供应商\"\n  - code: \"688070\"\n    name: \"纵横股份\"\n    sector: \"\
+      工业无人机\"\n    reason: \"工业无人机龙头\"\n  - code: \"002097\"\n    name: \"山河智能\"\n\
+      \    sector: \"无人机整机\"\n    reason: \"无人机通航双布局\"\n\nevents:\n  - date: \"2026-01-20\"\
+      \n    date_precision: day\n    name: \"民航局年度工作会议\"\n    importance: 4\n    type:\
+      \ policy\n    description: \"民航局部署2026年工作重点，低空经济有望获专项支持\"\n    confirmed: false\n\
+      \    suggested_action:\n      stocks: [\"002085\", \"600038\"]\n      action:\
+      \ \"埋伏\"\n\n  - date: \"2026-01\"\n    date_precision: month\n    name: \"深圳低空经济示范区详细规划发布\"\
+      \n    importance: 4\n    type: policy\n    description: \"深圳作为首批示范区发布具体实施方案，含基建、空管、运营\"\
+      \n    confirmed: false\n    suggested_action:\n      stocks: [\"002085\", \"\
+      600580\"]\n      action: \"埋伏\"\n\n  - date: \"2026-02\"\n    date_precision:\
+      \ month\n    name: \"多省份地方两会涉及低空经济议题\"\n    importance: 3\n    type: policy\n\
+      \    description: \"广东、安徽、四川等省有望将低空经济纳入发展规划\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"002097\", \"688070\"]\n      action: \"观望\"\n\n  - date: \"\
+      2026-03-03\"\n    date_precision: day\n    name: \"全国两会召开\"\n    importance:\
+      \ 5\n    type: policy\n    description: \"低空经济有望写入政府工作报告，成为国家战略重点\"\n    confirmed:\
+      \ false\n    suggested_action:\n      stocks: [\"002085\", \"600038\", \"600580\"\
+      ]\n      action: \"加仓\"\n\n  - date: \"2026-03\"\n    date_precision: month\n\
+      \    name: \"民航局适航审定司政策发布\"\n    importance: 5\n    type: regulation\n    description:\
+      \ \"发布eVTOL适航审定指南，明确取证路径和时间表\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"002085\", \"600038\"]\n      action: \"加仓\"\n\n  - date: \"\
+      2026-04\"\n    date_precision: month\n    name: \"亿航EH216-S生产许可证取证\"\n    importance:\
+      \ 5\n    type: regulation\n    description: \"全球首款获型号认证的eVTOL，有望获生产许可加速商业化\"\
+      \n    confirmed: false\n    suggested_action:\n      stocks: [\"002085\", \"\
+      600580\"]\n      action: \"加仓\"\n\n  - date: \"2026-04-12\"\n    date_precision:\
+      \ day\n    name: \"国际无人机展（深圳）\"\n    importance: 4\n    type: exhibition\n \
+      \   description: \"展示最新无人机和eVTOL产品，发布新订单\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"688070\", \"002097\"]\n      action: \"埋伏\"\n\n  - date: \"\
+      2026-04\"\n    date_precision: month\n    name: \"低空基建首批招标启动\"\n    importance:\
+      \ 5\n    type: policy\n    description: \"起降场、空管系统、通信设施等基建进入招投标阶段\"\n    confirmed:\
+      \ false\n    suggested_action:\n      stocks: [\"600580\", \"002085\"]\n   \
+      \   action: \"加仓\"\n\n  - date: \"2026-04-25\"\n    date_precision: day\n  \
+      \  name: \"万丰奥威年报及一季报\"\n    importance: 3\n    type: earnings\n    description:\
+      \ \"观察eVTOL业务占比及订单进展\"\n    confirmed: true\n    suggested_action:\n      stocks:\
+      \ [\"002085\"]\n      action: \"观望\"\n\n  - date: \"2026-05\"\n    date_precision:\
+      \ month\n    name: \"低空经济产业发展大会\"\n    importance: 3\n    type: exhibition\n\
+      \    description: \"政产学研用对接，推动订单落地\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"002097\", \"688070\"]\n      action: \"埋伏\"\n\n  - date: \"\
+      2026-05\"\n    date_precision: month\n    name: \"无人机物流配送试点扩大\"\n    importance:\
+      \ 4\n    type: policy\n    description: \"美团、顺丰等物流企业获准扩大无人机配送范围\"\n    confirmed:\
+      \ false\n    suggested_action:\n      stocks: [\"688070\", \"002097\"]\n   \
+      \   action: \"埋伏\"\n\n  - date: \"2026-06\"\n    date_precision: month\n   \
+      \ name: \"低空经济示范区集中获批\"\n    importance: 5\n    type: policy\n    description:\
+      \ \"民航局批复首批低空经济示范区，享政策+资金支持\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"002085\", \"600038\", \"600580\"]\n      action: \"加仓\"\n\n\
+      \  - date: \"2026-06\"\n    date_precision: month\n    name: \"eVTOL飞行演示（上海）\"\
+      \n    importance: 4\n    type: technology\n    description: \"多家企业展示eVTOL飞行表演，积累商业化信心\"\
+      \n    confirmed: false\n    suggested_action:\n      stocks: [\"002085\", \"\
+      600038\"]\n      action: \"埋伏\"\n\n  - date: \"2026-07\"\n    date_precision:\
+      \ month\n    name: \"无人机适航标准体系发布\"\n    importance: 4\n    type: regulation\n\
+      \    description: \"民航局发布工业无人机适航标准，推动规范化发展\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"688070\", \"002097\"]\n      action: \"埋伏\"\n\n  - date: \"\
+      2026-08\"\n    date_precision: month\n    name: \"核心标的年中财报披露\"\n    importance:\
+      \ 3\n    type: earnings\n    description: \"卧龙电驱等发布中报，观察低空业务收入占比\"\n    confirmed:\
+      \ true\n    suggested_action:\n      stocks: [\"600580\"]\n      action: \"\
+      观望\"\n\n  - date: \"2026-08\"\n    date_precision: month\n    name: \"空管系统第二批招标\"\
+      \n    importance: 4\n    type: policy\n    description: \"低空智联网建设进入第二阶段，相关公司受益\"\
+      \n    confirmed: false\n    suggested_action:\n      stocks: [\"600580\"]\n\
+      \      action: \"加仓\"\n\n  - date: \"2026-09\"\n    date_precision: month\n\
+      \    name: \"北京服贸会低空经济展区\"\n    importance: 3\n    type: exhibition\n    description:\
+      \ \"服贸会设立低空经济专区，展示应用场景\"\n    confirmed: false\n    suggested_action:\n    \
+      \  stocks: [\"688070\", \"002097\"]\n      action: \"观望\"\n\n  - date: \"2026-10\"\
+      \n    date_precision: month\n    name: \"亿航智能等新机型发布\"\n    importance: 4\n \
+      \   type: product\n    description: \"新代际eVTOL产品发布，商业化进程加速\"\n    confirmed:\
+      \ false\n    suggested_action:\n      stocks: [\"002085\", \"600038\"]\n   \
+      \   action: \"埋伏\"\n\n  - date: \"2026-11\"\n    date_precision: month\n   \
+      \ name: \"珠海航展重要订单公布\"\n    importance: 5\n    type: policy\n    description:\
+      \ \"航展期间公布大额订单，政策+订单双催化\"\n    confirmed: false\n    suggested_action:\n   \
+      \   stocks: [\"002085\", \"600038\", \"600580\"]\n      action: \"加仓\"\n\n \
+      \ - date: \"2026-11\"\n    date_precision: month\n    name: \"eVTOL型号合格证新进展\"\
+      \n    importance: 4\n    type: regulation\n    description: \"更多企业获型号认证或进入审定后期阶段\"\
+      \n    confirmed: false\n    suggested_action:\n      stocks: [\"002085\", \"\
+      600038\"]\n      action: \"埋伏\"\n\n  - date: \"2026-12\"\n    date_precision:\
+      \ month\n    name: \"全国民航工作会议\"\n    importance: 3\n    type: policy\n    description:\
+      \ \"部署2027年工作计划，低空经济料持续获支持\"\n    confirmed: false\n    suggested_action:\n\
+      \      stocks: [\"002085\", \"600038\"]\n      action: \"持有\"\n\n  - date: \"\
+      2026-12\"\n    date_precision: month\n    name: \"次年低空经济规划发布\"\n    importance:\
+      \ 4\n    type: policy\n    description: \"民航局或地方政府发布下一年度重点任务清单\"\n    confirmed:\
+      \ false\n    suggested_action:\n      stocks: [\"002085\", \"600580\"]\n   \
+      \   action: \"埋伏\"\n\nmonitors:\n  - indicator: \"eVTOL适航证发放进度\"\n    risk_level:\
+      \ high\n    action: \"若取证进度低于预期，板块可能面临调整，及时减仓\"\n  - indicator: \"低空基建招标规模和节奏\"\
+      \n    risk_level: medium\n    action: \"若招标延后，基建类标的股价承压，考虑调仓至整机\"\n  - indicator:\
+      \ \"主题投资资金轮动\"\n    risk_level: medium\n    action: \"低空经济为政策主题，若主线切换至其他板块，降低仓位\"\
+      \n```"
+    industry: 低空经济
+    provider: minimax
+    extra: ''
+    created: 2026-06-07T02:17
+    expires: 2026-06-08T02:17

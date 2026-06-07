@@ -1,4 +1,4 @@
-updated: '2026-06-06'
+updated: '2026-06-07'
 mapping:
   6G通信:
     code: '515050'
@@ -54,12 +54,6 @@ mapping:
     exchange: SH
     type: 行业
     note: 覆盖设备、设计、封测，国产替代主线
-  商业航天:
-    code: '512660'
-    name: 军工ETF
-    exchange: SH
-    type: 行业
-    note: 商业航天与军工发射产业链高度重合
   自动驾驶/L4:
     code: '515250'
     name: 智能汽车ETF
@@ -78,3 +72,9 @@ mapping:
     exchange: SH
     type: 自定义
     note: 自定义行业：绿色能源（请核实并填入ETF代码）
+  商业航天/火箭:
+    code: ''
+    name: ''
+    exchange: SH
+    type: 自定义
+    note: 自动添加：商业航天/火箭（请核实并填入ETF代码）

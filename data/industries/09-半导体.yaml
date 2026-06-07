@@ -1,197 +1,204 @@
-# ============================================================
-# 半导体/国产替代 — 事件日历数据
-# ============================================================
-industry: "半导体/国产替代"
-description: "美国出口管制+国产设备突破双线驱动，2026年看光刻机进展+HBM量产+AI芯片"
-tags: [芯片, 制造, 安全]
-updated: "2026-06-05"
-
+industry: 半导体/国产替代
+description: 美国出口管制+国产设备突破双线驱动，2026年看光刻机进展+HBM量产+AI芯片
+tags:
+- 芯片
+- 制造
+- 安全
+updated: '2026-06-05'
 core_stocks:
-  - code: "002371"
-    name: "北方华创"
-    reason: "国产半导体设备平台龙头，刻蚀/薄膜/清洗全面布局"
-    sector: "设备"
-  - code: "688012"
-    name: "中微公司"
-    reason: "刻蚀/沉积纯正标的，2026Q1净利+197%"
-    sector: "设备"
-  - code: "688981"
-    name: "中芯国际"
-    reason: "大陆晶圆代工唯一先进制程玩家"
-    sector: "代工"
-  - code: "603986"
-    name: "兆易创新"
-    reason: "NOR Flash+DRAM分销，CXMT平台受益"
-    sector: "存储"
-  - code: "688041"
-    name: "海光信息"
-    reason: "x86 CPU/DCU国产替代，AI推理需求驱动"
-    sector: "芯片设计"
-  - code: "002156"
-    name: "通富微电"
-    reason: "先进封装龙头，AMD+HBM封装需求"
-    sector: "封装"
-
+- code: '002371'
+  name: 北方华创
+  reason: 国产半导体设备平台龙头，刻蚀/薄膜/清洗全面布局
+  sector: 设备
+  market: A股
+  estimated_pe: 35-50x
+- code: '688012'
+  name: 中微公司
+  reason: 刻蚀/沉积纯正标的，2026Q1净利+197%
+  sector: 设备
+- code: '688981'
+  name: 中芯国际
+  reason: 大陆晶圆代工唯一先进制程玩家
+  sector: 代工
+  market: A股
+  estimated_pe: 30-45x
+- code: '603986'
+  name: 兆易创新
+  reason: NOR Flash+DRAM分销，CXMT平台受益
+  sector: 存储
+- code: '688041'
+  name: 海光信息
+  reason: x86 CPU/DCU国产替代，AI推理需求驱动
+  sector: 芯片设计
+- code: '002156'
+  name: 通富微电
+  reason: 先进封装龙头，AMD+HBM封装需求
+  sector: 封装
 events:
-
-  # ── 1月 ──
-  - date: "2026-01"
-    date_precision: month
-    confirmed: true
-    name: "CXMT长鑫存储宣布$4.2B IPO计划（HBM3量产）"
-    importance: 5
-    type: ipo
-    description: "长鑫存储科创板IPO，资金用于HBM3产能"
-    impact: "HBM国产化里程碑，带动存储+设备板块"
-    suggested_action:
-      stocks: ["603986", "002371"]
-      action: "埋伏"
-      reason: "CXMT IPO→存储产业链价值重估"
-
-  - date: "2026-01"
-    date_precision: month
-    confirmed: true
-    name: "阿里巴巴平头哥发布'镇岳810E'AI芯片"
-    importance: 4
-    type: product
-    description: "96G HBM2e，700GB/s片间互联带宽"
-    impact: "国产AI芯片生态进展"
-    suggested_action:
-      stocks: ["688041"]
-      action: "观望"
-
-  # ── 3月 ──
-  - date: "2026-03"
-    date_precision: month
-    confirmed: true
-    name: "全国两会——半导体自主可控政策定调"
-    importance: 4
-    type: policy
-    description: "半导体自给率提升为国家科技头号议程"
-    suggested_action:
-      stocks: ["002371", "688012", "688981"]
-      action: "持有"
-      reason: "政策催化，板块情绪利好"
-
-  - date: "2026-03"
-    date_precision: month
-    confirmed: false
-    name: "SMEE SSA800 28nm浸没式DUV光刻机在SEMICON China首次公开"
-    importance: 5
-    type: product
-    description: "国产光刻机重大突破，28nm节点"
-    impact: "国产半导体最核心的瓶颈突破信号"
-    suggested_action:
-      stocks: ["002371", "688981"]
-      action: "加仓"
-      reason: "光刻机突破→国产Fab扩产预期提升"
-
-  # ── 4月 ──
-  - date: "2026-04"
-    date_precision: month
-    confirmed: true
-    name: "SMEE SSA800 28nm光刻机批量交付报道"
-    importance: 5
-    type: product
-    description: "多源媒体报道SSA800已批量交付，全年目标50-200台"
-    impact: "国产光刻机从0到1的验证"
-    suggested_action:
-      stocks: ["002371", "688012", "688981"]
-      action: "加仓"
-      reason: "光刻机交付→国产Fab产能扩张确定性提升"
-
-  - date: "2026-04"
-    date_precision: month
-    confirmed: true
-    name: "MATCH法案在美国国会提出"
-    importance: 5
-    type: regulation
-    description: "最严厉版本：禁止DUV浸没式销售+售后支持到中国"
-    impact: "若通过→国产替代紧迫性再升级"
-    suggested_action:
-      stocks: ["002371", "688012"]
-      action: "加仓"
-      reason: "出口管制越严→国产替代逻辑越强"
-
-  # ── 5月 ──
-  - date: "2026-05"
-    date_precision: month
-    confirmed: true
-    name: "CXMT HBM3向国产AI芯片客户送样"
-    importance: 5
-    type: product
-    description: "HBM3样品交付华为等AI芯片客户"
-    impact: "国产HBM从研发到送样的关键一步"
-    suggested_action:
-      stocks: ["603986", "002156"]
-      action: "埋伏"
-      reason: "HBM国产化→存储+封装板块催化"
-
-  # ── 6月 ──
-  - date: "2026-06"
-    date_precision: month
-    confirmed: true
-    name: "黄仁勋出席美国参议院听证会（对华芯片政策）"
-    importance: 4
-    type: policy
-    description: "NVIDIA CEO就AI芯片对华出口政策作证"
-    impact: "影响AI芯片出口管制预期"
-    suggested_action:
-      stocks: ["688041", "002156"]
-      action: "观望"
-
-  # ── 7-8月 ──
-  - date: "2026-07"
-    date_precision: month
-    confirmed: false
-    name: "CXMT HBM3量产目标节点"
-    importance: 5
-    type: product
-    description: "国产HBM3首次量产——AI芯片生态里程碑"
-    impact: "国产AI芯片关键瓶颈突破"
-    suggested_action:
-      stocks: ["603986", "002156"]
-      action: "加仓"
-
-  - date: "2026-08"
-    date_precision: month
-    confirmed: false
-    name: "半导体设备公司半年报密集披露"
-    importance: 5
-    type: earnings
-    description: "设备订单 backlog、毛利率趋势"
-    impact: "验证设备国产替代速度"
-    suggested_action:
-      stocks: ["002371", "688012"]
-      action: "持有"
-
-  # ── 12月 ──
-  - date: "2026-12"
-    date_precision: month
-    confirmed: false
-    name: "中美出口管制年度回顾——BIS实体清单更新"
-    importance: 5
-    type: regulation
-    description: "可能的实体清单新增/MATCH法案进展"
-    impact: "决定2027年国产替代节奏"
-    suggested_action:
-      stocks: ["002371", "688012", "688981"]
-      action: "持有"
-      reason: "管制升级则国产替代加速，管制放松则板块回调"
-
+- date: 2026-01
+  date_precision: month
+  confirmed: true
+  name: CXMT长鑫存储宣布$4.2B IPO计划（HBM3量产）
+  importance: 5
+  type: ipo
+  description: 长鑫存储科创板IPO，资金用于HBM3产能
+  impact: HBM国产化里程碑，带动存储+设备板块
+  suggested_action:
+    stocks:
+    - '603986'
+    - '002371'
+    action: 埋伏
+    reason: CXMT IPO→存储产业链价值重估
+- date: 2026-01
+  date_precision: month
+  confirmed: true
+  name: 阿里巴巴平头哥发布'镇岳810E'AI芯片
+  importance: 4
+  type: product
+  description: 96G HBM2e，700GB/s片间互联带宽
+  impact: 国产AI芯片生态进展
+  suggested_action:
+    stocks:
+    - '688041'
+    action: 观望
+- date: 2026-03
+  date_precision: month
+  confirmed: true
+  name: 全国两会——半导体自主可控政策定调
+  importance: 4
+  type: policy
+  description: 半导体自给率提升为国家科技头号议程
+  suggested_action:
+    stocks:
+    - '002371'
+    - '688012'
+    - '688981'
+    action: 持有
+    reason: 政策催化，板块情绪利好
+- date: 2026-03
+  date_precision: month
+  confirmed: false
+  name: SMEE SSA800 28nm浸没式DUV光刻机在SEMICON China首次公开
+  importance: 5
+  type: product
+  description: 国产光刻机重大突破，28nm节点
+  impact: 国产半导体最核心的瓶颈突破信号
+  suggested_action:
+    stocks:
+    - '002371'
+    - '688981'
+    action: 加仓
+    reason: 光刻机突破→国产Fab扩产预期提升
+- date: 2026-04
+  date_precision: month
+  confirmed: true
+  name: SMEE SSA800 28nm光刻机批量交付报道
+  importance: 5
+  type: product
+  description: 多源媒体报道SSA800已批量交付，全年目标50-200台
+  impact: 国产光刻机从0到1的验证
+  suggested_action:
+    stocks:
+    - '002371'
+    - '688012'
+    - '688981'
+    action: 加仓
+    reason: 光刻机交付→国产Fab产能扩张确定性提升
+- date: 2026-04
+  date_precision: month
+  confirmed: true
+  name: MATCH法案在美国国会提出
+  importance: 5
+  type: regulation
+  description: 最严厉版本：禁止DUV浸没式销售+售后支持到中国
+  impact: 若通过→国产替代紧迫性再升级
+  suggested_action:
+    stocks:
+    - '002371'
+    - '688012'
+    action: 加仓
+    reason: 出口管制越严→国产替代逻辑越强
+- date: 2026-05
+  date_precision: month
+  confirmed: true
+  name: CXMT HBM3向国产AI芯片客户送样
+  importance: 5
+  type: product
+  description: HBM3样品交付华为等AI芯片客户
+  impact: 国产HBM从研发到送样的关键一步
+  suggested_action:
+    stocks:
+    - '603986'
+    - '002156'
+    action: 埋伏
+    reason: HBM国产化→存储+封装板块催化
+- date: 2026-06
+  date_precision: month
+  confirmed: true
+  name: 黄仁勋出席美国参议院听证会（对华芯片政策）
+  importance: 4
+  type: policy
+  description: NVIDIA CEO就AI芯片对华出口政策作证
+  impact: 影响AI芯片出口管制预期
+  suggested_action:
+    stocks:
+    - '688041'
+    - '002156'
+    action: 观望
+- date: 2026-07
+  date_precision: month
+  confirmed: false
+  name: CXMT HBM3量产目标节点
+  importance: 5
+  type: product
+  description: 国产HBM3首次量产——AI芯片生态里程碑
+  impact: 国产AI芯片关键瓶颈突破
+  suggested_action:
+    stocks:
+    - '603986'
+    - '002156'
+    action: 加仓
+- date: 2026-08
+  date_precision: month
+  confirmed: false
+  name: 半导体设备公司半年报密集披露
+  importance: 5
+  type: earnings
+  description: 设备订单 backlog、毛利率趋势
+  impact: 验证设备国产替代速度
+  suggested_action:
+    stocks:
+    - '002371'
+    - '688012'
+    action: 持有
+- date: 2026-12
+  date_precision: month
+  confirmed: false
+  name: 中美出口管制年度回顾——BIS实体清单更新
+  importance: 5
+  type: regulation
+  description: 可能的实体清单新增/MATCH法案进展
+  impact: 决定2027年国产替代节奏
+  suggested_action:
+    stocks:
+    - '002371'
+    - '688012'
+    - '688981'
+    action: 持有
+    reason: 管制升级则国产替代加速，管制放松则板块回调
 monitors:
-  - indicator: "MATCH法案通过→DUV售后支持停止"
-    risk_level: high
-    action: "短期利空（冲击设备商），中期利好（国产替代加速）"
-  - indicator: "SMEE光刻机交付不及预期"
-    risk_level: high
-    action: "减仓设备板块"
-  - indicator: "CXMT HBM3量产延迟"
-    risk_level: medium
-    action: "减仓存储板块"
-  - indicator: "中美关系缓和→ASML设备恢复供应"
-    risk_level: medium
-    action: "减仓设备板块（国产替代逻辑削弱）"
-  - indicator: "存储周期见顶（DRAM价格拐头）"
-    risk_level: medium
-    action: "减仓存储标的"
+- indicator: MATCH法案通过→DUV售后支持停止
+  risk_level: high
+  action: 短期利空（冲击设备商），中期利好（国产替代加速）
+- indicator: SMEE光刻机交付不及预期
+  risk_level: high
+  action: 减仓设备板块
+- indicator: CXMT HBM3量产延迟
+  risk_level: medium
+  action: 减仓存储板块
+- indicator: 中美关系缓和→ASML设备恢复供应
+  risk_level: medium
+  action: 减仓设备板块（国产替代逻辑削弱）
+- indicator: 存储周期见顶（DRAM价格拐头）
+  risk_level: medium
+  action: 减仓存储标的

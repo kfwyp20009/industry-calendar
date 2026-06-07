@@ -86,7 +86,15 @@ def get_all_skills():
     result = {}
     for name, info in BUILTIN_SKILLS.items():
         if name not in hidden:
-            result[name] = {**info, "builtin": True}
+            result[name] = {**info, "builtin": True, "id": ""}
+
+    # 应用内置技能关键词覆盖（用户自定义）
+    data = _load_skills_file()
+    overrides = data.get("builtin_overrides", {})
+    for name, override in overrides.items():
+        if name in result:
+            result[name]["keywords"] = override["keywords"]
+
     for s in load_custom_skills()[0]:
         name = s["name"]
         result[name] = {
@@ -164,6 +172,29 @@ def update_skill(skill_id, name=None, keywords=None, description=None):
             save_custom_skills(skills, hidden)
             return True, "更新成功"
     return False, "未找到该技能"
+
+
+def update_keywords_by_name(name, keywords):
+    """按行业名称更新关键词（内置/自定义通用）"""
+    normalized = normalize_keywords(keywords)
+
+    # 内置技能 → 存覆盖到 custom.yaml
+    if name in BUILTIN_SKILLS:
+        data = _load_skills_file()
+        overrides = data.setdefault("builtin_overrides", {})
+        overrides[name] = {"keywords": normalized}
+        with open(SKILLS_FILE, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, allow_unicode=True, sort_keys=False)
+        return True, "更新成功"
+
+    # 自定义技能 → 按 ID 查找更新
+    skills, hidden = load_custom_skills()
+    for s in skills:
+        if s["name"] == name:
+            s["keywords"] = normalized
+            save_custom_skills(skills, hidden)
+            return True, "更新成功"
+    return False, "未找到该行业"
 
 
 def delete_skill(skill_id):

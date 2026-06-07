@@ -1,200 +1,501 @@
-# ============================================================
-# 低空经济 — 事件日历数据
-# ============================================================
-industry: "低空经济"
-description: "2026年是从政策走向订单落地的关键年，eVTOL取证+基建招标是核心主线"
-tags: [政策, 基建, 交通]
-updated: "2026-06-05"
-
+industry: 低空经济
+description: 2026年是从政策走向订单落地的关键年，eVTOL取证+基建招标是核心主线
+tags:
+- 政策
+- 基建
+- 交通
+updated: '2026-06-07'
 core_stocks:
-  - code: "EH.US"
-    name: "亿航智能"
-    reason: "全球首张eVTOL TC+OC，商业化先行者"
-    sector: "整机"
-  - code: "688631"
-    name: "莱斯信息"
-    reason: "空管系统龙头，低空空管全国总包"
-    sector: "基础设施"
-  - code: "002253"
-    name: "川大智胜"
-    reason: "空管仿真模拟+低空监视"
-    sector: "基础设施"
-  - code: "301091"
-    name: "深城交"
-    reason: "深圳低空智能融合基建项目主导"
-    sector: "基础设施"
-  - code: "600562"
-    name: "国睿科技"
-    reason: "低空监视雷达"
-    sector: "基础设施"
-  - code: "300699"
-    name: "光威复材"
-    reason: "碳纤维复合材料，eVTOL减重核心材料"
-    sector: "材料"
-
+- code: EH.US
+  name: 亿航智能
+  reason: 全球首张eVTOL TC+OC，商业化先行者
+  sector: 整机
+  market: 美股
+  estimated_pe: '-'
+  key_dates:
+  - Q1财报(6月)
+  - 全年交付(11月)
+- code: '688631'
+  name: 莱斯信息
+  reason: 空管系统龙头，低空空管全国总包
+  sector: 基础设施
+  market: A股
+  estimated_pe: 40-50x
+  key_dates:
+  - 发改委规划(6月)
+  - 半年报(8月)
+  - 空域扩容(11月)
+- code: '002253'
+  name: 川大智胜
+  reason: 空管仿真模拟+低空监视
+  sector: 基础设施
+- code: '301091'
+  name: 深城交
+  reason: 深圳低空智能融合基建项目主导
+  sector: 基础设施
+- code: '600562'
+  name: 国睿科技
+  reason: 低空监视雷达
+  sector: 基础设施
+- code: '300699'
+  name: 光威复材
+  reason: 碳纤维复合材料，eVTOL减重核心材料
+  sector: 材料
+- code: 002085
+  name: 万丰奥威
+  sector: eVTOL整机
+  reason: eVTOL取证主线标的
+- code: '600038'
+  name: 中直股份
+  sector: 直升机/eVTOL
+  reason: 航空工业集团核心平台
+- code: '600580'
+  name: 卧龙电驱
+  sector: 电机驱动
+  reason: eVTOL动力系统供应商
+- code: '688070'
+  name: 纵横股份
+  sector: 工业无人机
+  reason: 工业无人机龙头
+- code: 002097
+  name: 山河智能
+  sector: 无人机整机
+  reason: 无人机通航双布局
 events:
-
-  # ── 6月 ──
-  - date: "2026-06-10"
-    date_precision: day
-    confirmed: false
-    name: "亿航智能2026Q1财报（OC后首个完整季度）"
-    importance: 5
-    type: earnings
-    description: "Q1交付数量、OC后商业化收入"
-    impact: "全年低空经济最重要业绩验证——验证eVTOL商业化可行性"
-    suggested_action:
-      stocks: ["EH.US"]
-      action: "埋伏"
-      reason: "若交付超预期→板块整体催化"
-    linked_industries: []
-
-  - date: "2026-06"
-    date_precision: month
-    confirmed: false
-    name: "发改委低空司年度产业规划发布"
-    importance: 5
-    type: policy
-    description: "新一批试点城市、基建投资规模"
-    impact: "低空经济政策定调，影响全年投资节奏"
-    suggested_action:
-      stocks: ["688631", "002253", "301091"]
-      action: "建仓"
-      reason: "政策催化+基建招标启动预期"
-
-  # ── 持续事件 ──
-  - date: "2026-06"
-    date_precision: month
-    confirmed: false
-    name: "各省起降场/CNS系统招标公告"
-    importance: 5
-    type: other
-    description: "持续跟踪中标公告"
-    impact: "验证基建逻辑落地"
-    suggested_action:
-      stocks: ["688631", "600562"]
-      action: "加仓"
-      reason: "中标公告是直接催化剂"
-
-  # ── 7月 ──
-  - date: "2026-07"
-    date_precision: month
-    confirmed: false
-    name: "小鹏汇天'陆地航母'TC审定进入符合性验证阶段"
-    importance: 5
-    type: regulation
-    description: "第二家eVTOL企业适航进展"
-    impact: "若推进顺利→打开eVTOL第二股预期"
-    suggested_action:
-      stocks: ["300699"]
-      action: "埋伏"
-
-  - date: "2026-07"
-    date_precision: month
-    confirmed: false
-    name: "6省低空全域开放试点半年评估报告"
-    importance: 4
-    type: policy
-    description: "飞行架次、空域使用率、事故率"
-    impact: "验证空域开放的实质性效果"
-    suggested_action:
-      stocks: ["688631", "002253"]
-      action: "持有"
-      reason: "评估结果决定下半年试点扩容速度"
-
-  # ── 8月 ──
-  - date: "2026-08"
-    date_precision: month
-    confirmed: false
-    name: "莱斯信息2026半年报（低空订单验证）"
-    importance: 5
-    type: earnings
-    description: "低空业务在手订单、收入占比"
-    impact: "全年低空经济最重要业绩验证"
-    suggested_action:
-      stocks: ["688631"]
-      action: "加仓"
-      reason: "如果低空订单超预期→确认基建逻辑"
-
-  - date: "2026-08"
-    date_precision: month
-    confirmed: false
-    name: "FAA发布eVTOL适航标准SFAR草案"
-    importance: 4
-    type: regulation
-    description: "美国eVTOL适航审批路径"
-    impact: "影响全球eVTOL适航标准互认"
-    suggested_action:
-      stocks: ["EH.US"]
-      action: "观望"
-
-  # ── 11月 ──
-  - date: "2026-11"
-    date_precision: month
-    confirmed: false
-    name: "亿航智能全年交付量（目标300+架）"
-    importance: 5
-    type: earnings
-    description: "是否达标→2027年产能指引→板块方向选择"
-    impact: "决定低空板块2027年方向"
-    suggested_action:
-      stocks: ["EH.US"]
-      action: "持有"
-      reason: "若达标→2027年产能翻倍预期"
-
-  - date: "2026-11"
-    date_precision: month
-    confirmed: false
-    name: "首批G类空域省份扩容（6省外新增）"
-    importance: 4
-    type: policy
-    description: "新增省份加入试点"
-    impact: "基础设施市场空间扩大"
-    suggested_action:
-      stocks: ["688631"]
-      action: "加仓"
-      reason: "区域扩容→基建需求扩大"
-
-  # ── 12月 ──
-  - date: "2026-12"
-    date_precision: month
-    confirmed: false
-    name: "中央经济工作会议——低空经济表述"
-    importance: 5
-    type: policy
-    description: "是否再次提及低空经济"
-    impact: "决定2027年政策支持力度"
-    suggested_action:
-      stocks: ["688631", "EH.US"]
-      action: "埋伏"
-      reason: "跨年布局，政策预期催化"
-    linked_industries: ["__all__"]
-
-  - date: "2026-12"
-    date_precision: month
-    confirmed: false
-    name: "光威复材/中航高科航空碳纤维出货量验证"
-    importance: 4
-    type: earnings
-    description: "碳纤维在eVTOL中渗透率提升"
-    impact: "材料端验证低空经济产业链景气度"
-    suggested_action:
-      stocks: ["300699"]
-      action: "持有"
-
+- date: '2026-06-10'
+  date_precision: day
+  confirmed: false
+  name: 亿航智能2026Q1财报（OC后首个完整季度）
+  importance: 5
+  type: earnings
+  description: Q1交付数量、OC后商业化收入
+  impact: 全年低空经济最重要业绩验证——验证eVTOL商业化可行性
+  suggested_action:
+    stocks:
+    - EH.US
+    action: 埋伏
+    reason: 若交付超预期→板块整体催化
+  linked_industries: []
+- date: 2026-06
+  date_precision: month
+  confirmed: false
+  name: 发改委低空司年度产业规划发布
+  importance: 5
+  type: policy
+  description: 新一批试点城市、基建投资规模
+  impact: 低空经济政策定调，影响全年投资节奏
+  suggested_action:
+    stocks:
+    - '688631'
+    - '002253'
+    - '301091'
+    action: 建仓
+    reason: 政策催化+基建招标启动预期
+- date: 2026-06
+  date_precision: month
+  confirmed: false
+  name: 各省起降场/CNS系统招标公告
+  importance: 5
+  type: other
+  description: 持续跟踪中标公告
+  impact: 验证基建逻辑落地
+  suggested_action:
+    stocks:
+    - '688631'
+    - '600562'
+    action: 加仓
+    reason: 中标公告是直接催化剂
+- date: 2026-07
+  date_precision: month
+  confirmed: false
+  name: 小鹏汇天'陆地航母'TC审定进入符合性验证阶段
+  importance: 5
+  type: regulation
+  description: 第二家eVTOL企业适航进展
+  impact: 若推进顺利→打开eVTOL第二股预期
+  suggested_action:
+    stocks:
+    - '300699'
+    action: 埋伏
+- date: 2026-07
+  date_precision: month
+  confirmed: false
+  name: 6省低空全域开放试点半年评估报告
+  importance: 4
+  type: policy
+  description: 飞行架次、空域使用率、事故率
+  impact: 验证空域开放的实质性效果
+  suggested_action:
+    stocks:
+    - '688631'
+    - '002253'
+    action: 持有
+    reason: 评估结果决定下半年试点扩容速度
+- date: 2026-08
+  date_precision: month
+  confirmed: false
+  name: 莱斯信息2026半年报（低空订单验证）
+  importance: 5
+  type: earnings
+  description: 低空业务在手订单、收入占比
+  impact: 全年低空经济最重要业绩验证
+  suggested_action:
+    stocks:
+    - '688631'
+    action: 加仓
+    reason: 如果低空订单超预期→确认基建逻辑
+- date: 2026-08
+  date_precision: month
+  confirmed: false
+  name: FAA发布eVTOL适航标准SFAR草案
+  importance: 4
+  type: regulation
+  description: 美国eVTOL适航审批路径
+  impact: 影响全球eVTOL适航标准互认
+  suggested_action:
+    stocks:
+    - EH.US
+    action: 观望
+- date: 2026-11
+  date_precision: month
+  confirmed: false
+  name: 亿航智能全年交付量（目标300+架）
+  importance: 5
+  type: earnings
+  description: 是否达标→2027年产能指引→板块方向选择
+  impact: 决定低空板块2027年方向
+  suggested_action:
+    stocks:
+    - EH.US
+    action: 持有
+    reason: 若达标→2027年产能翻倍预期
+- date: 2026-11
+  date_precision: month
+  confirmed: false
+  name: 首批G类空域省份扩容（6省外新增）
+  importance: 4
+  type: policy
+  description: 新增省份加入试点
+  impact: 基础设施市场空间扩大
+  suggested_action:
+    stocks:
+    - '688631'
+    action: 加仓
+    reason: 区域扩容→基建需求扩大
+- date: 2026-12
+  date_precision: month
+  confirmed: false
+  name: 中央经济工作会议——低空经济表述
+  importance: 5
+  type: policy
+  description: 是否再次提及低空经济
+  impact: 决定2027年政策支持力度
+  suggested_action:
+    stocks:
+    - '688631'
+    - EH.US
+    action: 埋伏
+    reason: 跨年布局，政策预期催化
+  linked_industries:
+  - __all__
+- date: 2026-12
+  date_precision: month
+  confirmed: false
+  name: 光威复材/中航高科航空碳纤维出货量验证
+  importance: 4
+  type: earnings
+  description: 碳纤维在eVTOL中渗透率提升
+  impact: 材料端验证低空经济产业链景气度
+  suggested_action:
+    stocks:
+    - '300699'
+    action: 持有
+- date: '2026-01-20'
+  date_precision: day
+  name: 民航局年度工作会议
+  importance: 4
+  type: policy
+  description: 民航局部署2026年工作重点，低空经济有望获专项支持
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    action: 埋伏
+- date: 2026-01
+  date_precision: month
+  name: 深圳低空经济示范区详细规划发布
+  importance: 4
+  type: policy
+  description: 深圳作为首批示范区发布具体实施方案，含基建、空管、运营
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600580'
+    action: 埋伏
+- date: 2026-02
+  date_precision: month
+  name: 多省份地方两会涉及低空经济议题
+  importance: 3
+  type: policy
+  description: 广东、安徽、四川等省有望将低空经济纳入发展规划
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002097
+    - '688070'
+    action: 观望
+- date: '2026-03-03'
+  date_precision: day
+  name: 全国两会召开
+  importance: 5
+  type: policy
+  description: 低空经济有望写入政府工作报告，成为国家战略重点
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    - '600580'
+    action: 加仓
+- date: 2026-03
+  date_precision: month
+  name: 民航局适航审定司政策发布
+  importance: 5
+  type: regulation
+  description: 发布eVTOL适航审定指南，明确取证路径和时间表
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    action: 加仓
+- date: 2026-04
+  date_precision: month
+  name: 亿航EH216-S生产许可证取证
+  importance: 5
+  type: regulation
+  description: 全球首款获型号认证的eVTOL，有望获生产许可加速商业化
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600580'
+    action: 加仓
+- date: '2026-04-12'
+  date_precision: day
+  name: 国际无人机展（深圳）
+  importance: 4
+  type: exhibition
+  description: 展示最新无人机和eVTOL产品，发布新订单
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '688070'
+    - 002097
+    action: 埋伏
+- date: 2026-04
+  date_precision: month
+  name: 低空基建首批招标启动
+  importance: 5
+  type: policy
+  description: 起降场、空管系统、通信设施等基建进入招投标阶段
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600580'
+    - 002085
+    action: 加仓
+- date: '2026-04-25'
+  date_precision: day
+  name: 万丰奥威年报及一季报
+  importance: 3
+  type: earnings
+  description: 观察eVTOL业务占比及订单进展
+  confirmed: true
+  suggested_action:
+    stocks:
+    - 002085
+    action: 观望
+- date: 2026-05
+  date_precision: month
+  name: 低空经济产业发展大会
+  importance: 3
+  type: exhibition
+  description: 政产学研用对接，推动订单落地
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002097
+    - '688070'
+    action: 埋伏
+- date: 2026-05
+  date_precision: month
+  name: 无人机物流配送试点扩大
+  importance: 4
+  type: policy
+  description: 美团、顺丰等物流企业获准扩大无人机配送范围
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '688070'
+    - 002097
+    action: 埋伏
+- date: 2026-06
+  date_precision: month
+  name: 低空经济示范区集中获批
+  importance: 5
+  type: policy
+  description: 民航局批复首批低空经济示范区，享政策+资金支持
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    - '600580'
+    action: 加仓
+- date: 2026-06
+  date_precision: month
+  name: eVTOL飞行演示（上海）
+  importance: 4
+  type: technology
+  description: 多家企业展示eVTOL飞行表演，积累商业化信心
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    action: 埋伏
+- date: 2026-07
+  date_precision: month
+  name: 无人机适航标准体系发布
+  importance: 4
+  type: regulation
+  description: 民航局发布工业无人机适航标准，推动规范化发展
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '688070'
+    - 002097
+    action: 埋伏
+- date: 2026-08
+  date_precision: month
+  name: 核心标的年中财报披露
+  importance: 3
+  type: earnings
+  description: 卧龙电驱等发布中报，观察低空业务收入占比
+  confirmed: true
+  suggested_action:
+    stocks:
+    - '600580'
+    action: 观望
+- date: 2026-08
+  date_precision: month
+  name: 空管系统第二批招标
+  importance: 4
+  type: policy
+  description: 低空智联网建设进入第二阶段，相关公司受益
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '600580'
+    action: 加仓
+- date: 2026-09
+  date_precision: month
+  name: 北京服贸会低空经济展区
+  importance: 3
+  type: exhibition
+  description: 服贸会设立低空经济专区，展示应用场景
+  confirmed: false
+  suggested_action:
+    stocks:
+    - '688070'
+    - 002097
+    action: 观望
+- date: 2026-10
+  date_precision: month
+  name: 亿航智能等新机型发布
+  importance: 4
+  type: product
+  description: 新代际eVTOL产品发布，商业化进程加速
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    action: 埋伏
+- date: 2026-11
+  date_precision: month
+  name: 珠海航展重要订单公布
+  importance: 5
+  type: policy
+  description: 航展期间公布大额订单，政策+订单双催化
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    - '600580'
+    action: 加仓
+- date: 2026-11
+  date_precision: month
+  name: eVTOL型号合格证新进展
+  importance: 4
+  type: regulation
+  description: 更多企业获型号认证或进入审定后期阶段
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    action: 埋伏
+- date: 2026-12
+  date_precision: month
+  name: 全国民航工作会议
+  importance: 3
+  type: policy
+  description: 部署2027年工作计划，低空经济料持续获支持
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600038'
+    action: 持有
+- date: 2026-12
+  date_precision: month
+  name: 次年低空经济规划发布
+  importance: 4
+  type: policy
+  description: 民航局或地方政府发布下一年度重点任务清单
+  confirmed: false
+  suggested_action:
+    stocks:
+    - 002085
+    - '600580'
+    action: 埋伏
 monitors:
-  - indicator: "eVTOL重大安全事故"
-    risk_level: high
-    action: "全板块清仓"
-  - indicator: "亿航现金流恶化（季度现金消耗率显著上升）"
-    risk_level: medium
-    action: "减仓亿航"
-  - indicator: "莱斯信息低空业务收入连续两季低于预期"
-    risk_level: high
-    action: "减仓基建板块"
-  - indicator: "空域改革实质性倒退（G类空域下放被撤回）"
-    risk_level: high
-    action: "全板块清仓"
-  - indicator: "省级低空基建招标规模大幅缩水"
-    risk_level: high
-    action: "减仓基建标的"
+- indicator: eVTOL重大安全事故
+  risk_level: high
+  action: 全板块清仓
+- indicator: 亿航现金流恶化（季度现金消耗率显著上升）
+  risk_level: medium
+  action: 减仓亿航
+- indicator: 莱斯信息低空业务收入连续两季低于预期
+  risk_level: high
+  action: 减仓基建板块
+- indicator: 空域改革实质性倒退（G类空域下放被撤回）
+  risk_level: high
+  action: 全板块清仓
+- indicator: 省级低空基建招标规模大幅缩水
+  risk_level: high
+  action: 减仓基建标的
+- indicator: eVTOL适航证发放进度
+  risk_level: high
+  action: 若取证进度低于预期，板块可能面临调整，及时减仓
+- indicator: 低空基建招标规模和节奏
+  risk_level: medium
+  action: 若招标延后，基建类标的股价承压，考虑调仓至整机
+- indicator: 主题投资资金轮动
+  risk_level: medium
+  action: 低空经济为政策主题，若主线切换至其他板块，降低仓位

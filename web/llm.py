@@ -40,6 +40,41 @@ BUILTIN_PROVIDERS = {
         "default_model": "claude-sonnet-4-20250514",
         "docs_url": "https://console.anthropic.com/",
     },
+    "google": {
+        "name": "Google Gemini",
+        "base_url": "https://generativelanguage.googleapis.com/v1beta",
+        "models": ["gemini-2.5-pro", "gemini-2.5-flash"],
+        "default_model": "gemini-2.5-flash",
+        "docs_url": "https://aistudio.google.com/apikey",
+    },
+    "siliconflow": {
+        "name": "SiliconFlow (硅基流动)",
+        "base_url": "https://api.siliconflow.cn/v1",
+        "models": ["deepseek-ai/DeepSeek-V3", "deepseek-ai/DeepSeek-R1", "Qwen/Qwen2.5-72B-Instruct"],
+        "default_model": "deepseek-ai/DeepSeek-V3",
+        "docs_url": "https://cloud.siliconflow.cn/",
+    },
+    "zhipu": {
+        "name": "智谱 GLM",
+        "base_url": "https://open.bigmodel.cn/api/paas/v4",
+        "models": ["glm-4-plus", "glm-4-air", "glm-4-flash"],
+        "default_model": "glm-4-flash",
+        "docs_url": "https://open.bigmodel.cn/",
+    },
+    "groq": {
+        "name": "Groq",
+        "base_url": "https://api.groq.com/openai/v1",
+        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"],
+        "default_model": "llama-3.3-70b-versatile",
+        "docs_url": "https://console.groq.com/keys",
+    },
+    "openrouter": {
+        "name": "OpenRouter",
+        "base_url": "https://openrouter.ai/api/v1",
+        "models": ["auto"],
+        "default_model": "auto",
+        "docs_url": "https://openrouter.ai/keys",
+    },
     "ollama": {
         "name": "Ollama (本地)",
         "base_url": "http://localhost:11434",
@@ -48,6 +83,65 @@ BUILTIN_PROVIDERS = {
         "docs_url": None,
     },
 }
+
+
+def get_custom_providers(config=None):
+    """获取自定义厂商列表"""
+    if config is None:
+        config = load_config()
+    return config.get("custom_providers", {})
+
+
+def add_custom_provider(key, name, base_url, models, api_key="", model=""):
+    """添加自定义厂商"""
+    config = load_config()
+    custom = config.setdefault("custom_providers", {})
+    if key in custom:
+        return False, f"标识 '{key}' 已存在"
+    custom[key] = {
+        "name": name,
+        "base_url": base_url,
+        "models": models.split(",") if isinstance(models, str) else models,
+        "model": model or (models.split(",")[0] if isinstance(models, str) else models[0]),
+        "api_key": api_key,
+        "enabled": False,
+    }
+    save_config(config)
+    return True, "添加成功"
+
+
+def detect_models(base_url, api_key=""):
+    """从 OpenAI 兼容的 /v1/models 端点探测可用模型列表"""
+    url = base_url.rstrip("/") + "/models"
+    # 如果 base_url 已经以 /models 结尾则不再追加
+    if "/models" in base_url:
+        url = base_url
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    try:
+        req = Request(url, headers=headers)
+        with urlopen(req, timeout=15) as resp:
+            result = json.loads(resp.read())
+        models = [m["id"] for m in result.get("data", []) if m.get("id")]
+        # 过滤掉嵌入类、tts类等非对话模型
+        chat_models = [m for m in models if not any(
+            skip in m.lower() for skip in ["embed", "tts", "whisper", "moderation", "davinci", "babbage"])
+        ]
+        return chat_models or models, None
+    except Exception as e:
+        return None, str(e)
+
+
+def remove_custom_provider(key):
+    """删除自定义厂商"""
+    config = load_config()
+    custom = config.get("custom_providers", {})
+    if key not in custom:
+        return False, "未找到该厂商"
+    del custom[key]
+    save_config(config)
+    return True, "删除成功"
 
 
 def load_config():
@@ -127,11 +221,33 @@ def _save_cache(key, content, industry, provider, extra=""):
         yaml.dump(cache, f, allow_unicode=True, sort_keys=False)
 
 
+def get_default_provider():
+    """获取默认厂商 key"""
+    config = load_config()
+    return config.get("default_provider", "deepseek")
+
+
+def set_default_provider(provider_key):
+    """设置默认厂商"""
+    config = load_config()
+    # 检查厂商是否存在（内置或自定义）
+    if provider_key in BUILTIN_PROVIDERS or provider_key in config.get("custom_providers", {}):
+        config["default_provider"] = provider_key
+        save_config(config)
+        return True, "已设为默认"
+    return False, "厂商不存在"
+
+
 def get_enabled_providers():
-    """获取已启用的厂商列表"""
+    """获取已启用的厂商列表（含自定义厂商）"""
     config = load_config()
     providers = config.get("providers", {})
-    return [(key, info) for key, info in providers.items() if info.get("enabled")]
+    result = [(key, info) for key, info in providers.items() if info.get("enabled")]
+    # 加入已启用的自定义厂商
+    for key, info in config.get("custom_providers", {}).items():
+        if info.get("enabled"):
+            result.append((key, info))
+    return result
 
 
 # ── Prompt 模板管理 ──
@@ -176,11 +292,26 @@ def get_available_presets():
     return result
 
 
-def call_llm(prompt, provider_key="deepseek", model=None, temperature=0.7, max_tokens=4096):
-    """调用 LLM 生成文本"""
-    config = load_config()
+def _is_custom_provider(config, provider_key):
+    """检查 provider_key 是否为自定义厂商"""
+    custom = config.get("custom_providers", {})
+    return provider_key in custom
+
+
+def _get_provider_cfg(config, provider_key):
+    """获取 provider 配置（内置+自定义合并）"""
     providers = config.get("providers", {})
-    provider_cfg = providers.get(provider_key)
+    cfg = providers.get(provider_key)
+    if cfg:
+        return cfg
+    custom = config.get("custom_providers", {})
+    return custom.get(provider_key)
+
+
+def call_llm(prompt, provider_key="deepseek", model=None, temperature=0.7, max_tokens=4096):
+    """调用 LLM 生成文本（支持内置+自定义厂商）"""
+    config = load_config()
+    provider_cfg = _get_provider_cfg(config, provider_key)
     if not provider_cfg:
         return {"ok": False, "error": f"未找到厂商 {provider_key}"}
     if not provider_cfg.get("api_key") and provider_key != "ollama":
@@ -190,6 +321,14 @@ def call_llm(prompt, provider_key="deepseek", model=None, temperature=0.7, max_t
     base_url = provider_cfg.get("base_url", provider_info.get("base_url", ""))
     model_name = model or provider_cfg.get("model", provider_info.get("default_model", ""))
     api_key = provider_cfg.get("api_key", "")
+
+    # 自定义厂商一律走 OpenAI 兼容格式
+    if _is_custom_provider(config, provider_key):
+        url = base_url.rstrip("/") + "/chat/completions"
+        # 如果 base_url 已经包含 /chat/completions 则不再追加
+        if "/chat/completions" in base_url:
+            url = base_url
+        return _call_openai_compat(url, api_key, model_name, prompt, temperature, max_tokens)
 
     try:
         if provider_key == "deepseek":
@@ -201,7 +340,11 @@ def call_llm(prompt, provider_key="deepseek", model=None, temperature=0.7, max_t
         elif provider_key == "ollama":
             return _call_ollama(base_url, model_name, prompt, temperature, max_tokens)
         else:
-            return {"ok": False, "error": f"不支持的厂商: {provider_key}"}
+            # fallback: OpenAI 兼容格式
+            url = base_url.rstrip("/") + "/chat/completions"
+            if "/chat/completions" in base_url:
+                url = base_url
+            return _call_openai_compat(url, api_key, model_name, prompt, temperature, max_tokens)
     except Exception as e:
         return {"ok": False, "error": str(e)}
 

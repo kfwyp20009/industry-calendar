@@ -49,16 +49,19 @@
                                     <span class="text-muted ms-2" style="font-size:0.85rem;">{{ s.code }}</span>
                                     <i class="fas fa-external-link-alt" style="font-size:0.55rem;opacity:0.4;"></i>
                                 </a>
-                                <span class="badge bg-light text-dark ms-1" style="font-size:0.7rem;">{{ s.sector }}</span>
                                 {% if s.market %}
                                 <span class="badge bg-info text-dark" style="font-size:0.65rem;">{{ s.market }}</span>
                                 {% endif %}
                             </div>
-                            {% if s.estimated_pe %}
+                            {% if s.estimated_pe and s.estimated_pe != '-' %}
                             <span class="text-muted" style="font-size:0.75rem;">PE: {{ s.estimated_pe }}</span>
                             {% endif %}
                         </div>
-                        <div class="text-muted" style="font-size:0.8rem; margin-top:0.25rem;">{{ s.reason }}</div>
+                        <div class="mt-1">
+                            {% for ind_name in s.industries %}
+                            <span class="badge bg-secondary me-1" style="font-size:0.65rem;">{{ ind_name }}</span>
+                            {% endfor %}
+                        </div>
                         {% if s.key_dates %}
                         <div class="mt-1">
                             {% for kd in s.key_dates %}

@@ -1,188 +1,540 @@
-# ============================================================
-# 核心标的池 — 跨行业统一管理
-# ============================================================
-# 所有推荐标的按行业分类，含估值参考和操作节奏
-# ============================================================
-updated: "2026-06-05"
-
+updated: '2026-06-07'
+_generated: true
+_note: 自动生成，请勿手动编辑。修改标的请编辑 data/industries/*.yaml 中的 core_stocks
 stocks:
-
-  # ── 6G通信 ──
-  - code: "000063"
-    name: "中兴通讯"
-    industry: "6G通信"
-    reason: "A股唯一6G主设备商，3GPP贡献量前五"
-    sector: "主设备商"
-    market: "A股"
-    estimated_pe: "18-22x"
-    key_dates: ["TSG#112(6月)", "MWC上海(6月)", "IMT-2030(9月)", "ITU批准(12月)"]
-
-  - code: "688387"
-    name: "信科移动"
-    industry: "6G通信"
-    reason: "卫星+6G标准双主线"
-    sector: "主设备商"
-    market: "A股"
-    estimated_pe: "-"
-    key_dates: ["TSG#112(6月)", "MWC上海(6月)", "IMT-2030(9月)"]
-
-  - code: "688283"
-    name: "坤恒顺维"
-    industry: "6G通信"
-    reason: "6G信道仿真仪垄断，标准先行受益"
-    sector: "测试仪器"
-    market: "A股"
-    estimated_pe: "35-45x"
-    key_dates: ["TSG#112(6月)", "MWC上海(6月)", "IMT-2030(9月)", "ITU批准(12月)"]
-
-  # ── 低空经济 ──
-  - code: "EH.US"
-    name: "亿航智能"
-    industry: "低空经济"
-    reason: "全球首张eVTOL TC+OC"
-    sector: "整机"
-    market: "美股"
-    estimated_pe: "-"
-    key_dates: ["Q1财报(6月)", "全年交付(11月)"]
-
-  - code: "688631"
-    name: "莱斯信息"
-    industry: "低空经济"
-    reason: "低空空管全国总包"
-    sector: "基础设施"
-    market: "A股"
-    estimated_pe: "40-50x"
-    key_dates: ["发改委规划(6月)", "半年报(8月)", "空域扩容(11月)"]
-
-  # ── 卫星互联网 ──
-  - code: "001270"
-    name: "铖昌科技"
-    industry: "卫星互联网"
-    reason: "星载T/R芯片国产市占>70%"
-    sector: "星载芯片"
-    market: "A股"
-    estimated_pe: "50-65x"
-    key_dates: ["千帆发射(每月)", "GW发射(6月)", "三季报(10月)"]
-
-  - code: "600879"
-    name: "航天电子"
-    industry: "卫星互联网"
-    reason: "卫星计算机市占90%+"
-    sector: "卫星制造"
-    market: "A股"
-    estimated_pe: "30-40x"
-    key_dates: ["GW发射(6月)", "可回收首飞(7月)", "十五五规划(11月)"]
-
-  # ── 机器人零部件 ──
-  - code: "688017"
-    name: "绿的谐波"
-    industry: "机器人零部件"
-    reason: "谐波减速器国产第一"
-    sector: "减速器"
-    market: "A股"
-    estimated_pe: "60-80x"
-    key_dates: ["AI Day(6月)", "Gen3(7月)", "供应商大会(9月)", "年度出货(11月)"]
-
-  - code: "603662"
-    name: "柯力传感"
-    industry: "机器人零部件"
-    reason: "六维力传感器，Tesla验证中"
-    sector: "传感器"
-    market: "A股"
-    estimated_pe: "30-40x"
-    key_dates: ["AI Day(6月)", "Gen3(7月)", "供应商大会(9月)"]
-
-  # ── 绿氢氨醇 ──
-  - code: "002202"
-    name: "金风科技"
-    industry: "绿氢氨醇"
-    reason: "绿甲醇龙头，马士基长协锁定"
-    sector: "绿色燃料"
-    market: "A股"
-    estimated_pe: "12-15x"
-    key_dates: ["MEPC 83(6月)", "FID公告(7月)", "MEPC 85(10月)"]
-
-  - code: "601012"
-    name: "隆基绿能"
-    industry: "绿氢氨醇"
-    reason: "电解槽龙头"
-    sector: "电解槽"
-    market: "A股"
-    estimated_pe: "15-20x"
-    key_dates: ["月度招标(每月)", "H1出货(7月)", "十五五规划(11月)"]
-
-  # ── 数字人民币 ──
-  - code: "300348"
-    name: "长亮科技"
-    industry: "数字人民币"
-    reason: "银行核心系统龙头，覆盖7家运营机构"
-    sector: "银行IT"
-    market: "A股"
-    estimated_pe: "35-45x"
-    key_dates: ["Q1支付数据(6月)", "半年报(7月)", "Q3数据(10月)"]
-
-  - code: "300468"
-    name: "四方精创"
-    industry: "数字人民币"
-    reason: "mBridge深度参与者"
-    sector: "跨境"
-    market: "A股"
-    estimated_pe: "40-55x"
-    key_dates: ["金砖峰会(9月)", "mBridge公告(11月)"]
-
-  # ── AI大模型/应用 ──
-  - code: "002230"
-    name: "科大讯飞"
-    industry: "AI大模型/应用"
-    reason: "讯飞星火大模型，A股AI龙头"
-    sector: "大模型"
-    market: "A股"
-    estimated_pe: "50-70x"
-    key_dates: []
-
-  - code: "688256"
-    name: "寒武纪"
-    industry: "AI大模型/应用"
-    reason: "AI芯片龙头，国产算力核心"
-    sector: "算力"
-    market: "A股"
-    estimated_pe: "-"
-    key_dates: []
-
-  # ── 半导体/国产替代 ──
-  - code: "688981"
-    name: "中芯国际"
-    industry: "半导体/国产替代"
-    reason: "大陆晶圆代工龙头，先进制程突破"
-    sector: "代工"
-    market: "A股"
-    estimated_pe: "30-45x"
-    key_dates: []
-
-  - code: "002371"
-    name: "北方华创"
-    industry: "半导体/国产替代"
-    reason: "国产半导体设备龙头"
-    sector: "设备"
-    market: "A股"
-    estimated_pe: "35-50x"
-    key_dates: []
-
-  # ── 自动驾驶/L4 ──
-  - code: "002920"
-    name: "德赛西威"
-    industry: "自动驾驶/L4"
-    reason: "座舱+驾驶域控双龙头"
-    sector: "域控"
-    market: "A股"
-    estimated_pe: "30-40x"
-    key_dates: []
-
-  - code: "688326"
-    name: "经纬恒润"
-    industry: "自动驾驶/L4"
-    reason: "汽车电子+ADAS解决方案"
-    sector: "ADAS"
-    market: "A股"
-    estimated_pe: "40-55x"
-    key_dates: []
+- code: '000035'
+  name: 中国天楹
+  industries:
+  - 绿氢氨醇
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '000063'
+  name: 中兴通讯
+  industries:
+  - 6G通信
+  market: A股
+  estimated_pe: 18-22x
+  key_dates:
+  - TSG#112(6月)
+  - MWC上海(6月)
+  - IMT-2030(9月)
+  - ITU批准(12月)
+- code: 000988
+  name: 华工科技
+  industries:
+  - 量子计算
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '001270'
+  name: 铖昌科技
+  industries:
+  - 卫星互联网
+  market: A股
+  estimated_pe: 50-65x
+  key_dates:
+  - 千帆发射(每月)
+  - GW发射(6月)
+  - 三季报(10月)
+- code: 002085
+  name: 万丰奥威
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: 002097
+  name: 山河智能
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: 002149
+  name: 西部材料
+  industries:
+  - 商业航天/火箭
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '002152'
+  name: 广电运通
+  industries:
+  - 数字人民币
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '002156'
+  name: 通富微电
+  industries:
+  - 半导体/国产替代
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '002202'
+  name: 金风科技
+  industries:
+  - 绿氢氨醇
+  - 绿色能源
+  market: A股
+  estimated_pe: 12-15x
+  key_dates:
+  - MEPC 83(6月)
+  - FID公告(7月)
+  - MEPC 85(10月)
+- code: '002230'
+  name: 科大讯飞
+  industries:
+  - AI大模型/应用
+  market: A股
+  estimated_pe: 50-70x
+  key_dates: []
+- code: '002253'
+  name: 川大智胜
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '002335'
+  name: 科华数据
+  industries:
+  - 量子计算
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '002371'
+  name: 北方华创
+  industries:
+  - 半导体/国产替代
+  market: A股
+  estimated_pe: 35-50x
+  key_dates: []
+- code: '002446'
+  name: 盛路通信
+  industries:
+  - 6G通信
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '002703'
+  name: 浙江世宝
+  industries:
+  - 自动驾驶/L4
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: 002920
+  name: 德赛西威
+  industries:
+  - 自动驾驶/L4
+  market: A股
+  estimated_pe: 30-40x
+  key_dates: []
+- code: '300024'
+  name: 机器人
+  industries:
+  - 具身智能
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '300124'
+  name: 汇川技术
+  industries:
+  - 机器人零部件
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '300274'
+  name: 阳光电源
+  industries:
+  - 绿氢氨醇
+  - 绿色能源
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '300308'
+  name: 中际旭创
+  industries:
+  - AI大模型/应用
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '300348'
+  name: 长亮科技
+  industries:
+  - 数字人民币
+  market: A股
+  estimated_pe: 35-45x
+  key_dates:
+  - Q1支付数据(6月)
+  - 半年报(7月)
+  - Q3数据(10月)
+- code: '300468'
+  name: 四方精创
+  industries:
+  - 数字人民币
+  market: A股
+  estimated_pe: 40-55x
+  key_dates:
+  - 金砖峰会(9月)
+  - mBridge公告(11月)
+- code: '300580'
+  name: 贝斯特
+  industries:
+  - 机器人零部件
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '300647'
+  name: 拓斯达
+  industries:
+  - 具身智能
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '300674'
+  name: 宇信科技
+  industries:
+  - 数字人民币
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '300699'
+  name: 光威复材
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '300762'
+  name: 上海瀚讯
+  industries:
+  - 卫星互联网
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '301005'
+  name: 超捷股份
+  industries:
+  - 商业航天/火箭
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '301091'
+  name: 深城交
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600038'
+  name: 中直股份
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600118'
+  name: 中国卫星
+  industries:
+  - 卫星互联网
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600150'
+  name: 中国船舶
+  industries:
+  - 绿氢氨醇
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600481'
+  name: 双良节能
+  industries:
+  - 绿氢氨醇
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600487'
+  name: 亨通光电
+  industries:
+  - 量子计算
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600562'
+  name: 国睿科技
+  industries:
+  - 6G通信
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600570'
+  name: 恒生电子
+  industries:
+  - 数字人民币
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600580'
+  name: 卧龙电驱
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600703'
+  name: 三安光电
+  industries:
+  - 量子计算
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '600879'
+  name: 航天电子
+  industries:
+  - 卫星互联网
+  market: A股
+  estimated_pe: 30-40x
+  key_dates:
+  - GW发射(6月)
+  - 可回收首飞(7月)
+  - 十五五规划(11月)
+- code: '600900'
+  name: 长江电力
+  industries:
+  - 绿色能源
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '601012'
+  name: 隆基绿能
+  industries:
+  - 绿氢氨醇
+  - 绿色能源
+  market: A股
+  estimated_pe: 15-20x
+  key_dates:
+  - 月度招标(每月)
+  - H1出货(7月)
+  - 十五五规划(11月)
+- code: '601100'
+  name: 恒立液压
+  industries:
+  - 机器人零部件
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '601698'
+  name: 中国卫通
+  industries:
+  - 卫星互联网
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '601777'
+  name: 千里科技
+  industries:
+  - 自动驾驶/L4
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '603596'
+  name: 伯特利
+  industries:
+  - 自动驾驶/L4
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '603662'
+  name: 柯力传感
+  industries:
+  - 机器人零部件
+  market: A股
+  estimated_pe: 30-40x
+  key_dates:
+  - AI Day(6月)
+  - Gen3(7月)
+  - 供应商大会(9月)
+- code: '603728'
+  name: 鸣志电器
+  industries:
+  - 机器人零部件
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '603986'
+  name: 兆易创新
+  industries:
+  - 半导体/国产替代
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688012'
+  name: 中微公司
+  industries:
+  - 半导体/国产替代
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688017'
+  name: 绿的谐波
+  industries:
+  - 机器人零部件
+  market: A股
+  estimated_pe: 60-80x
+  key_dates:
+  - AI Day(6月)
+  - Gen3(7月)
+  - 供应商大会(9月)
+  - 年度出货(11月)
+- code: '688041'
+  name: 海光信息
+  industries:
+  - AI大模型/应用
+  - 半导体/国产替代
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688070'
+  name: 纵横股份
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688102'
+  name: 斯瑞新材
+  industries:
+  - 商业航天/火箭
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688111'
+  name: 金山办公
+  industries:
+  - AI大模型/应用
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688256'
+  name: 寒武纪
+  industries:
+  - AI大模型/应用
+  market: A股
+  estimated_pe: '-'
+  key_dates: []
+- code: '688270'
+  name: 臻镭科技
+  industries:
+  - 卫星互联网
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688283'
+  name: 坤恒顺维
+  industries:
+  - 6G通信
+  market: A股
+  estimated_pe: 35-45x
+  key_dates:
+  - TSG#112(6月)
+  - MWC上海(6月)
+  - IMT-2030(9月)
+  - ITU批准(12月)
+- code: '688306'
+  name: 均普智能
+  industries:
+  - 具身智能
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688326'
+  name: 经纬恒润
+  industries:
+  - 自动驾驶/L4
+  market: A股
+  estimated_pe: 40-55x
+  key_dates: []
+- code: '688333'
+  name: 铂力特
+  industries:
+  - 商业航天/火箭
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688375'
+  name: 国博电子
+  industries:
+  - 卫星互联网
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688387'
+  name: 信科移动
+  industries:
+  - 6G通信
+  market: A股
+  estimated_pe: '-'
+  key_dates:
+  - TSG#112(6月)
+  - MWC上海(6月)
+  - IMT-2030(9月)
+- code: '688523'
+  name: 航天环宇
+  industries:
+  - 商业航天/火箭
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688599'
+  name: 天合光能
+  industries:
+  - 绿色能源
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: '688631'
+  name: 莱斯信息
+  industries:
+  - 低空经济
+  market: A股
+  estimated_pe: 40-50x
+  key_dates:
+  - 发改委规划(6月)
+  - 半年报(8月)
+  - 空域扩容(11月)
+- code: '688981'
+  name: 中芯国际
+  industries:
+  - 半导体/国产替代
+  - 量子计算
+  market: A股
+  estimated_pe: 30-45x
+  key_dates: []
+- code: 9880.HK
+  name: 优必选
+  industries:
+  - 具身智能
+  market: A股
+  estimated_pe: ''
+  key_dates: []
+- code: EH.US
+  name: 亿航智能
+  industries:
+  - 低空经济
+  market: 美股
+  estimated_pe: '-'
+  key_dates:
+  - Q1财报(6月)
+  - 全年交付(11月)
+- code: IPO
+  name: 宇树科技
+  industries:
+  - 具身智能
+  market: A股
+  estimated_pe: ''
+  key_dates: []

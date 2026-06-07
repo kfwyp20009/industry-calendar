@@ -51,11 +51,26 @@
 
                     <div class="mb-3">
                         <label class="form-label">选择模型</label>
-                        <select class="form-select" name="provider" id="providerSelect">
-                            {% for key, cfg in enabled_providers %}
-                            <option value="{{ key }}">{{ llm.BUILTIN_PROVIDERS[key].name }} — {{ cfg.get('model', llm.BUILTIN_PROVIDERS[key].default_model) }}</option>
-                            {% endfor %}
-                        </select>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <select class="form-select" name="provider" id="providerSelect">
+                                    {% for key, _ in enabled_providers %}
+                                    <option value="{{ key }}" {{ 'selected' if key == default_provider else '' }}>{{ provider_names[key] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select" name="model" id="modelSelect">
+                                    {% for key, _ in enabled_providers %}
+                                    {% if loop.first or key == default_provider %}
+                                    {% for m in provider_models[key] %}
+                                    <option value="{{ m }}" {{ 'selected' if m == provider_default_models[key] else '' }}>{{ m }}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                         {% if not enabled_providers %}
                         <div class="text-warning mt-1" style="font-size:0.8rem;">
                             未启用任何大模型，请先在 <a href="/settings#llm">设置 → 大模型配置</a> 中配置。
@@ -138,7 +153,20 @@
 {% block scripts %}
 <script>
 var PROMPT_TEXTS = {{ prompt_texts | tojson }};
+var PROVIDER_MODELS = {{ provider_models | tojson }};
+var PROVIDER_DEFAULT_MODELS = {{ provider_default_models | tojson }};
 var CURRENT_PRESET = 'standard';
+
+// 厂商切换 → 更新模型下拉
+document.getElementById('providerSelect').addEventListener('change', function() {
+    var key = this.value;
+    var models = PROVIDER_MODELS[key] || [];
+    var defaultModel = PROVIDER_DEFAULT_MODELS[key] || models[0] || '';
+    var sel = document.getElementById('modelSelect');
+    sel.innerHTML = models.map(function(m) {
+        return '<option value="' + m + '"' + (m === defaultModel ? ' selected' : '') + '>' + m + '</option>';
+    }).join('');
+});
 
 function switchPreset() {
     var key = document.getElementById('promptPreset').value;
@@ -187,6 +215,7 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
     var industries = [];
     selected.forEach(function(cb) { industries.push(cb.value); });
     var provider = form.get('provider');
+    var model = form.get('model');
     var extra = form.get('extra_instructions') || '';
     var saveToCalendar = form.get('save_to_calendar') === 'on';
     var customPrompt = document.getElementById('customPrompt').value.trim();
@@ -211,6 +240,7 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
             body: JSON.stringify({
                 industry: industries[0],
                 provider: provider,
+                model: model,
                 extra_instructions: extra,
                 save_to_calendar: saveToCalendar,
                 custom_prompt: customPrompt,
@@ -260,6 +290,7 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
                 body: JSON.stringify({
                     industry: ind,
                     provider: provider,
+                    model: model,
                     extra_instructions: extra,
                     save_to_calendar: saveToCalendar,
                 custom_prompt: customPrompt,

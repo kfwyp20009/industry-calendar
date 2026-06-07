@@ -2,6 +2,7 @@
 
 import os
 import sys
+import calendar as _cal
 from collections import defaultdict
 from datetime import datetime, date
 
@@ -12,6 +13,10 @@ import skills
 import llm
 import followed
 import quotes
+
+# 数据同步模块（行业 YAML → portfolio / config 等派生数据）
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"))
+import sync_data
 
 app = Flask(__name__)
 
@@ -184,6 +189,7 @@ def inject_globals():
         now=date.today(),
         llm=llm,
         llm_config=llm.load_config(),
+        default_provider=llm.get_default_provider(),
         followed_names=followed_names,
         is_followed=followed.is_followed,
         get_stock_url=get_stock_url,
@@ -291,7 +297,15 @@ def calendar():
     now = date.today()
     cross = load_yaml(CROSS_FILE)
 
-    # 按月聚合事件
+    # 要显示的月份（默认当前月）
+    try:
+        display_month = int(request.args.get("month", now.month))
+    except ValueError:
+        display_month = now.month
+    display_month = max(1, min(12, display_month))
+    display_year = now.year
+
+    # 收集所有事件
     all_events = []
     for code, ind in industries.items():
         for ev in ind.get("events", []):
@@ -301,13 +315,12 @@ def calendar():
                 "industry_code": code,
             })
 
-    # 构建月度数据结构
+    # 按月聚合（月份导航用）
     months = []
     for m in range(1, 13):
         month_str = f"{now.year}-{m:02d}"
         month_events = [e for e in all_events if e.get("date", "").startswith(month_str)]
         month_events.sort(key=lambda e: e.get("date", ""))
-        # 按重要性分组
         by_importance = {5: [], 4: [], 3: [], 2: [], 1: []}
         for ev in month_events:
             by_importance[ev.get("importance", 3)].append(ev)
@@ -321,10 +334,71 @@ def calendar():
             "top_count": len(by_importance[5]) + len(by_importance[4]),
         })
 
+    # 当月事件按天索引
+    month_str = f"{display_year}-{display_month:02d}"
+    display_events = [e for e in all_events if e.get("date", "").startswith(month_str)]
+
+    events_by_day = defaultdict(list)
+    month_precision_events = []
+    for ev in display_events:
+        date_str = ev.get("date", "")
+        if ev.get("date_precision") == "day" and len(date_str) >= 10:
+            try:
+                day_num = int(date_str[8:10])
+                events_by_day[day_num].append(ev)
+            except (ValueError, IndexError):
+                month_precision_events.append(ev)
+        else:
+            month_precision_events.append(ev)
+
+    # 当日事件的 JSON（给前端弹窗用）
+    day_events_json = {}
+    for day_num, ev_list in events_by_day.items():
+        date_key = f"{month_str}-{day_num:02d}"
+        day_events_json[date_key] = [{
+            "name": e["name"],
+            "industry": e["industry"],
+            "importance": e.get("importance", 3),
+            "type": e.get("type", ""),
+            "description": e.get("description", ""),
+            "confirmed": e.get("confirmed", False),
+            "action": e.get("suggested_action", {}).get("action", "") if e.get("suggested_action") else "",
+        } for e in ev_list]
+
+    # 构建日历网格（周一为第一天）
+    first_weekday, days_in_month = _cal.monthrange(display_year, display_month)
+    # first_weekday: 0=Mon, 1=Tue, ..., 6=Sun
+
+    today = date.today()
+    calendar_grid = []
+    week = []
+    for _ in range(first_weekday):
+        week.append(None)  # 填充空白
+    for day in range(1, days_in_month + 1):
+        is_today = (display_year == today.year and display_month == today.month and day == today.day)
+        week.append({
+            "day": day,
+            "is_today": is_today,
+            "events": events_by_day.get(day, []),
+        })
+        if len(week) == 7:
+            calendar_grid.append(week)
+            week = []
+    if week:
+        while len(week) < 7:
+            week.append(None)
+        calendar_grid.append(week)
+
     return render_template(
         "calendar.html",
         now=now,
         months=months,
+        calendar_grid=calendar_grid,
+        day_events_json=day_events_json,
+        display_month=display_month,
+        display_year=display_year,
+        month_precision_events=month_precision_events,
+        industries=industries,
         get_importance_color=get_importance_color,
         get_importance_label=get_importance_label,
         get_action_color=get_action_color,
@@ -448,11 +522,11 @@ def portfolio():
     stocks = portfolio.get("stocks", [])
     industries = load_all_industries()
 
-    # 按行业分组
+    # 按行业分组（支持一股多行业）
     by_industry = {}
     for s in stocks:
-        ind_name = s.get("industry", "其他")
-        by_industry.setdefault(ind_name, []).append(s)
+        for ind_name in s.get("industries", ["其他"]):
+            by_industry.setdefault(ind_name, []).append(s)
 
     # 行业名 → code 映射（用于跳转链接）
     industry_code_map = {}
@@ -638,6 +712,7 @@ def api_accept_event():
         ok, msg = news.accept_event_with_details(data["idx"], data["fields"])
         return jsonify({"ok": ok, "error": None if ok else msg})
     news.accept_event(data["idx"])
+    sync_data.sync_all()
     return jsonify({"ok": True})
 
 
@@ -645,6 +720,7 @@ def api_accept_event():
 def api_reject_event():
     data = request.get_json()
     news.reject_event(data["idx"])
+    sync_data.sync_all()
     return jsonify({"ok": True})
 
 
@@ -705,6 +781,7 @@ def api_update_event():
 
     ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
     _save_industry_data(fpath, ind_data)
+    sync_data.sync_all()
     return jsonify({"ok": True})
 
 
@@ -737,7 +814,9 @@ def api_add_event():
 
     ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
     _save_industry_data(fpath, ind_data)
+    sync_data.sync_all()
     return jsonify({"ok": True, "idx": len(events) - 1})
+
 
 
 @app.route("/api/events/delete", methods=["POST"])
@@ -761,6 +840,7 @@ def api_delete_event():
     del events[idx]
     ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
     _save_industry_data(fpath, ind_data)
+    sync_data.sync_all()
     return jsonify({"ok": True})
 
 
@@ -791,6 +871,7 @@ def api_update_backtest():
     events[idx]["backtest"]["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
     ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
     _save_industry_data(fpath, ind_data)
+    sync_data.sync_all()
     return jsonify({"ok": True})
 
 
@@ -853,6 +934,7 @@ def api_add_skill():
     return jsonify({
         "ok": True,
         "industry": industry_result,
+        "sync": sync_data.sync_all(),
     })
 
 
@@ -872,6 +954,18 @@ def api_update_skill():
         keywords = skills.normalize_keywords(keywords)
 
     ok, msg = skills.update_skill(skill_id, name=name, keywords=keywords, description=description)
+    return jsonify({"ok": ok, "error": None if ok else msg})
+
+
+@app.route("/api/skills/update-keywords", methods=["POST"])
+def api_update_skill_keywords():
+    """按行业名称更新关键词（内置/自定义通用）"""
+    data = request.get_json()
+    name = data.get("name") if data else None
+    keywords = data.get("keywords") if data else None
+    if not name or keywords is None:
+        return jsonify({"ok": False, "error": "缺少行业名称或关键词"}), 400
+    ok, msg = skills.update_keywords_by_name(name, keywords)
     return jsonify({"ok": ok, "error": None if ok else msg})
 
 
@@ -897,6 +991,8 @@ def api_delete_skill():
         skills.remove_from_cross_industry(skill_name)
         skills.remove_from_portfolio(skill_name)
         skills.remove_from_followed(skill_name)
+
+    sync_data.sync_all()
 
     return jsonify({"ok": True})
 
@@ -937,6 +1033,8 @@ def api_create_skill_industry():
         # 同步 ETF 映射 + 跨行业联动
         skills.sync_etf_mapping(name)
         skills.sync_cross_industry(name)
+    if ind_ok:
+        sync_data.sync_all()
     return jsonify({
         "ok": ind_ok,
         "error": None if ind_ok else ind_msg,
@@ -1005,6 +1103,8 @@ def api_generate_skill_calendar():
 
         with open(target_file, "w", encoding="utf-8") as f:
             yaml.dump(ind_data, f, allow_unicode=True, sort_keys=False)
+
+        sync_data.sync_all()
 
         return jsonify({
             "ok": True,
@@ -1092,6 +1192,24 @@ def analysis_page():
             "industry_report": llm.get_preset_prompt(key, "industry_report"),
             "calendar_generation": llm.get_preset_prompt(key, "calendar_generation"),
         }
+    # 构建厂商→模型列表映射（给前端两级联动用）
+    config = llm.load_config()
+    provider_models = {}
+    provider_names = {}
+    for key, info in enabled_providers:
+        if key in llm.BUILTIN_PROVIDERS:
+            bi = llm.BUILTIN_PROVIDERS[key]
+            provider_models[key] = bi["models"]
+            provider_names[key] = bi["name"]
+        else:
+            provider_models[key] = info.get("models", [])
+            provider_names[key] = info.get("name", key)
+    # 每个厂商当前配置的默认模型
+    provider_default_models = {}
+    for key, _ in enabled_providers:
+        cfg = config.get("providers", {}).get(key, {}) or config.get("custom_providers", {}).get(key, {})
+        provider_default_models[key] = cfg.get("model", "")
+
     return render_template(
         "analysis.html",
         active_page="analysis",
@@ -1099,6 +1217,10 @@ def analysis_page():
         custom_skills=skills.load_custom_skills()[0],
         prompt_presets=presets,
         prompt_texts=prompt_texts,
+        builtin_provider_keys=list(llm.BUILTIN_PROVIDERS.keys()),
+        provider_models=provider_models,
+        provider_names=provider_names,
+        provider_default_models=provider_default_models,
     )
 
 
@@ -1110,13 +1232,15 @@ def api_generate_report():
 
     industry = data["industry"]
     provider = data.get("provider") or llm.load_config().get("default_provider", "deepseek")
+    model = data.get("model") or None
     extra = data.get("extra_instructions", "")
     save_to_calendar = data.get("save_to_calendar", False)
     custom_prompt = data.get("custom_prompt", "")
 
     # 检查是否有可用的 LLM 厂商
     enabled = llm.get_enabled_providers()
-    provider_cfg = llm.load_config().get("providers", {}).get(provider, {})
+    config = llm.load_config()
+    provider_cfg = config.get("providers", {}).get(provider, {}) or config.get("custom_providers", {}).get(provider, {})
     has_api_key = provider_cfg.get("api_key") or provider == "ollama"
     if not enabled or not has_api_key:
         return jsonify({
@@ -1127,18 +1251,19 @@ def api_generate_report():
         })
 
     if save_to_calendar:
-        return _generate_and_save_events(industry, provider, extra, custom_prompt)
+        return _generate_and_save_events(industry, provider, extra, custom_prompt, model=model)
 
     result = llm.generate_industry_report(
         industry=industry,
         provider_key=provider,
+        model=model,
         extra_instructions=extra,
         custom_prompt=custom_prompt,
     )
     return jsonify(result)
 
 
-def _generate_and_save_events(industry, provider, extra, custom_prompt=""):
+def _generate_and_save_events(industry, provider, extra, custom_prompt="", model=None):
     """生成日历事件并写入行业 YAML 文件"""
     fpath, ind_data = _find_industry_file(industry)
     if not fpath:
@@ -1154,6 +1279,7 @@ def _generate_and_save_events(industry, provider, extra, custom_prompt=""):
         description=description,
         keywords=tags,
         provider_key=provider,
+        model=model,
         extra_instructions=extra,
         custom_prompt=custom_prompt,
     )
@@ -1201,6 +1327,7 @@ def _generate_and_save_events(industry, provider, extra, custom_prompt=""):
 
     ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
     _save_industry_data(fpath, ind_data)
+    sync_data.sync_all()
 
     # 将事件格式化为可读报告
     report_lines = [
@@ -1250,12 +1377,80 @@ def api_save_llm_config():
             if "model" in cfg:
                 config["providers"][key]["model"] = cfg["model"]
 
+    # 保存自定义厂商
+    if "custom_providers" in data:
+        custom = config.setdefault("custom_providers", {})
+        for key, cfg in data["custom_providers"].items():
+            if key in custom:
+                if "enabled" in cfg:
+                    custom[key]["enabled"] = cfg["enabled"]
+                if "api_key" in cfg:
+                    custom[key]["api_key"] = cfg["api_key"]
+                if "base_url" in cfg:
+                    custom[key]["base_url"] = cfg["base_url"]
+                if "model" in cfg:
+                    custom[key]["model"] = cfg["model"]
+
     llm.save_config(config)
     return jsonify({"ok": True})
 
 
+@app.route("/api/llm/custom-provider/detect-models", methods=["POST"])
+def api_detect_custom_provider_models():
+    """探测自定义厂商的可用模型列表"""
+    data = request.get_json()
+    base_url = data.get("base_url") if data else None
+    api_key = data.get("api_key") if data else ""
+    if not base_url:
+        return jsonify({"ok": False, "error": "接口地址不能为空"}), 400
+    models, error = llm.detect_models(base_url, api_key)
+    if models:
+        return jsonify({"ok": True, "models": models})
+    return jsonify({"ok": False, "error": error or "未能获取模型列表"}), 400
+
+
+@app.route("/api/llm/custom-provider/add", methods=["POST"])
+def api_add_custom_provider():
+    data = request.get_json()
+    key = data.get("key") if data else None
+    name = data.get("name") if data else None
+    base_url = data.get("base_url") if data else None
+    models = data.get("models", "") if data else ""
+    api_key = data.get("api_key", "") if data else ""
+    model = data.get("model", "") if data else ""
+    if not key or not name or not base_url:
+        return jsonify({"ok": False, "error": "厂商标识、名称和接口地址不能为空"}), 400
+    ok, msg = llm.add_custom_provider(key, name, base_url, models, api_key=api_key, model=model)
+    return jsonify({"ok": ok, "error": None if ok else msg})
+
+
+@app.route("/api/llm/custom-provider/delete", methods=["POST"])
+def api_delete_custom_provider():
+    data = request.get_json()
+    key = data.get("key") if data else None
+    if not key:
+        return jsonify({"ok": False, "error": "厂商标识不能为空"}), 400
+    ok, msg = llm.remove_custom_provider(key)
+    return jsonify({"ok": ok, "error": None if ok else msg})
+
+
+@app.route("/api/llm/default-provider/set", methods=["POST"])
+def api_set_default_provider():
+    """设置默认厂商"""
+    data = request.get_json()
+    provider_key = data.get("provider") if data else None
+    if not provider_key:
+        return jsonify({"ok": False, "error": "厂商不能为空"}), 400
+    ok, msg = llm.set_default_provider(provider_key)
+    return jsonify({"ok": ok, "error": msg if not ok else None})
+
+
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 5000
+    # 启动时同步数据（行业 YAML → portfolio / config / etf / cross-industry）
+    print("[同步] 数据同步中...")
+    sync_result = sync_data.sync_all()
+    print(f"[同步] {sync_result['message']}")
     # 启动时刷新新闻
     print("[新闻] 首次加载中...")
     news.refresh_news()

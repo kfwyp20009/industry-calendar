@@ -18,7 +18,7 @@
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#skills">自定义技能</button>
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#skills">自定义行业</button>
     </li>
     <li class="nav-item">
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#keywords">关键词总览</button>
@@ -182,15 +182,15 @@
         </div>
     </div>
 
-    {# ── 技能管理（内置+自定义合并） ── #}
+    {# ── 行业管理（内置+自定义合并） ── #}
     <div class="tab-pane fade" id="skills">
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-brain me-1"></i> 所有技能
+                <span><i class="fas fa-brain me-1"></i> 所有行业
                     <small class="text-muted ms-2" style="font-size:0.75rem;">共 {{ all_skills_list|length }} 个</small>
                 </span>
                 <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addSkillModal">
-                    <i class="fas fa-plus me-1"></i>新建技能
+                    <i class="fas fa-plus me-1"></i>新建行业
                 </button>
             </div>
             <div class="card-body p-0">
@@ -199,11 +199,11 @@
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>技能名称</th>
+                                <th>行业名称</th>
                                 <th>描述</th>
                                 <th>关键词</th>
-                                <th>行业状态</th>
-                                <th style="width:160px">操作</th>
+                                <th>日历状态</th>
+                                <th style="width:180px">操作</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -232,16 +232,15 @@
                                     {% endif %}
                                 </td>
                                 <td class="align-middle" style="white-space:nowrap;">
-                                    {% if not s.builtin %}
                                     <button class="btn btn-sm btn-outline-primary edit-skill"
                                             data-id="{{ s.id }}"
                                             data-name="{{ s.name }}"
                                             data-keywords="{{ s.keywords | join(',') }}"
                                             data-description="{{ s.description }}"
+                                            data-builtin="{{ 'true' if s.builtin else 'false' }}"
                                             title="编辑关键词">
-                                        <i class="fas fa-edit"></i>
+                                        <i class="fas fa-edit me-1"></i>关键词
                                     </button>
-                                    {% endif %}
                                     {% if has_industry %}
                                     <button class="btn btn-sm btn-outline-info gen-calendar"
                                             data-name="{{ s.name }}"
@@ -262,7 +261,7 @@
                                     </button>
                                     {% else %}
                                     <button class="btn btn-sm btn-outline-danger delete-skill" data-id="{{ s.id }}"
-                                            title="删除技能">
+                                            title="删除行业">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                     {% endif %}
@@ -274,8 +273,8 @@
                 </div>
                 {% else %}
                 <div class="p-4 text-center text-muted">
-                    暂无技能。<br>
-                    点击"新建技能"创建一个。
+                    暂无行业。<br>
+                    点击"新建行业"创建一个。
                 </div>
                 {% endif %}
             </div>
@@ -285,7 +284,7 @@
         {% if hidden_builtins %}
         <div class="card">
             <div class="card-header text-muted">
-                <i class="fas fa-eye-slash me-1"></i> 已隐藏的内置技能
+                <i class="fas fa-eye-slash me-1"></i> 已隐藏的内置行业
             </div>
             <div class="card-body p-2">
                 <div class="row">
@@ -310,7 +309,7 @@
         <div class="card">
             <div class="card-header">关键词总览（内置 + 自定义）</div>
             <div class="card-body">
-                <p class="text-muted">用于新闻自动匹配分类。自定义技能的关键词会自动合并到此列表中。</p>
+                <p class="text-muted">用于新闻自动匹配分类。自定义行业的关键词会自动合并到此列表中。</p>
                 {% for name, kws in industry_keywords.items() %}
                 <div class="mb-3">
                     <label class="fw-semibold mb-1">{{ name }}
@@ -331,7 +330,7 @@
 
     {# ── 大模型配置 ── #}
     <div class="tab-pane fade" id="llm">
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-robot me-1"></i> 大模型厂商配置</span>
                 <span class="text-muted" style="font-size:0.8rem;">用于 AI 行业分析报告生成</span>
@@ -339,10 +338,12 @@
             <div class="card-body">
                 {% set llm_config = llm_config or {} %}
                 {% set providers = llm_config.get('providers', {}) %}
+                {% set custom_providers = llm_config.get('custom_providers', {}) %}
                 <form id="llmConfigForm">
+                    <h6 class="text-muted mb-3">内置厂商</h6>
                     {% for key, info in llm.BUILTIN_PROVIDERS.items() %}
                     {% set cfg = providers.get(key, {}) %}
-                    <div class="mb-4 p-3 border rounded">
+                    <div class="mb-3 p-3 border rounded">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
                                 <strong class="fs-6">{{ info.name }}</strong>
@@ -350,14 +351,22 @@
                                 <a href="{{ info.docs_url }}" target="_blank" class="ms-2" style="font-size:0.75rem;">获取 Key</a>
                                 {% endif %}
                             </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="{{ key }}_enabled"
-                                       id="{{ key }}_enabled" {{ 'checked' if cfg.get('enabled') else '' }}>
-                                <label class="form-check-label" for="{{ key }}_enabled">启用</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" name="{{ key }}_enabled"
+                                           id="{{ key }}_enabled" {{ 'checked' if cfg.get('enabled') else '' }}>
+                                    <label class="form-check-label" for="{{ key }}_enabled">启用</label>
+                                </div>
+                                {% if key == default_provider %}
+                                <span class="badge bg-warning text-dark" style="font-size:0.65rem;cursor:default;" title="当前默认厂商">默认</span>
+                                {% else %}
+                                <button class="btn btn-sm btn-link text-decoration-none p-0 set-default-provider"
+                                        data-provider="{{ key }}" style="font-size:0.75rem;min-width:auto;">设为默认</button>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="row g-2">
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label" style="font-size:0.8rem;">API Key</label>
                                 <input type="password" class="form-control form-control-sm" name="{{ key }}_api_key"
                                        value="{{ cfg.get('api_key', '') }}" placeholder="sk-...">
@@ -367,18 +376,105 @@
                                 <input type="text" class="form-control form-control-sm" name="{{ key }}_base_url"
                                        value="{{ cfg.get('base_url', info.base_url) }}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label" style="font-size:0.8rem;">默认模型</label>
-                                <select class="form-select form-select-sm" name="{{ key }}_model">
-                                    {% for m in info.models %}
-                                    <option value="{{ m }}" {{ 'selected' if cfg.get('model', info.default_model) == m else '' }}>{{ m }}</option>
+                                <div class="input-group input-group-sm">
+                                    <select class="form-select" name="{{ key }}_model">
+                                        {% for m in info.models %}
+                                        <option value="{{ m }}" {{ 'selected' if cfg.get('model', info.default_model) == m else '' }}>{{ m }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="button" class="btn btn-outline-info detect-builtin-models-btn"
+                                            data-key="{{ key }}"
+                                            title="通过 API 探测可用模型">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <div id="detect-result-builtin-{{ key }}" class="mt-1" style="font-size:0.75rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <h6 class="text-muted mb-3 d-flex align-items-center">
+                        <span>自定义厂商</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#addCustomProviderModal">
+                            <i class="fas fa-plus me-1"></i>添加
+                        </button>
+                    </h6>
+                    {% if custom_providers %}
+                    {% for key, cfg in custom_providers.items() %}
+                    <div class="mb-3 p-3 border rounded custom-provider" data-key="{{ key }}">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <strong class="fs-6">{{ cfg.name }}</strong>
+                                <span class="badge bg-secondary ms-1" style="font-size:0.6rem;">自定义</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" name="custom_{{ key }}_enabled"
+                                           id="custom_{{ key }}_enabled" {{ 'checked' if cfg.get('enabled') else '' }}>
+                                </div>
+                                {% if key == default_provider %}
+                                <span class="badge bg-warning text-dark" style="font-size:0.65rem;cursor:default;" title="当前默认厂商">默认</span>
+                                {% else %}
+                                <button class="btn btn-sm btn-link text-decoration-none p-0 set-default-provider"
+                                        data-provider="{{ key }}" style="font-size:0.75rem;min-width:auto;">设为默认</button>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-custom-provider" data-key="{{ key }}" title="删除">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label" style="font-size:0.8rem;">厂商名称</label>
+                                <input type="text" class="form-control form-control-sm" name="custom_{{ key }}_name" value="{{ cfg.name }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" style="font-size:0.8rem;">API Key</label>
+                                <input type="password" class="form-control form-control-sm" name="custom_{{ key }}_api_key"
+                                       value="{{ cfg.get('api_key', '') }}" placeholder="sk-...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" style="font-size:0.8rem;">接口地址</label>
+                                <input type="text" class="form-control form-control-sm" name="custom_{{ key }}_base_url"
+                                       value="{{ cfg.get('base_url', '') }}" placeholder="https://api.example.com/v1">
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-1">
+                            <div class="col-md-8">
+                                <label class="form-label" style="font-size:0.8rem;">可用模型</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" name="custom_{{ key }}_models"
+                                           value="{{ cfg.get('models', []) | join(',') }}" placeholder="model1,model2">
+                                    <button type="button" class="btn btn-outline-info detect-models-btn"
+                                            data-base-url="{{ cfg.get('base_url', '') }}"
+                                            data-api-key="{{ cfg.get('api_key', '') }}"
+                                            data-target="{{ key }}" title="通过 API 探测可用模型">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <div id="detect-result-{{ key }}" class="mt-1" style="font-size:0.75rem;"></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" style="font-size:0.8rem;">默认模型</label>
+                                <select class="form-select form-select-sm" name="custom_{{ key }}_model">
+                                    {% for m in cfg.get('models', []) %}
+                                    <option value="{{ m }}" {{ 'selected' if cfg.get('model') == m else '' }}>{{ m }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                         </div>
                     </div>
                     {% endfor %}
-                    <div class="d-flex align-items-center gap-3">
+                    {% else %}
+                    <div class="text-center text-muted py-3" style="font-size:0.85rem;">
+                        暂无自定义厂商，点击"添加"按钮新增。
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex align-items-center gap-3 mt-3">
                         <button type="submit" class="btn btn-primary">保存配置</button>
                         <span id="llmSaveMsg" class="text-muted" style="font-size:0.85rem;"></span>
                     </div>
@@ -601,18 +697,18 @@
     </div>
 </div>
 
-{# ── 新建技能弹窗 ── #}
+{# ── 新建行业弹窗 ── #}
 <div class="modal fade" id="addSkillModal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">新建技能</h5>
+                <h5 class="modal-title">新建行业</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="addSkillForm">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">技能名称</label>
+                        <label class="form-label">行业名称</label>
                         <input type="text" class="form-control" name="name" required
                                placeholder="如: 量子计算">
                     </div>
@@ -653,19 +749,20 @@
     </div>
 </div>
 
-{# ── 编辑技能弹窗 ── #}
+{# ── 编辑行业弹窗 ── #}
 <div class="modal fade" id="editSkillModal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">编辑技能</h5>
+                <h5 class="modal-title">编辑行业关键词</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="editSkillForm">
                 <div class="modal-body">
                     <input type="hidden" name="id" id="editSkillId">
+                    <input type="hidden" name="builtin" id="editSkillBuiltin">
                     <div class="mb-3">
-                        <label class="form-label">技能名称</label>
+                        <label class="form-label">行业名称</label>
                         <input type="text" class="form-control" name="name" id="editSkillName" required>
                     </div>
                     <div class="mb-3">
@@ -681,6 +778,57 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                     <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{# ── 添加自定义厂商弹窗 ── #}
+<div class="modal fade" id="addCustomProviderModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加自定义厂商</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addCustomProviderForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">厂商标识 <small class="text-muted">(唯一英文标识，如 my_provider)</small></label>
+                        <input type="text" class="form-control form-control-sm" name="key" required placeholder="my_provider">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">厂商名称</label>
+                        <input type="text" class="form-control form-control-sm" name="name" required placeholder="如: 我的模型">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">接口地址</label>
+                        <input type="text" class="form-control form-control-sm" name="base_url" required placeholder="https://api.example.com/v1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">API Key</label>
+                        <input type="password" class="form-control form-control-sm" name="api_key" placeholder="sk-...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">可用模型</label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" name="models" id="cpModels" required placeholder="model1,model2,model3">
+                            <button type="button" class="btn btn-outline-info" id="cpDetectModelsBtn" title="通过 API 探测可用模型">
+                                <i class="fas fa-search me-1"></i>检测
+                            </button>
+                        </div>
+                        <div id="cpDetectResult" class="mt-1" style="font-size:0.8rem;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">默认模型</label>
+                        <select class="form-select form-select-sm" name="model" id="cpDefaultModel">
+                            <option value="">留空则使用第一个模型</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
                 </div>
             </form>
         </div>
@@ -803,13 +951,14 @@ document.getElementById('addSkillForm').addEventListener('submit', function(e) {
         auto_industry: form.get('auto_industry') === 'on',
         etf_code: form.get('etf_code'),
         etf_name: form.get('etf_name'),
-    }, '✓ 技能已创建');
+    }, '✓ 行业已创建');
 });
 
-// 编辑技能
+// 编辑行业关键词
 document.querySelectorAll('.edit-skill').forEach(btn => {
     btn.addEventListener('click', function() {
         document.getElementById('editSkillId').value = this.dataset.id;
+        document.getElementById('editSkillBuiltin').value = this.dataset.builtin;
         document.getElementById('editSkillName').value = this.dataset.name;
         document.getElementById('editSkillDescription').value = this.dataset.description;
         document.getElementById('editSkillKeywords').value = this.dataset.keywords || '';
@@ -829,20 +978,34 @@ document.getElementById('editSkillKeywords').addEventListener('input', updateKey
 document.getElementById('editSkillForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const form = new FormData(this);
+    const isBuiltin = form.get('builtin') === 'true';
     const modal = bootstrap.Modal.getInstance(document.getElementById('editSkillModal'));
     if (modal) modal.hide();
-    doActionAndReload('/api/skills/update', {
-        id: form.get('id'),
-        name: form.get('name'),
-        description: form.get('description'),
-        keywords: form.get('keywords'),
-    }, '✓ 技能已更新');
+
+    const name = form.get('name');
+    const keywords = form.get('keywords');
+
+    if (isBuiltin) {
+        // 内置行业 → 用名称更新关键词
+        doActionAndReload('/api/skills/update-keywords', {
+            name: name,
+            keywords: keywords,
+        }, '✓ 关键词已更新');
+    } else {
+        // 自定义行业 → 用 ID 更新
+        doActionAndReload('/api/skills/update', {
+            id: form.get('id'),
+            name: name,
+            description: form.get('description'),
+            keywords: keywords,
+        }, '✓ 行业已更新');
+    }
 });
 
 document.querySelectorAll('.delete-skill').forEach(btn => {
     btn.addEventListener('click', async function() {
-        if (await showConfirm('确定删除此技能？（关联的行业日历也会被删除）')) {
-            doActionAndReload('/api/skills/delete', {id: this.dataset.id}, '✓ 技能已删除');
+        if (await showConfirm('确定删除此行业？（关联的日历数据也会被删除）')) {
+            doActionAndReload('/api/skills/delete', {id: this.dataset.id}, '✓ 行业已删除');
         }
     });
 });
@@ -950,6 +1113,21 @@ document.getElementById('llmConfigForm').addEventListener('submit', function(e) 
     {% for key in llm.BUILTIN_PROVIDERS.keys() %}
     if (!payload.providers['{{ key }}']) payload.providers['{{ key }}'] = {enabled: false};
     {% endfor %}
+
+    // 收集自定义厂商配置
+    payload.custom_providers = {};
+    document.querySelectorAll('.custom-provider').forEach(el => {
+        const key = el.dataset.key;
+        payload.custom_providers[key] = {
+            enabled: document.getElementById('custom_' + key + '_enabled').checked,
+            name: el.querySelector('input[name="custom_' + key + '_name"]').value,
+            api_key: el.querySelector('input[name="custom_' + key + '_api_key"]').value,
+            base_url: el.querySelector('input[name="custom_' + key + '_base_url"]').value,
+            models: el.querySelector('input[name="custom_' + key + '_models"]').value,
+            model: el.querySelector('input[name="custom_' + key + '_model"]').value,
+        };
+    });
+
     fetch('/api/llm/config', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -959,6 +1137,182 @@ document.getElementById('llmConfigForm').addEventListener('submit', function(e) 
             showToast('✓ LLM 配置已保存', 'success');
         } else {
             showToast('保存失败: ' + (data.error || ''), 'error');
+        }
+    });
+});
+
+// 设为默认厂商
+document.querySelectorAll('.set-default-provider').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const provider = this.dataset.provider;
+        fetch('/api/llm/default-provider/set', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({provider: provider})
+        }).then(r => r.json()).then(data => {
+            if (data.ok) {
+                showToast('✓ 默认厂商已切换', 'success');
+                setTimeout(() => location.reload(), 500);
+            } else {
+                showToast('设置失败: ' + (data.error || ''), 'error');
+            }
+        });
+    });
+});
+
+// 探测模型 — 添加弹窗中的按钮
+document.getElementById('cpDetectModelsBtn').addEventListener('click', function() {
+    const baseUrl = document.querySelector('#addCustomProviderForm input[name="base_url"]').value.trim();
+    const apiKey = document.querySelector('#addCustomProviderForm input[name="api_key"]').value.trim();
+    const resultDiv = document.getElementById('cpDetectResult');
+    const modelsInput = document.getElementById('cpModels');
+    const modelSelect = document.getElementById('cpDefaultModel');
+
+    if (!baseUrl) {
+        resultDiv.innerHTML = '<span class="text-danger">请先填写接口地址</span>';
+        return;
+    }
+
+    resultDiv.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin"></i> 探测中...</span>';
+    this.disabled = true;
+
+    fetch('/api/llm/custom-provider/detect-models', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({base_url: baseUrl, api_key: apiKey})
+    }).then(r => r.json()).then(data => {
+        this.disabled = false;
+        if (data.ok && data.models && data.models.length) {
+            modelsInput.value = data.models.join(', ');
+            modelSelect.innerHTML = data.models.map(m =>
+                '<option value="' + m + '">' + m + '</option>'
+            ).join('');
+            modelSelect.value = data.models[0];
+            resultDiv.innerHTML = '<span class="text-success">✓ 探测到 ' + data.models.length + ' 个模型，默认选择 <strong>' + data.models[0] + '</strong></span>';
+        } else {
+            resultDiv.innerHTML = '<span class="text-danger">探测失败: ' + (data.error || '无可用模型') + '</span>';
+        }
+    }).catch(err => {
+        this.disabled = false;
+        resultDiv.innerHTML = '<span class="text-danger">请求失败: ' + err.message + '</span>';
+    });
+});
+
+// 探测模型 — 已有厂商卡片中的按钮
+document.querySelectorAll('.detect-models-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const card = this.closest('.custom-provider');
+        const targetKey = card.dataset.key;
+        const baseUrl = card.querySelector('input[name="custom_' + targetKey + '_base_url"]').value.trim();
+        const apiKey = card.querySelector('input[name="custom_' + targetKey + '_api_key"]').value.trim();
+        const resultDiv = document.getElementById('detect-result-' + targetKey);
+        const modelsInput = card.querySelector('input[name="custom_' + targetKey + '_models"]');
+        const modelSelect = card.querySelector('select[name="custom_' + targetKey + '_model"]');
+
+        resultDiv.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin"></i> 探测中...</span>';
+        this.disabled = true;
+
+        fetch('/api/llm/custom-provider/detect-models', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({base_url: baseUrl, api_key: apiKey})
+        }).then(r => r.json()).then(data => {
+            this.disabled = false;
+            if (data.ok && data.models && data.models.length) {
+                modelsInput.value = data.models.join(', ');
+                modelSelect.innerHTML = data.models.map(m =>
+                    '<option value="' + m + '">' + m + '</option>'
+                ).join('');
+                modelSelect.value = data.models[0];
+                resultDiv.innerHTML = '<span class="text-success">✓ 探测到 ' + data.models.length + ' 个模型，默认选择 <strong>' + data.models[0] + '</strong></span>';
+            } else {
+                resultDiv.innerHTML = '<span class="text-danger">探测失败: ' + (data.error || '无可用模型') + '</span>';
+            }
+        }).catch(err => {
+            this.disabled = false;
+            resultDiv.innerHTML = '<span class="text-danger">请求失败: ' + err.message + '</span>';
+        });
+    });
+});
+
+// 探测模型 — 内置厂商卡片中的按钮
+document.querySelectorAll('.detect-builtin-models-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const key = this.dataset.key;
+        const baseUrl = document.querySelector('input[name="' + key + '_base_url"]').value.trim();
+        const apiKey = document.querySelector('input[name="' + key + '_api_key"]').value.trim();
+        const resultDiv = document.getElementById('detect-result-builtin-' + key);
+        const modelSelect = document.querySelector('select[name="' + key + '_model"]');
+
+        if (!baseUrl) {
+            resultDiv.innerHTML = '<span class="text-danger">接口地址为空</span>';
+            return;
+        }
+
+        resultDiv.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin"></i> 探测中...</span>';
+        this.disabled = true;
+
+        fetch('/api/llm/custom-provider/detect-models', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({base_url: baseUrl, api_key: apiKey})
+        }).then(r => r.json()).then(data => {
+            this.disabled = false;
+            if (data.ok && data.models && data.models.length) {
+                modelSelect.innerHTML = data.models.map(m =>
+                    '<option value="' + m + '">' + m + '</option>'
+                ).join('');
+                modelSelect.value = data.models[0];
+                resultDiv.innerHTML = '<span class="text-success">✓ 探测到 ' + data.models.length + ' 个模型，默认选择 <strong>' + data.models[0] + '</strong></span>';
+            } else {
+                resultDiv.innerHTML = '<span class="text-danger">探测失败: ' + (data.error || '无可用模型') + '</span>';
+            }
+        }).catch(err => {
+            this.disabled = false;
+            resultDiv.innerHTML = '<span class="text-danger">请求失败: ' + err.message + '</span>';
+        });
+    });
+});
+
+// 删除自定义厂商
+document.querySelectorAll('.delete-custom-provider').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        if (await showConfirm('确定删除此自定义厂商？')) {
+            const key = this.dataset.key;
+            const result = await doAction('/api/llm/custom-provider/delete', {key: key});
+            if (result.ok) {
+                showToast('✓ 已删除', 'success');
+                setTimeout(() => location.reload(), 500);
+            } else {
+                showToast('删除失败: ' + (result.error || ''), 'error');
+            }
+        }
+    });
+});
+
+// 添加自定义厂商
+document.getElementById('addCustomProviderForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = new FormData(this);
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addCustomProviderModal'));
+    if (modal) modal.hide();
+    fetch('/api/llm/custom-provider/add', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            key: form.get('key'),
+            name: form.get('name'),
+            base_url: form.get('base_url'),
+            api_key: form.get('api_key'),
+            models: form.get('models'),
+            model: form.get('model'),
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            showToast('✓ 自定义厂商已添加', 'success');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast('添加失败: ' + (data.error || ''), 'error');
         }
     });
 });

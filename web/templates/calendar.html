@@ -4,7 +4,7 @@
 
 <div class="page-header">
     <h2><i class="fas fa-calendar-days me-2"></i>事件日历</h2>
-    <div class="subtitle">{{ now.year }}年全年 · 按月份查看各行业事件</div>
+    <div class="subtitle">{{ display_year }}年 · 点击日期查看事件</div>
 </div>
 
 <!-- 筛选栏 -->
@@ -33,22 +33,113 @@
 </div>
 
 <!-- 月份导航 -->
-<div class="mb-3 text-center">
+<div class="mb-3 text-center month-nav">
     {% for m in months %}
-    <a href="#month-{{ m.num }}" class="month-tab {% if m.is_current %}current{% endif %}">
+    <a href="?month={{ m.num }}" class="month-tab {% if m.num == display_month %}current{% endif %}">
         {{ m.name }}
         <span class="count">({{ m.total }})</span>
     </a>
     {% endfor %}
 </div>
 
-<!-- 各月 -->
+<!-- 日历网格 -->
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-calendar-alt me-1"></i> {{ display_year }}年{{ display_month }}月</span>
+        <span>
+            <button class="btn btn-sm btn-outline-primary" onclick="openAddEvent('{{ display_year }}-{{ '%02d' % display_month }}-')">
+                <i class="fas fa-plus me-1"></i>添加事件
+            </button>
+        </span>
+    </div>
+    <div class="card-body p-2">
+        <div class="calendar-grid">
+            <div class="cal-header">一</div>
+            <div class="cal-header">二</div>
+            <div class="cal-header">三</div>
+            <div class="cal-header">四</div>
+            <div class="cal-header">五</div>
+            <div class="cal-header">六</div>
+            <div class="cal-header cal-header-weekend">日</div>
+            {% for week in calendar_grid %}
+            {% for cell in week %}
+            {% if cell is none %}
+            <div class="cal-cell cal-empty"></div>
+            {% else %}
+            {% set date_str = '%04d-%02d-%02d'|format(display_year, display_month, cell.day) %}
+            <div class="cal-cell {% if cell.is_today %}cal-today{% endif %} {% if cell.events %}cal-has-event{% endif %}"
+                 onclick="showDayEvents('{{ date_str }}', {{ cell.day }})">
+                <div class="cal-day-number">{{ cell.day }}</div>
+                {% if cell.events %}
+                <div class="cal-event-list">
+                    {% for ev in cell.events[:3] %}
+                    <span class="cal-event-dot" style="background:{{ get_importance_color(ev.importance) }}"></span>
+                    <span class="cal-event-title">{{ ev.name[:16] }}{% if ev.name|length > 16 %}..{% endif %}</span>
+                    {% if not loop.last %}<br>{% endif %}
+                    {% endfor %}
+                    {% if cell.events|length > 3 %}
+                    <span class="cal-event-more">+{{ cell.events|length - 3 }} 更多</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- 当月无精确日期的其他事件 -->
+{% if month_precision_events %}
+<div class="card mb-3">
+    <div class="card-header">
+        <span><i class="fas fa-list me-1"></i> {{ display_year }}年{{ display_month }}月 其他事件（未指定具体日期）</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:40px"></th>
+                        <th style="width:100px">行业</th>
+                        <th>事件</th>
+                        <th>类型</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ev in month_precision_events %}
+                    <tr>
+                        <td class="align-middle">
+                            <span style="color:{{ get_importance_color(ev.importance) }};font-size:0.75rem;">
+                                {{ get_importance_label(ev.importance) }}
+                            </span>
+                        </td>
+                        <td class="align-middle">{{ ev.industry }}</td>
+                        <td class="align-middle">
+                            <strong>{{ ev.name }}</strong>
+                            <div class="text-muted" style="font-size:0.8rem;">{{ ev.description }}</div>
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge bg-info text-dark">{{ ev.type }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- 月份详情（保留原来的月份事件列表） -->
 {% for m in months %}
-<div id="month-{{ m.num }}" class="card mb-4 {% if m.is_current %}border-primary{% endif %}">
+{% if m.num == display_month %}
+<div class="card">
     <div class="card-header d-flex justify-content-between align-items-center
         {% if m.is_current %}bg-primary text-white{% endif %}">
         <span>
-            {{ m.name }}
+            {{ m.name }}事件列表
             {% if m.is_current %}<span class="now-indicator">本月</span>{% endif %}
         </span>
         <span>
@@ -98,24 +189,7 @@
                         <td class="align-middle">{{ ev.industry }}</td>
                         <td class="align-middle">
                             <strong>{{ ev.name }}</strong>
-                            {% if ev.is_past %}
-                                {% if ev.backtest_badge %}
-                                <span class="badge {{ ev.backtest_badge.class }}" style="font-size:0.6rem;">{{ ev.backtest_badge.label }}</span>
-                                {% else %}
-                                <span class="badge bg-secondary" style="font-size:0.6rem;">待回测</span>
-                                {% endif %}
-                            {% endif %}
                             <div class="text-muted" style="font-size:0.8rem;">{{ ev.description }}</div>
-                            {% if ev.impact %}
-                            <div class="text-muted" style="font-size:0.75rem;">
-                                <i class="fas fa-arrow-right me-1"></i> {{ ev.impact[:80] }}{% if ev.impact|length > 80 %}...{% endif %}
-                            </div>
-                            {% endif %}
-                            {% if ev.backtest and ev.backtest.notes %}
-                            <div class="mt-1" style="font-size:0.75rem;color:var(--text-muted);">
-                                <i class="fas fa-rotate-left me-1"></i> {{ ev.backtest.notes[:60] }}
-                            </div>
-                            {% endif %}
                         </td>
                         <td class="align-middle">
                             <span class="badge bg-info text-dark">{{ ev.type }}</span>
@@ -126,13 +200,6 @@
                             <span class="stock-tag" style="background:{{ get_action_color(act) }}; color:#fff;">
                                 {{ act }}
                             </span>
-                            {% endif %}
-                            {% if ev.backtest and ev.backtest.price_change %}
-                            <div style="font-size:0.65rem;margin-top:2px;">
-                                <span class="{% if ev.backtest.price_change.startswith('+') %}text-danger{% else %}text-success{% endif %}">
-                                    {{ ev.backtest.price_change }}
-                                </span>
-                            </div>
                             {% endif %}
                         </td>
                     </tr>
@@ -145,32 +212,332 @@
         {% endif %}
     </div>
 </div>
+{% endif %}
 {% endfor %}
+
+<!-- 日事件弹窗 -->
+<div class="modal fade" id="dayEventModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dayEventTitle"><i class="fas fa-calendar-day me-2"></i><span id="dayEventDate"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="dayEventBody">
+                <div class="text-center text-muted py-4">加载中...</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="addEventFromDayBtn" onclick="openAddEventFromDay()">
+                    <i class="fas fa-plus me-1"></i>添加事件
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加事件弹窗 -->
+<div class="modal fade" id="addEventModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>添加事件</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addEventForm">
+                    <div class="mb-2">
+                        <label class="form-label" style="font-size:0.8rem;">日期</label>
+                        <input type="date" class="form-control form-control-sm" id="eventDate" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" style="font-size:0.8rem;">行业</label>
+                        <select class="form-select form-select-sm" id="eventIndustry" required>
+                            <option value="">选择行业</option>
+                            {% for code, ind in industries.items() %}
+                            <option value="{{ ind.industry }}">{{ ind.industry }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" style="font-size:0.8rem;">事件名称</label>
+                        <input type="text" class="form-control form-control-sm" id="eventName" placeholder="输入事件名称" required>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label class="form-label" style="font-size:0.8rem;">重要性</label>
+                            <select class="form-select form-select-sm" id="eventImportance">
+                                <option value="5">★★★★★ 板块级行情</option>
+                                <option value="4">★★★★ 龙头行情</option>
+                                <option value="3" selected>★★★ 短期脉冲</option>
+                                <option value="2">★★ 局部影响</option>
+                                <option value="1">★ 噪声</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label" style="font-size:0.8rem;">类型</label>
+                            <select class="form-select form-select-sm" id="eventType">
+                                <option value="policy">政策</option>
+                                <option value="technology">技术</option>
+                                <option value="product">产品</option>
+                                <option value="exhibition">会议</option>
+                                <option value="earnings">财报</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label" style="font-size:0.8rem;">描述</label>
+                        <textarea class="form-control form-control-sm" id="eventDescription" rows="2" placeholder="事件详情"></textarea>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input type="checkbox" class="form-check-input" id="eventConfirmed">
+                        <label class="form-check-label" style="font-size:0.8rem;">已确认</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-primary" onclick="submitEvent()"><i class="fas fa-save me-1"></i>保存</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block scripts %}
-<script>
-// 默认滚动到当前月
-document.addEventListener('DOMContentLoaded', function() {
-    const currentMonth = document.querySelector('.month-tab.current');
-    if (currentMonth) {
-        const href = currentMonth.getAttribute('href');
-        if (href) {
-            setTimeout(function() {
-                const target = document.querySelector(href);
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 200);
-        }
+<style>
+/* 日历网格 */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+.cal-header {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 0;
+    color: var(--text-muted);
+}
+.cal-header-weekend {
+    color: #e74c3c;
+}
+.cal-cell {
+    min-height: 85px;
+    padding: 4px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    background: var(--bg-secondary);
+    border: 1px solid transparent;
+    overflow: hidden;
+}
+.cal-cell:hover {
+    background: var(--border-color);
+    border-color: var(--color-primary, #2563eb);
+}
+.cal-empty {
+    background: transparent;
+    cursor: default;
+}
+.cal-empty:hover {
+    background: transparent;
+    border-color: transparent;
+}
+.cal-today {
+    border-color: var(--color-primary, #2563eb) !important;
+    background: rgba(var(--bs-primary-rgb, 37,99,235), 0.08);
+}
+.cal-day-number {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: var(--text-primary);
+}
+.cal-today .cal-day-number {
+    color: var(--color-primary, #2563eb);
+}
+.cal-event-list {
+    font-size: 0.6rem;
+    line-height: 1.3;
+    margin-top: 1px;
+}
+.cal-event-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    margin-right: 3px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+.cal-event-title {
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+.cal-event-more {
+    color: var(--text-muted);
+    font-size: 0.55rem;
+    font-style: italic;
+}
+
+/* 弹窗事件卡片 */
+.day-event-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: var(--bg-card);
+}
+.day-event-card:last-child {
+    margin-bottom: 0;
+}
+.day-event-card .event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+/* 月份导航响应式 */
+.month-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+}
+.month-nav .month-tab {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+    .cal-cell {
+        min-height: 60px;
+        padding: 2px 4px;
     }
-});
+    .cal-event-title {
+        display: none;
+    }
+    .cal-day-number {
+        font-size: 0.75rem;
+    }
+}
+</style>
+
+<script>
+// 当日事件 JSON（由后端注入）
+const DAY_EVENTS = {{ day_events_json | tojson | safe }};
+let _selectedDate = '';
+
+function showDayEvents(dateStr, dayNum) {
+    _selectedDate = dateStr;
+    const events = DAY_EVENTS[dateStr] || [];
+    const monthDay = dateStr.slice(5);
+    document.getElementById('dayEventDate').textContent = monthDay + ' 日 · 共 ' + events.length + ' 个事件';
+
+    const body = document.getElementById('dayEventBody');
+    if (events.length === 0) {
+        body.innerHTML = '<div class="text-center text-muted py-4"><i class="fas fa-calendar-day fa-2x mb-2"></i><div>当天暂无事件</div><div class="mt-2" style="font-size:0.8rem;">点击下方按钮添加</div></div>';
+    } else {
+        let html = '';
+        events.forEach(function(ev) {
+            const impColors = {5: '#dc3545', 4: '#fd7e14', 3: '#ffc107', 2: '#6c757d', 1: '#adb5bd'};
+            const impLabels = {5: '★★★★★', 4: '★★★★', 3: '★★★', 2: '★★', 1: '★'};
+            const color = impColors[ev.importance] || '#6c757d';
+            const stars = impLabels[ev.importance] || '';
+            const confirmedBadge = ev.confirmed
+                ? '<span class="badge bg-success" style="font-size:0.55rem;">已确认</span>'
+                : '<span class="badge bg-warning text-dark" style="font-size:0.55rem;">待确认</span>';
+            const actionBadge = ev.action
+                ? '<span class="badge" style="background:#dc3545;color:#fff;font-size:0.6rem;">' + ev.action + '</span>'
+                : '';
+            html += '<div class="day-event-card">'
+                + '<div class="event-header">'
+                + '<div><strong style="font-size:0.85rem;">' + escapeHtml(ev.name) + '</strong></div>'
+                + '<div>' + confirmedBadge + '</div>'
+                + '</div>'
+                + '<div class="mb-1">'
+                + '<span class="badge bg-light text-dark me-1" style="font-size:0.6rem;">' + escapeHtml(ev.industry) + '</span>'
+                + '<span class="badge bg-info text-dark me-1" style="font-size:0.6rem;">' + escapeHtml(ev.type) + '</span>'
+                + '<span style="color:' + color + ';font-size:0.65rem;">' + stars + '</span>'
+                + actionBadge
+                + '</div>'
+                + '<div style="font-size:0.75rem;color:var(--text-muted);">' + escapeHtml(ev.description || '暂无描述') + '</div>'
+                + '</div>';
+        });
+        body.innerHTML = html;
+    }
+
+    document.getElementById('addEventFromDayBtn').onclick = function() {
+        openAddEvent(dateStr);
+    };
+
+    const modal = new bootstrap.Modal('#dayEventModal');
+    modal.show();
+}
+
+function openAddEvent(dateStr) {
+    document.getElementById('eventDate').value = dateStr;
+
+    // 关闭日弹窗
+    const dayModal = bootstrap.Modal.getInstance('#dayEventModal');
+    if (dayModal) dayModal.hide();
+
+    new bootstrap.Modal('#addEventModal').show();
+}
+
+function openAddEventFromDay() {
+    if (_selectedDate) {
+        openAddEvent(_selectedDate);
+    }
+}
+
+function submitEvent() {
+    const dateVal = document.getElementById('eventDate').value;
+    const industry = document.getElementById('eventIndustry').value;
+    const name = document.getElementById('eventName').value.trim();
+
+    if (!dateVal) { alert('请选择日期'); return; }
+    if (!industry) { alert('请选择行业'); return; }
+    if (!name) { alert('请输入事件名称'); return; }
+
+    const data = {
+        date: dateVal,
+        date_precision: 'day',
+        industry: industry,
+        name: name,
+        importance: parseInt(document.getElementById('eventImportance').value),
+        type: document.getElementById('eventType').value,
+        description: document.getElementById('eventDescription').value.trim(),
+        confirmed: document.getElementById('eventConfirmed').checked,
+    };
+
+    fetch('/api/events/add', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+        if (res.ok) {
+            bootstrap.Modal.getInstance('#addEventModal').hide();
+            location.reload();
+        } else {
+            alert('添加失败: ' + (res.error || '未知错误'));
+        }
+    })
+    .catch(function(err) {
+        alert('网络错误: ' + err.message);
+    });
+}
 
 function filterCalendar() {
     const search = (document.getElementById('calSearch').value || '').toLowerCase();
     const industry = document.getElementById('calIndustryFilter').value;
     const importance = document.getElementById('calImportanceFilter').value;
+    // 高亮匹配的事件行（下方的列表部分）
     let totalVisible = 0;
-    document.querySelectorAll('.cal-event').forEach(el => {
+    document.querySelectorAll('.cal-event').forEach(function(el) {
         const name = (el.dataset.name || '').toLowerCase();
         const ind = (el.dataset.industry || '');
         const imp = el.dataset.importance || '';
@@ -181,12 +548,14 @@ function filterCalendar() {
         el.style.display = show ? '' : 'none';
         if (show) totalVisible++;
     });
-    document.querySelectorAll('[id^="month-"]').forEach(m => {
-        const visible = m.querySelectorAll('.cal-event[style*="display: none"]').length;
-        const total = m.querySelectorAll('.cal-event').length;
-        m.style.display = (visible === total && total > 0) ? 'none' : '';
-    });
     document.getElementById('calCount').textContent = '显示 ' + totalVisible + ' 个事件';
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(text));
+    return d.innerHTML;
 }
 </script>
 {% endblock %}

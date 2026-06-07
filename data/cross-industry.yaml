@@ -1,4 +1,4 @@
-updated: '2026-06-06'
+updated: '2026-06-07'
 cross_events:
 - date: '2026-06-24'
   date_precision: day
@@ -201,3 +201,5 @@ affinity_matrix:
     半导体/国产替代: 3
     低空经济: 2
   绿色能源: {}
+  低空经济: {}
+  量子计算: {}
