@@ -1,0 +1,10 @@
+materials:
+- id: mat_1780845865481_0
+  title: 财务造假！派瑞股份将被ST
+  summary: 财务造假！这家公司将被ST 来源：证券日报之声 本报记者 殷高峰 6月7日晚间，西安派瑞功率半导体变流技术股份有限公司（以下简称“派瑞股份”）披露公告称...
+  source_url: https://finance.sina.com.cn/stock/s/2026-06-07/doc-iniareah6098038.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-07 23:24
+  status: pending

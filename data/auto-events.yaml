@@ -120,3 +120,64 @@ detected_events:
   confidence: 0.7
   status: pending
   detected_at: 2026-06-06 21:52
+- date: '2026-06-05'
+  name: 华安证券：短期AI算力方向内部切换 中期仍有上涨空间
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/stock/2026-06-07/doc-iniaqhwq9705462.shtml
+  source_title: 华安证券：短期AI算力方向内部切换 中期仍有上涨空间
+  confidence: 0.8
+  status: pending
+  detected_at: 2026-06-07 14:54
+- date: '2026-06-07'
+  name: 京东与腾讯就AI Agent将达成重要合作
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/tob/2026-06-07/doc-iniaqtnk9511200.shtml
+  source_title: 京东与腾讯就AI Agent将达成重要合作
+  confidence: 0.75
+  status: pending
+  detected_at: 2026-06-07 18:46
+- date: '2026-06-05'
+  name: 一篇推文带火机器人龙头，“白毛股神”Serenity究竟是谁？
+  industry: 机器人零部件
+  all_industries:
+  - 机器人零部件
+  - 具身智能
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-07/doc-iniaqtns4624401.shtml
+  source_title: 一篇推文带火机器人龙头，“白毛股神”Serenity究竟是谁？
+  confidence: 0.8
+  status: pending
+  detected_at: 2026-06-07 18:46
+- date: '2026-06-09'
+  name: 300831，将被ST！明日停牌
+  industry: 半导体/国产替代
+  all_industries:
+  - 半导体/国产替代
+  source_url: https://finance.sina.com.cn/stock/s/2026-06-07/doc-iniaqtns4623887.shtml
+  source_title: 300831，将被ST！明日停牌
+  confidence: 0.85
+  status: pending
+  detected_at: 2026-06-07 18:46
+- date: '2026-06-05'
+  name: 吴清，周末发声！国常会，重磅部署！算力，大利好！重大资产重组，终止！影响一周市场的十大消息
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/wm/2026-06-07/doc-iniaqpes7965209.shtml
+  source_title: 吴清，周末发声！国常会，重磅部署！算力，大利好！重大资产重组，终止！影响一周市场的十大消息
+  confidence: 0.85
+  status: pending
+  detected_at: 2026-06-07 18:46
+- date: '2026-06-07'
+  name: 领益智造通过港交所上市聆讯
+  industry: AI大模型/应用
+  all_industries:
+  - AI大模型/应用
+  source_url: https://finance.sina.com.cn/stock/relnews/cn/2026-06-07/doc-iniaqtnk9511919.shtml
+  source_title: 领益智造通过港交所上市聆讯
+  confidence: 0.7
+  status: pending
+  detected_at: 2026-06-07 20:47

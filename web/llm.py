@@ -606,3 +606,102 @@ def generate_calendar_events(industry_name, description="", keywords=None, provi
                     "warning": "LLM 返回格式异常，请检查生成结果"}
     except Exception as e:
         return {"ok": False, "error": f"YAML 解析失败: {e}", "raw": content}
+
+
+# ── 新闻素材推理审核 ──
+
+MATERIALS_REVIEW_PROMPT = """你是一位行业研究分析师，负责审核新闻素材并判断哪些应该纳入投资日历。
+
+## 行业
+{industry}
+
+## 当前日历事件
+{existing_events}
+
+## 待审核新闻素材
+{materials}
+
+## 审核要求
+对每一条素材，判断它是否值得作为行业催化事件加入日历：
+
+**值得加入的情况：**
+- 有明确时间节点的行业政策/法规出台
+- 重要行业会议/展览（有具体日期）
+- 技术标准突破/产品发布
+- 龙头公司的重大业务进展
+- 行业级的供需变化信号
+
+**不值得加入的情况：**
+- 股价波动、个股新闻（非行业级）
+- 券商研报观点（不是事件本身）
+- 日常商品报价、常规财报
+- 没有明确时间节点或时间已过的新闻
+- 标题党、市场传闻
+
+## 输出格式
+只输出 YAML，不要额外说明：
+```yaml
+suggestions:
+  - material_id: "mat_xxx"
+    action: "add"              # add 或 skip
+    reasoning: "具体理由（30字内）"
+    event:
+      date: "2026-09"          # 精确日期用 "2026-09-15"
+      date_precision: "month"  # 或 "day"
+      name: "事件名称"
+      importance: 4            # 1-5
+      type: "policy"           # policy/product/technology/exhibition/regulation/other
+      description: "事件简要说明（20字内）"
+      confirmed: true          # 有确切日期和来源设为 true
+"""
+
+
+def review_materials(industry_name, materials, existing_events, provider_key=None, model=None):
+    """审核新闻素材，返回结构化建议"""
+    if not materials:
+        return {"ok": True, "suggestions": [], "total": 0}
+
+    # 格式化现有日历
+    if existing_events:
+        ev_lines = []
+        for i, ev in enumerate(existing_events, 1):
+            stars = "★" * ev.get("importance", 0)
+            date_str = ev.get("date", "未知日期")[:10]
+            status = "✓" if ev.get("confirmed") else "~"
+            ev_lines.append(f"  {i}. [{status}] {date_str} {stars} {ev.get('name', '')}")
+        existing_str = "\n".join(ev_lines)
+    else:
+        existing_str = "  （无现有事件）"
+
+    # 格式化素材
+    mat_lines = []
+    for i, m in enumerate(materials, 1):
+        mat_lines.append(f"  {i}. [{m.get('source_name', '未知来源')}] {m['title']}")
+        if m.get("summary"):
+            mat_lines.append(f"     摘要: {m['summary'][:100]}")
+        mat_lines.append(f"     链接: {m.get('source_url', '')}")
+    materials_str = "\n".join(mat_lines)
+
+    prompt = MATERIALS_REVIEW_PROMPT.format(
+        industry=industry_name,
+        existing_events=existing_str,
+        materials=materials_str,
+    )
+
+    result = call_llm(prompt, provider_key=provider_key, model=model, temperature=0.3, max_tokens=4096)
+    if not result.get("ok"):
+        return result
+
+    # 解析 YAML
+    content = result["content"]
+    yaml_match = re.search(r"```(?:yaml)?\s*\n(.*?)```", content, re.DOTALL)
+    yaml_str = yaml_match.group(1) if yaml_match else content
+
+    try:
+        parsed = yaml.safe_load(yaml_str)
+        suggestions = (parsed or {}).get("suggestions", [])
+        # 只返回 action 为 add 的建议
+        adds = [s for s in suggestions if s.get("action") == "add"]
+        return {"ok": True, "suggestions": adds, "total": len(adds), "raw": content}
+    except Exception as e:
+        return {"ok": False, "error": f"解析建议失败: {e}", "raw": content}

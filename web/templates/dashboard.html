@@ -46,6 +46,14 @@
 </div>
 {% endif %}
 
+{% if materials_total and materials_total > 0 %}
+<div class="alert alert-info d-flex justify-content-between align-items-center py-2" role="alert">
+    <span><i class="fas fa-brain me-2"></i> 新闻素材池收集到 <strong>{{ materials_total }}</strong> 条待推理素材
+    <small class="text-muted ms-2">（AI 可分析哪些值得纳入日历）</small></span>
+    <a href="/settings#materials" class="btn btn-sm btn-outline-info">去推理</a>
+</div>
+{% endif %}
+
 <!-- 最近更新 -->
 {% if recent_updates %}
 <div class="row g-3 mb-4">
@@ -80,7 +88,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span>
                     <i class="fas fa-newspaper me-1"></i> 行业实时新闻
-                    <small class="text-muted ms-2">每次启动自动获取最新资讯</small>
+                    <span id="newsFreshness" class="badge bg-success ms-1" style="font-size:0.65rem;">刚刚更新</span>
                 </span>
                 <button class="btn btn-sm btn-outline-primary" onclick="refreshNews()">
                     <i class="fas fa-sync me-1"></i>刷新
@@ -512,6 +520,9 @@ function refreshNews() {
         })
         .finally(() => {
             if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-sync me-1"></i>刷新'; }
+            // 重置新鲜度标签
+            const fel = document.getElementById('newsFreshness');
+            if (fel) { fel.textContent = '刚刚更新'; fel.className = 'badge bg-success ms-1'; }
         });
 }
 
@@ -656,6 +667,28 @@ document.addEventListener('DOMContentLoaded', function() {
         {% endif %}
     }
     localStorage.setItem(LAST_VISIT_KEY, now);
+
+    // ── 新闻新鲜度指示器 ──
+    function updateFreshness() {
+        const ts = {{ news_last_refresh }};
+        if (!ts) return;
+        const elapsed = Math.floor((Date.now() / 1000) - ts);
+        const el = document.getElementById('newsFreshness');
+        if (!el) return;
+        if (elapsed < 60) {
+            el.textContent = '刚刚更新';
+            el.className = 'badge bg-success ms-1';
+        } else if (elapsed < 3600) {
+            el.textContent = Math.floor(elapsed / 60) + ' 分钟前更新';
+            el.className = 'badge bg-success ms-1';
+        } else {
+            el.textContent = Math.floor(elapsed / 3600) + ' 小时前更新';
+            el.className = 'badge bg-warning text-dark ms-1';
+            showToast('⚠️ 新闻数据已超过 ' + Math.floor(elapsed / 3600) + ' 小时未更新，点击「刷新」获取最新资讯', 'warning');
+        }
+    }
+    updateFreshness();
+    setInterval(updateFreshness, 60000);
 });
 </script>
 

@@ -18,6 +18,12 @@
         </button>
     </li>
     <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#materials">素材推理
+            {% set pending_count = materials_summary.values()|sum %}
+            {% if pending_count > 0 %}<span class="badge bg-danger ms-1">{{ pending_count }}</span>{% endif %}
+        </button>
+    </li>
+    <li class="nav-item">
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#skills">自定义行业</button>
     </li>
     <li class="nav-item">
@@ -178,6 +184,78 @@
                     </div>
                 </div>
                 {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ── 新闻素材推理 ── #}
+    <div class="tab-pane fade" id="materials">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-brain me-1"></i> 新闻素材推理审核</span>
+                <span class="text-muted" style="font-size:0.8rem;">勾选素材 → AI 判断哪些值得纳入行业日历</span>
+            </div>
+            <div class="card-body">
+                {% if materials_summary %}
+                <div id="materialsContainer">
+                    {% for ind_name, count in materials_summary.items() %}
+                    <div class="border rounded mb-2 industry-material-group" data-industry="{{ ind_name }}">
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light bg-opacity-25 cursor-pointer"
+                             onclick="toggleMaterials('{{ ind_name }}')" style="cursor:pointer;">
+                            <div>
+                                <strong><i class="fas fa-folder-open me-1"></i>{{ ind_name }}</strong>
+                                <span class="badge bg-primary ms-2">{{ count }} 条素材</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-outline-primary review-btn"
+                                        onclick="event.stopPropagation();reviewSelected('{{ ind_name }}')"
+                                        id="reviewBtn-{{ ind_name|replace('/','_') }}" disabled>
+                                    <i class="fas fa-robot me-1"></i>AI 推理 <span class="selected-count">(0)</span>
+                                </button>
+                                <span class="text-muted" style="font-size:0.8rem;" id="toggleIcon-{{ ind_name|replace('/','_') }}">▶ 展开</span>
+                            </div>
+                        </div>
+                        <div id="materialsList-{{ ind_name|replace('/','_') }}" style="display:none;">
+                            <div class="p-3 border-top">
+                                <div class="d-flex gap-2 mb-2">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="selectAll('{{ ind_name }}', true)">全选</button>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="selectAll('{{ ind_name }}', false)">取消全选</button>
+                                    <span class="text-muted" style="font-size:0.8rem;align-self:center;" id="loading-{{ ind_name|replace('/','_') }}"></span>
+                                </div>
+                                <div id="materialsItems-{{ ind_name|replace('/','_') }}" class="list-group">
+                                    <div class="text-center text-muted py-3"><i class="fas fa-spinner fa-spin me-1"></i>加载中...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-check-circle text-success mb-2" style="font-size:2rem;"></i>
+                    <p>暂无待审核素材。刷新新闻后会自动收集。</p>
+                </div>
+                {% endif %}
+
+                <!-- 推理结果区域 -->
+                <div id="reviewResult" style="display:none;">
+                    <hr>
+                    <h6 class="mb-3"><i class="fas fa-lightbulb me-1"></i>推理建议</h6>
+                    <div id="suggestionsContainer"></div>
+                    <div class="d-flex gap-2 mt-3" id="batchActions" style="display:none;">
+                        <button class="btn btn-success btn-sm" onclick="acceptAllSuggestions()">
+                            <i class="fas fa-check me-1"></i>采纳全部
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="skipAllSuggestions()">
+                            <i class="fas fa-forward me-1"></i>全部跳过
+                        </button>
+                    </div>
+                </div>
+
+                <div id="reviewLoading" style="display:none;" class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin me-2" style="font-size:1.5rem;"></i>
+                    <p class="text-muted mt-2">AI 正在分析 {{ selectedCount }} 条素材，请稍候...</p>
+                </div>
             </div>
         </div>
     </div>
@@ -1316,5 +1394,238 @@ document.getElementById('addCustomProviderForm').addEventListener('submit', func
         }
     });
 });
+// ── 素材推理审核（带选择）──
+let _currentSuggestions = [];
+let _currentIndustry = '';
+let _materialCache = {};
+
+function toggleMaterials(industry) {
+    const key = industry.replace(/\//g, '_');
+    const list = document.getElementById('materialsList-' + key);
+    const icon = document.getElementById('toggleIcon-' + key);
+    if (list.style.display === 'none') {
+        list.style.display = '';
+        icon.textContent = '▼ 收起';
+        loadMaterials(industry);
+    } else {
+        list.style.display = 'none';
+        icon.textContent = '▶ 展开';
+    }
+}
+
+function loadMaterials(industry) {
+    const key = industry.replace(/\//g, '_');
+    const container = document.getElementById('materialsItems-' + key);
+    fetch('/api/materials?industry=' + encodeURIComponent(industry))
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok || !data.materials || data.materials.length === 0) {
+                container.innerHTML = '<div class="text-muted py-2 text-center" style="font-size:0.85rem;">暂无素材</div>';
+                return;
+            }
+            _materialCache[industry] = data.materials;
+            container.innerHTML = data.materials.map(m =>
+                '<div class="list-group-item py-2 px-3 d-flex align-items-start gap-2">'
+                + '<input type="checkbox" class="material-checkbox mt-1 flex-shrink-0"'
+                + ' data-industry="' + industry.replace(/"/g, '&quot;') + '"'
+                + ' data-id="' + m.id + '"'
+                + ' onchange="updateReviewBtn(\'' + industry.replace(/'/g, "\\'") + '\')">'
+                + '<div style="flex:1;min-width:0;">'
+                + '<div style="font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (m.title || '') + '</div>'
+                + '<div class="text-muted" style="font-size:0.75rem;">来源：' + (m.source_name || '') + ' · ' + (m.detected_at || '') + '</div>'
+                + (m.summary ? '<div class="text-muted" style="font-size:0.75rem;">' + m.summary.slice(0, 120) + (m.summary.length > 120 ? '...' : '') + '</div>' : '')
+                + '<div class="mt-1"><a href="' + m.source_url + '" target="_blank" style="font-size:0.75rem;">原文链接 <i class="fas fa-external-link-alt" style="font-size:0.6rem;"></i></a></div>'
+                + '</div>'
+                + '</div>'
+            ).join('');
+            updateReviewBtn(industry);
+        })
+        .catch(() => {
+            container.innerHTML = '<div class="text-danger py-2 text-center" style="font-size:0.85rem;">加载失败</div>';
+        });
+}
+
+function updateReviewBtn(industry) {
+    const key = industry.replace(/\//g, '_');
+    const checked = document.querySelectorAll('#materialsItems-' + key + ' .material-checkbox:checked');
+    const btn = document.getElementById('reviewBtn-' + key);
+    const countSpan = btn.querySelector('.selected-count');
+    const count = checked.length;
+    countSpan.textContent = '(' + count + ')';
+    btn.disabled = count === 0;
+}
+
+function selectAll(industry, checked) {
+    const key = industry.replace(/\//g, '_');
+    document.querySelectorAll('#materialsItems-' + key + ' .material-checkbox')
+        .forEach(cb => cb.checked = checked);
+    updateReviewBtn(industry);
+}
+
+function getSelectedMaterialIds(industry) {
+    const key = industry.replace(/\//g, '_');
+    return Array.from(document.querySelectorAll('#materialsItems-' + key + ' .material-checkbox:checked'))
+        .map(cb => cb.dataset.id);
+}
+
+function reviewSelected(industry) {
+    const ids = getSelectedMaterialIds(industry);
+    if (ids.length === 0) { showToast('请先勾选要推理的素材', 'warning'); return; }
+
+    _currentIndustry = industry;
+    document.getElementById('reviewLoading').querySelector('p').textContent = 'AI 正在分析 ' + ids.length + ' 条素材，请稍候...';
+    document.getElementById('reviewLoading').style.display = '';
+    document.getElementById('reviewResult').style.display = 'none';
+
+    // 禁用按钮
+    const key = industry.replace(/\//g, '_');
+    const btn = document.getElementById('reviewBtn-' + key);
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> 分析中'; }
+
+    fetch('/api/materials/review', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({industry: industry, material_ids: ids})
+    }).then(r => r.json()).then(data => {
+        document.getElementById('reviewLoading').style.display = 'none';
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-robot me-1"></i>AI 推理 <span class="selected-count">(0)</span>'; }
+        if (data.ok) {
+            _currentSuggestions = data.suggestions || [];
+            renderSuggestions(industry, _currentSuggestions);
+        } else {
+            showToast('推理失败: ' + (data.error || ''), 'error');
+        }
+    }).catch(err => {
+        document.getElementById('reviewLoading').style.display = 'none';
+        showToast('请求失败: ' + err.message, 'error');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-robot me-1"></i>AI 推理 <span class="selected-count">(0)</span>'; }
+    });
+}
+
+function renderSuggestions(industry, suggestions) {
+    const container = document.getElementById('suggestionsContainer');
+    const resultDiv = document.getElementById('reviewResult');
+    const batch = document.getElementById('batchActions');
+
+    if (!suggestions || suggestions.length === 0) {
+        container.innerHTML = '<div class="alert alert-success py-2 mb-0"><i class="fas fa-check me-1"></i>选中的素材无值得纳入日历的事件。</div>';
+        resultDiv.style.display = '';
+        batch.style.display = 'none';
+        return;
+    }
+
+    let html = '<div class="alert alert-info py-2"><strong>' + industry + '</strong>：AI 建议采纳 ' + suggestions.length + ' 个事件</div>';
+    html += '<div class="list-group">';
+    suggestions.forEach((s, idx) => {
+        const ev = s.event || {};
+        const stars = '★'.repeat(ev.importance || 3);
+        const mat = s._material || {};
+        html += '<div class="list-group-item list-group-item-action" id="sug-' + idx + '">'
+            + '<div class="d-flex justify-content-between align-items-start">'
+            + '<div style="flex:1;">'
+            + '<div class="fw-semibold">' + (ev.name || '') + '</div>'
+            + '<div class="text-muted" style="font-size:0.8rem;">'
+            + (ev.date || '') + ' · ' + stars + ' · ' + (ev.type || '')
+            + '</div>'
+            + '<div class="small text-muted mt-1">' + (s.reasoning || '') + '</div>'
+            + '<div class="small mt-1">来源：<a href="' + (mat.source_url || '#') + '" target="_blank">' + (mat.source_name || '') + '</a></div>'
+            + '</div>'
+            + '<div class="ms-2" style="white-space:nowrap;">'
+            + '<button class="btn btn-sm btn-outline-success me-1" onclick="acceptSuggestion(' + idx + ')">采纳</button>'
+            + '<button class="btn btn-sm btn-outline-secondary" onclick="skipSuggestion(' + idx + ')">跳过</button>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+    resultDiv.style.display = '';
+    batch.style.display = suggestions.length > 1 ? '' : 'none';
+}
+
+function acceptSuggestion(idx) {
+    const sug = _currentSuggestions[idx];
+    if (!sug) return;
+    fetch('/api/materials/accept', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            industry: _currentIndustry,
+            suggestions: [sug]
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            showToast('✓ 已采纳：' + (sug.event?.name || ''), 'success');
+            const el = document.getElementById('sug-' + idx);
+            if (el) el.remove();
+            _currentSuggestions[idx] = null;
+            checkAllDone();
+        } else {
+            showToast('采纳失败: ' + (data.error || ''), 'error');
+        }
+    });
+}
+
+function skipSuggestion(idx) {
+    const sug = _currentSuggestions[idx];
+    if (!sug) return;
+    const mid = sug.material_id;
+    if (mid) {
+        fetch('/api/materials/skip', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({material_ids: [mid]})
+        }).then(r => r.json());
+    }
+    const el = document.getElementById('sug-' + idx);
+    if (el) el.remove();
+    _currentSuggestions[idx] = null;
+    checkAllDone();
+}
+
+function acceptAllSuggestions() {
+    const valid = _currentSuggestions.filter(s => s !== null);
+    if (valid.length === 0) return;
+    fetch('/api/materials/accept', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            industry: _currentIndustry,
+            suggestions: valid
+        })
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            showToast('✓ 已采纳 ' + data.accepted + ' 个事件', 'success');
+            document.getElementById('suggestionsContainer').innerHTML = ''
+                + '<div class="alert alert-success py-2 mb-0"><i class="fas fa-check me-1"></i>已采纳 ' + data.accepted + ' 个事件</div>';
+            document.getElementById('batchActions').style.display = 'none';
+            _currentSuggestions = [];
+        } else {
+            showToast('采纳失败: ' + (data.error || ''), 'error');
+        }
+    });
+}
+
+function skipAllSuggestions() {
+    const mids = _currentSuggestions.filter(s => s !== null).map(s => s.material_id).filter(Boolean);
+    if (mids.length > 0) {
+        fetch('/api/materials/skip', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({material_ids: mids})
+        }).then(r => r.json());
+    }
+    document.getElementById('suggestionsContainer').innerHTML = ''
+        + '<div class="alert alert-secondary py-2 mb-0"><i class="fas fa-forward me-1"></i>已跳过全部建议</div>';
+    document.getElementById('batchActions').style.display = 'none';
+    _currentSuggestions = [];
+}
+
+function checkAllDone() {
+    const remaining = _currentSuggestions.filter(s => s !== null).length;
+    if (remaining === 0) {
+        document.getElementById('batchActions').style.display = 'none';
+    }
+}
 </script>
 {% endblock %}

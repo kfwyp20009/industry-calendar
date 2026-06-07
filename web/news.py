@@ -14,6 +14,7 @@ import skills
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOURCES_FILE = os.path.join(BASE_DIR, "data", "sources.yaml")
 AUTO_EVENTS_FILE = os.path.join(BASE_DIR, "data", "auto-events.yaml")
+MATERIALS_FILE = os.path.join(BASE_DIR, "data", "news-materials.yaml")
 
 # 新闻缓存
 _cache = {"data": [], "timestamp": 0}
@@ -427,6 +428,73 @@ def reject_event(event_idx):
     return False
 
 
+# ── 新闻素材池（替代旧的事件检测）──
+
+def load_materials():
+    """加载新闻素材"""
+    if not os.path.exists(MATERIALS_FILE):
+        return []
+    with open(MATERIALS_FILE, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    return data.get("materials", [])
+
+
+def save_materials(materials):
+    """保存新闻素材"""
+    os.makedirs(os.path.dirname(MATERIALS_FILE), exist_ok=True)
+    with open(MATERIALS_FILE, "w", encoding="utf-8") as f:
+        yaml.dump({"materials": materials}, f, allow_unicode=True, sort_keys=False)
+
+
+def extract_news_materials(news_items):
+    """从已匹配的新闻中提取素材（不解析事件，只保存原文）"""
+    materials = load_materials()
+    existing_urls = {m["source_url"] for m in materials if m.get("source_url")}
+    new_count = 0
+
+    for item in news_items:
+        if not item.get("matched") or not item.get("industries"):
+            continue
+        url = item.get("url", "")
+        if not url or url in existing_urls:
+            continue
+
+        materials.append({
+            "id": f"mat_{int(time.time()*1000)}_{new_count}",
+            "title": item["title"],
+            "summary": (item.get("intro", "") or "")[:300],
+            "source_url": url,
+            "source_name": item.get("source", ""),
+            "industries": item["industries"],
+            "detected_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "status": "pending",
+        })
+        existing_urls.add(url)
+        new_count += 1
+
+    if new_count:
+        save_materials(materials)
+    return new_count
+
+
+def get_materials_by_industry(industry_name, status="pending"):
+    """获取指定行业的素材"""
+    return [m for m in load_materials()
+            if industry_name in m.get("industries", [])
+            and m.get("status") == status]
+
+
+def get_materials_summary():
+    """返回各行业素材数量统计"""
+    materials = load_materials()
+    summary = {}
+    for m in materials:
+        if m.get("status") == "pending":
+            for ind in m.get("industries", []):
+                summary[ind] = summary.get(ind, 0) + 1
+    return summary
+
+
 # ── 缓存管理 ──
 
 def refresh_news():
@@ -468,12 +536,10 @@ def refresh_news():
     matched = [n for n in unique if n["matched"]]
     print(f"[新闻] 刷新成功: {len(unique)}条 (来自 {success_count}/{len(enabled_sources)} 个源), 相关 {len(matched)}条")
 
-    # 自动检测事件
-    detected = detect_events_from_news(unique)
-    if detected:
-        new_count = save_detected_events(detected)
-        if new_count > 0:
-            print(f"[检测] 发现 {new_count} 个新事件待审核")
+    # 提取新闻素材（替代旧的事件检测）
+    new_materials = extract_news_materials(unique)
+    if new_materials > 0:
+        print(f"[素材] 新增 {new_materials} 条待审核素材")
 
     return unique
 

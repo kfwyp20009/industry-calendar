@@ -36,6 +36,7 @@ def inject_globals():
         now=date.today(),
         recent_updates_global=updates,
         recent_codes_global=recent_codes,
+        news_last_refresh=news._cache.get("timestamp", 0),
     )
 
 
@@ -289,6 +290,10 @@ def dashboard():
     detected_events = news.load_detected_events()
     pending_count = len([e for e in detected_events if e.get("status") == "pending"])
 
+    # 新闻素材数量
+    materials_summary = news.get_materials_summary()
+    materials_total = sum(materials_summary.values())
+
     # 回测统计
     backtest_stats = {"hit": 0, "partial": 0, "miss": 0, "unknown": 0, "past_total": 0}
     for ev in current_month_events:
@@ -350,6 +355,8 @@ def dashboard():
         backtest_stats=backtest_stats,
         past_months_backtest=past_months_backtest,
         recent_updates=recent_updates,
+        materials_summary=materials_summary,
+        materials_total=materials_total,
     )
 
 
@@ -687,6 +694,7 @@ def settings_page():
         active_page="settings",
         sources=sources,
         detected_events=detected_events,
+        materials_summary=news.get_materials_summary(),
         industry_keywords=skills.get_all_keywords(),
         custom_skills=skills.load_custom_skills()[0],
         builtin_skills=builtin_visible,
@@ -694,6 +702,7 @@ def settings_page():
         hidden_builtins=skills.get_hidden_builtins(),
         existing_industry_names=existing_industry_names,
         llm_config=llm.load_config(),
+        industries=all_industries,
     )
 
 
@@ -1677,6 +1686,152 @@ def subscribe_calendar_ics():
             "Cache-Control": "no-cache",
         },
     )
+
+
+# ── 新闻素材池 API ──
+
+@app.route("/api/materials")
+def api_materials():
+    """获取新闻素材列表"""
+    industry = request.args.get("industry")
+    materials = news.load_materials()
+    # 过滤已接受（避免重复展示）
+    if industry:
+        materials = [m for m in materials if industry in m.get("industries", [])
+                     and m.get("status") != "accepted"]
+    else:
+        materials = [m for m in materials if m.get("status") != "accepted"]
+    # 按检测时间倒序
+    materials.sort(key=lambda m: m.get("detected_at", ""), reverse=True)
+    return jsonify({"ok": True, "count": len(materials), "materials": materials})
+
+
+@app.route("/api/materials/summary")
+def api_materials_summary():
+    """各行业待审核素材数量"""
+    return jsonify({"ok": True, "summary": news.get_materials_summary()})
+
+
+@app.route("/api/materials/review", methods=["POST"])
+def api_review_materials():
+    """对指定行业执行 AI 推理审核（支持指定 material_ids 筛选）"""
+    data = request.get_json()
+    industry = data.get("industry")
+    if not industry:
+        return jsonify({"ok": False, "error": "请指定行业"}), 400
+
+    material_ids = data.get("material_ids")  # 可选，指定审核哪些素材
+    materials = news.get_materials_by_industry(industry)
+    if material_ids:
+        id_set = set(material_ids)
+        materials = [m for m in materials if m["id"] in id_set]
+
+    if not materials:
+        return jsonify({"ok": False, "error": f"「{industry}」暂无待审核素材"}), 400
+
+    # 获取现有日历事件
+    _, ind_data = _find_industry_file(industry)
+    existing_events = (ind_data or {}).get("events", [])
+
+    # 调用 LLM 审核
+    provider = data.get("provider") or data.get("provider_key")
+    result = llm.review_materials(industry, materials, existing_events, provider_key=provider)
+    if not result.get("ok"):
+        return jsonify(result)
+
+    # 将建议关联回素材完整信息
+    suggestions = result.get("suggestions", [])
+    mat_map = {m["id"]: m for m in materials}
+    for s in suggestions:
+        mid = s.get("material_id")
+        if mid and mid in mat_map:
+            s["_material"] = mat_map[mid]
+
+    return jsonify({
+        "ok": True,
+        "suggestions": suggestions,
+        "total": result.get("total", 0),
+    })
+
+
+@app.route("/api/materials/accept", methods=["POST"])
+def api_accept_materials():
+    """采纳审核建议，将事件写入行业 YAML"""
+    data = request.get_json()
+    industry = data.get("industry")
+    suggestions = data.get("suggestions", [])
+    if not industry or not suggestions:
+        return jsonify({"ok": False, "error": "参数不足"}), 400
+
+    fpath, ind_data = _find_industry_file(industry)
+    if not fpath:
+        return jsonify({"ok": False, "error": f"未找到行业「{industry}」的数据文件"}), 404
+
+    accepted_ids = []
+    events = ind_data.setdefault("events", [])
+    existing_keys = {(e.get("name", ""), e.get("date", "")) for e in events}
+
+    for s in suggestions:
+        event_data = s.get("event", {})
+        if not event_data.get("name"):
+            continue
+        key = (event_data["name"], event_data.get("date", ""))
+        if key in existing_keys:
+            continue
+
+        # 附加来源追溯
+        mat = s.get("_material", {})
+        event_data["sources"] = [{
+            "url": mat.get("source_url", ""),
+            "title": mat.get("title", ""),
+        }] if mat.get("source_url") else []
+
+        events.append(event_data)
+        existing_keys.add(key)
+        accepted_ids.append(s.get("material_id"))
+
+    if not accepted_ids:
+        return jsonify({"ok": False, "error": "所有建议事件均已存在（重复）"}), 409
+
+    ind_data["updated"] = datetime.now().strftime("%Y-%m-%d")
+    _save_industry_data(fpath, ind_data)
+    sync_data.sync_all()
+
+    # 标记素材为已采纳
+    materials = news.load_materials()
+    updated = 0
+    for m in materials:
+        if m.get("id") in accepted_ids:
+            m["status"] = "accepted"
+            updated += 1
+    if updated:
+        news.save_materials(materials)
+
+    return jsonify({
+        "ok": True,
+        "accepted": len(accepted_ids),
+        "events_written": [{"name": s["event"]["name"]} for s in suggestions if s.get("material_id") in accepted_ids],
+    })
+
+
+@app.route("/api/materials/skip", methods=["POST"])
+def api_skip_materials():
+    """跳过（忽略）指定素材"""
+    data = request.get_json()
+    material_ids = data.get("material_ids", [])
+    if not material_ids:
+        return jsonify({"ok": False, "error": "请指定素材"}), 400
+
+    materials = news.load_materials()
+    updated = 0
+    for m in materials:
+        if m.get("id") in material_ids and m.get("status") == "pending":
+            m["status"] = "skipped"
+            updated += 1
+    if updated:
+        news.save_materials(materials)
+
+    return jsonify({"ok": True, "skipped": updated})
 
 
 if __name__ == "__main__":
