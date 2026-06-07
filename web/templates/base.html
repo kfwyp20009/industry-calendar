@@ -709,9 +709,9 @@
                     <div class="card-body">
                         <p class="text-muted small mb-2">下载后发送到手机，打开即可导入日历。</p>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="/export/calendar.ics" class="btn btn-outline-primary btn-sm" download>
+                            <button class="btn btn-outline-primary btn-sm" onclick="downloadAllIcs()">
                                 <i class="fas fa-file-export me-1"></i>导出全部行业
-                            </a>
+                            </button>
                             <div class="input-group input-group-sm" style="max-width:220px;">
                                 <select class="form-select" id="exportIndustrySelect">
                                     <option value="">— 选择单个行业 —</option>
@@ -719,7 +719,7 @@
                                     <option value="{{ code }}">{{ ind.industry }}</option>
                                     {% endfor %}
                                 </select>
-                                <button class="btn btn-outline-secondary" onclick="exportSingleIndustry()">
+                                <button class="btn btn-outline-secondary" onclick="downloadSingleIcs()">
                                     <i class="fas fa-download"></i>
                                 </button>
                             </div>
@@ -932,19 +932,23 @@ function openQuickAddModalFromManage() {
 
 // ── 导出日历 ──
 function openExportModal() {
-    // 刷新订阅地址（考虑当前域名）
     const urlInput = document.getElementById('subscribeUrl');
     if (urlInput) {
-        const currentUrl = window.location.origin;
-        urlInput.value = currentUrl + '/export/subscribe.ics';
+        urlInput.value = window.location.origin + '/export/subscribe.ics';
     }
     new bootstrap.Modal(document.getElementById('exportModal')).show();
 }
 
-function exportSingleIndustry() {
+function downloadAllIcs() {
+    showToast('⏳ 正在生成日历文件...', 'info');
+    window.location.href = '/export/calendar.ics';
+}
+
+function downloadSingleIcs() {
     const code = document.getElementById('exportIndustrySelect').value;
     if (!code) { showToast('请先选择一个行业', 'warning'); return; }
-    window.open('/export/calendar.ics?industry=' + code, '_blank');
+    showToast('⏳ 正在生成日历文件...', 'info');
+    window.location.href = '/export/calendar.ics?industry=' + code;
 }
 
 function copySubscribeUrl() {
