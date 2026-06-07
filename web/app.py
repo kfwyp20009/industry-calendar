@@ -21,6 +21,24 @@ import sync_data
 
 app = Flask(__name__)
 
+
+@app.context_processor
+def inject_globals():
+    """全局模板变量：最近更新的行业列表"""
+    try:
+        inds = load_all_industries()
+        updates = get_recent_updates(inds, since_days=7)
+        recent_codes = {u["code"] for u in updates}
+    except Exception:
+        updates = []
+        recent_codes = set()
+    return dict(
+        now=date.today(),
+        recent_updates_global=updates,
+        recent_codes_global=recent_codes,
+    )
+
+
 # ── 路径 ──
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data", "industries")
@@ -55,10 +73,44 @@ def load_all_industries():
                     ev_date = ev.get("date", "")
                     ev["is_current_month"] = ev_date.startswith(month_str) if ev_date else False
                 industries[code] = data
-        # 为所有行业事件添加回测上下文
-        enrich_events_with_backtest(
-            [ev for ind in industries.values() for ev in ind.get("events", [])]
-        )
+    # 为所有事件添加回测上下文（过期判断、回测标签）
+    all_events = [ev for ind in industries.values() for ev in ind.get("events", [])]
+    enrich_events_with_backtest(all_events)
+    return industries
+
+
+def get_recent_updates(industries, since_days=7):
+    """对比行业 updated 字段，找出最近有更新的行业"""
+    today = date.today()
+    from datetime import timedelta as _td
+    cutoff = today - _td(days=since_days)
+    recent = []
+    for code, ind in industries.items():
+        updated_str = ind.get("updated", "")
+        if not updated_str:
+            continue
+        try:
+            updated_date = datetime.strptime(updated_str[:10], "%Y-%m-%d").date()
+        except (ValueError, IndexError):
+            continue
+        if updated_date >= cutoff:
+            upcoming = [ev for ev in ind.get("events", [])
+                       if ev.get("date", "") >= today.strftime("%Y-%m-%d")]
+            recent.append({
+                "code": code,
+                "industry": ind.get("industry", code),
+                "updated": updated_str[:10],
+                "event_count": len(ind.get("events", [])),
+                "upcoming_count": len(upcoming),
+            })
+    recent.sort(key=lambda x: x["updated"], reverse=True)
+    return recent
+
+
+    # 为所有行业事件添加回测上下文
+    enrich_events_with_backtest(
+        [ev for ind in industries.values() for ev in ind.get("events", [])]
+    )
     return industries
 
 
@@ -273,6 +325,8 @@ def dashboard():
                 "stats": month_stats,
             })
 
+    recent_updates = get_recent_updates(industries, since_days=7)
+
     return render_template(
         "dashboard.html",
         now=now,
@@ -289,6 +343,7 @@ def dashboard():
         get_action_color=get_action_color,
         backtest_stats=backtest_stats,
         past_months_backtest=past_months_backtest,
+        recent_updates=recent_updates,
     )
 
 

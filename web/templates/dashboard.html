@@ -46,6 +46,33 @@
 </div>
 {% endif %}
 
+<!-- 最近更新 -->
+{% if recent_updates %}
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="card border-primary border-opacity-25">
+            <div class="card-header text-primary bg-primary bg-opacity-10">
+                <i class="fas fa-sparkles me-1"></i> 最近更新
+                <small class="text-muted ms-2">近7天有更新的行业</small>
+            </div>
+            <div class="card-body py-2">
+                <div class="d-flex flex-wrap gap-2">
+                    {% for item in recent_updates[:6] %}
+                    <a href="/industry/{{ item.code }}" class="btn btn-outline-primary btn-sm position-relative">
+                        {{ item.industry }}
+                        <span class="badge bg-danger ms-1" style="font-size:0.6rem;">{{ item.upcoming_count }}件</span>
+                    </a>
+                    {% endfor %}
+                    {% if recent_updates|length > 6 %}
+                    <span class="text-muted align-self-center" style="font-size:0.8rem;">+{{ recent_updates|length - 6 }} 个</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- 实时新闻 -->
 <div class="row g-3 mb-4">
     <div class="col-12">
@@ -606,6 +633,29 @@ function refreshETFQuotes() {
 
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(loadETFQuotes, 300);
+
+    // ── 上次访问标记（localStorage） ──
+    const LAST_VISIT_KEY = 'industry_calendar_last_visit';
+    const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
+    const now = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    if (lastVisit) {
+        // 计算间隔天数
+        const lastDate = new Date(lastVisit);
+        const todayDate = new Date(now);
+        const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+        {% if recent_updates %}
+        if (diffDays >= 3 && {{ recent_updates|length }} > 0) {
+            showToast('📋 您离开的 ' + diffDays + ' 天里，有 {{ recent_updates|length }} 个行业更新了事件日历', 'info');
+        }
+        {% endif %}
+    } else {
+        // 首次访问
+        {% if recent_updates %}
+        showToast('👋 欢迎！系统已覆盖 {{ industries|length }} 个行业，共 {{ recent_updates|length }} 个行业近期有事件更新', 'info');
+        {% endif %}
+    }
+    localStorage.setItem(LAST_VISIT_KEY, now);
 });
 </script>
 

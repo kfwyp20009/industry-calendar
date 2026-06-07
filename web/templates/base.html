@@ -541,6 +541,9 @@
                     <a class="nav-item {% if active_page == 'industry' and industry_code == code %}active{% endif %} collapse-indent"
                        href="/industry/{{ code }}">
                         <i class="fas fa-folder-open"></i> {{ ind.industry }}
+                        {% if code in recent_codes_global %}
+                        <span class="badge bg-danger" style="font-size:0.5rem;padding:0.1rem 0.3rem;margin-left:0.3rem;">新</span>
+                        {% endif %}
                     </a>
                     <span class="sidebar-unfollow" onclick="toggleFollow('{{ ind.industry }}', event)" title="取消关注">×</span>
                 </div>
