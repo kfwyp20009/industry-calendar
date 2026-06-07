@@ -4,10 +4,11 @@ import os
 import sys
 import calendar as _cal
 from collections import defaultdict
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 import yaml
-from flask import Flask, render_template, abort, jsonify, request
+from icalendar import Calendar, Event as ICalEvent, Alarm
+from flask import Flask, render_template, abort, jsonify, request, Response
 import news
 import skills
 import llm
@@ -1443,6 +1444,199 @@ def api_set_default_provider():
         return jsonify({"ok": False, "error": "厂商不能为空"}), 400
     ok, msg = llm.set_default_provider(provider_key)
     return jsonify({"ok": ok, "error": msg if not ok else None})
+
+
+# ── ICS 日历导出 ──
+
+
+@app.route("/export/calendar.ics")
+def export_calendar_ics():
+    """导出行业事件为 ICS 日历文件（iPhone 订阅 / 导入）"""
+    industries = load_all_industries()
+    industry_filter = request.args.get("industry", "").strip()
+
+    cal = Calendar()
+    cal.add("prodid", "-//行业投资日历//hermes-industry-calendar//CN")
+    cal.add("version", "2.0")
+    cal.add("calscale", "GREGORIAN")
+    cal.add("method", "PUBLISH")
+    cal.add("x-wr-calname", "行业投资日历")
+    cal.add("x-wr-timezone", "Asia/Shanghai")
+
+    importance_labels = {5: "★★★★★", 4: "★★★★", 3: "★★★", 2: "★★", 1: "★"}
+    type_colors = {"政策": "#e74c3c", "技术": "#3498db", "产品": "#2ecc71", "会议": "#f39c12"}
+
+    now = datetime.now()
+
+    for code, ind in industries.items():
+        if industry_filter and code != industry_filter:
+            continue
+        industry_name = ind.get("industry", code)
+        for ev in ind.get("events", []):
+            ev_date_str = ev.get("date", "").strip()
+            if not ev_date_str:
+                continue
+            try:
+                dt = datetime.strptime(ev_date_str[:10], "%Y-%m-%d")
+            except (ValueError, IndexError):
+                continue
+
+            title = ev.get("title", "")
+            importance = ev.get("importance", 1)
+            ev_type = ev.get("type", "")
+            category = ev.get("category", "")
+            ev_desc = ev.get("description", "")
+
+            # 构建日程标题
+            stars = importance_labels.get(importance, "")
+            summary = f"[{industry_name}] {title} {stars}".strip()
+
+            # 构建描述
+            desc_parts = [
+                f"行业：{industry_name}",
+                f"类型：{ev_type}",
+                f"重要性：{'★' * importance}{'☆' * (5 - importance)}",
+            ]
+            if category:
+                desc_parts.append(f"阶段：{category}")
+            if ev_desc:
+                desc_parts.append("")
+                desc_parts.append(ev_desc)
+
+            # 从 core_stocks 提取相关标的
+            stocks = ind.get("core_stocks", [])
+            if stocks:
+                desc_parts.append("")
+                desc_parts.append("相关标的：")
+                for s in stocks[:6]:
+                    name = s.get("name", "")
+                    reason = s.get("reason", "")
+                    desc_parts.append(f"  {name}（{s.get('code', '')}）- {reason}" if reason else f"  {name}（{s.get('code', '')}）")
+
+            description = "\n".join(desc_parts)
+
+            uid = f"{code}-{ev_date_str[:10]}-{hash(title) & 0xffffffff:08x}@industry-calendar"
+
+            ical_event = ICalEvent()
+            ical_event.add("uid", uid)
+            ical_event.add("dtstart", dt.date())
+            ical_event.add("dtend", dt.date())
+            ical_event.add("dtstamp", now)
+            ical_event.add("summary", summary)
+            ical_event.add("description", description)
+
+            # 颜色按事件类型
+            color = type_colors.get(ev_type, "#95a5a6")
+            ical_event.add("color", color)
+            ical_event.add("categories", [industry_name, ev_type, category] if category else [industry_name, ev_type])
+
+            # 3 星以上加提醒
+            if importance >= 3:
+                alarm = Alarm()
+                alarm.add("action", "DISPLAY")
+                alarm.add("description", f"提醒：{summary}")
+                alarm.add("trigger", timedelta(days=1) if importance >= 4 else timedelta(hours=3))
+                ical_event.add_component(alarm)
+
+            cal.add_component(ical_event)
+
+    ics_content = cal.to_ical()
+
+    return Response(
+        ics_content,
+        mimetype="text/calendar; charset=utf-8",
+        headers={
+            "Content-Disposition": "attachment; filename=industry-calendar.ics",
+            "Cache-Control": "no-cache",
+        },
+    )
+
+
+@app.route("/export/subscribe.ics")
+def subscribe_calendar_ics():
+    """用途同上，专为 iPhone 订阅日历优化（不强制下载）"""
+    industries = load_all_industries()
+    industry_filter = request.args.get("industry", "").strip()
+
+    cal = Calendar()
+    cal.add("prodid", "-//行业投资日历//hermes-industry-calendar//CN")
+    cal.add("version", "2.0")
+    cal.add("calscale", "GREGORIAN")
+    cal.add("method", "PUBLISH")
+    cal.add("x-wr-calname", "行业投资日历")
+    cal.add("x-wr-timezone", "Asia/Shanghai")
+    cal.add("refresh-interval", timedelta(days=1))  # 订阅日历每天自动刷新
+    cal.add("x-published-ttl", timedelta(days=1))
+
+    importance_labels = {5: "★★★★★", 4: "★★★★", 3: "★★★", 2: "★★", 1: "★"}
+    type_colors = {"政策": "#e74c3c", "技术": "#3498db", "产品": "#2ecc71", "会议": "#f39c12"}
+    now = datetime.now()
+
+    for code, ind in industries.items():
+        if industry_filter and code != industry_filter:
+            continue
+        industry_name = ind.get("industry", code)
+        for ev in ind.get("events", []):
+            ev_date_str = ev.get("date", "").strip()
+            if not ev_date_str:
+                continue
+            try:
+                dt = datetime.strptime(ev_date_str[:10], "%Y-%m-%d")
+            except (ValueError, IndexError):
+                continue
+
+            title = ev.get("title", "")
+            importance = ev.get("importance", 1)
+            ev_type = ev.get("type", "")
+            category = ev.get("category", "")
+            ev_desc = ev.get("description", "")
+            stars = importance_labels.get(importance, "")
+            summary = f"[{industry_name}] {title} {stars}".strip()
+
+            desc_parts = [
+                f"行业：{industry_name}",
+                f"类型：{ev_type}",
+                f"重要性：{'★' * importance}{'☆' * (5 - importance)}",
+            ]
+            if category:
+                desc_parts.append(f"阶段：{category}")
+            if ev_desc:
+                desc_parts.append("")
+                desc_parts.append(ev_desc)
+
+            description = "\n".join(desc_parts)
+            uid = f"{code}-{ev_date_str[:10]}-{hash(title) & 0xffffffff:08x}@industry-calendar"
+
+            ical_event = ICalEvent()
+            ical_event.add("uid", uid)
+            ical_event.add("dtstart", dt.date())
+            ical_event.add("dtend", dt.date())
+            ical_event.add("dtstamp", now)
+            ical_event.add("summary", summary)
+            ical_event.add("description", description)
+            color = type_colors.get(ev_type, "#95a5a6")
+            ical_event.add("color", color)
+            ical_event.add("categories", [industry_name, ev_type, category] if category else [industry_name, ev_type])
+
+            if importance >= 3:
+                alarm = Alarm()
+                alarm.add("action", "DISPLAY")
+                alarm.add("description", f"提醒：{summary}")
+                alarm.add("trigger", timedelta(days=1) if importance >= 4 else timedelta(hours=3))
+                ical_event.add_component(alarm)
+
+            cal.add_component(ical_event)
+
+    ics_content = cal.to_ical()
+
+    return Response(
+        ics_content,
+        mimetype="text/calendar; charset=utf-8",
+        headers={
+            "Content-Type": "text/calendar; charset=utf-8",
+            "Cache-Control": "no-cache",
+        },
+    )
 
 
 if __name__ == "__main__":
