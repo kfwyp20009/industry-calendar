@@ -566,8 +566,11 @@
             <a class="nav-item {% if active_page == 'settings' %}active{% endif %}" href="/settings">
                 <i class="fas fa-cog"></i> 设置
             </a>
-            <a class="nav-item" href="#" onclick="openExportModal(); return false;">
+            <a class="nav-item" href="/export/calendar.ics" title="下载 ICS 文件导入日历，点此直接下载">
                 <i class="fas fa-upload"></i> 导出日历
+            </a>
+            <a class="nav-item" href="#" onclick="openExportModal(); return false;" style="font-size:0.75rem;padding-top:0.2rem;padding-bottom:0.2rem;" title="订阅地址、单行业导出">
+                <i class="fas fa-info-circle" style="font-size:0.65rem;"></i> 订阅方式
             </a>
         </div>
         <div class="sidebar-footer">
