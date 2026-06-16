@@ -37,7 +37,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/wm/2026-06-06/doc-iniamxrt0827067.shtml
   source_title: 000488，被警示！氢能重磅大会召开在即，低PE+高股息的概念股是这几只
   confidence: 0.85
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 13:28
 - date: '2026-06-06'
   name: 吴清：中小机构不要拼规模要拼特色，走出特色化、精品化路线
@@ -47,7 +47,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/stock/marketresearch/2026-06-06/doc-iniancxs7513903.shtml
   source_title: 吴清：中小机构不要拼规模要拼特色，走出特色化、精品化路线
   confidence: 0.85
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 16:35
 - date: '2026-06-05'
   name: 去年60亿收购被否，华峰化学重启关联交易，尤氏家族两块资产再闯股东大会 | 长三角资本局
@@ -57,7 +57,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/stock/csjzbj/2026-06-06/doc-inianqpn7311487.shtml
   source_title: 去年60亿收购被否，华峰化学重启关联交易，尤氏家族两块资产再闯股东大会 | 长三角资本局
   confidence: 0.8
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 19:49
 - date: '2026-06-04'
   name: 线缆材料公司追逐算力风口，杭州高新服务器项目仍待落地 | 长三角资本局
@@ -67,7 +67,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/stock/csjzbj/2026-06-06/doc-inianqpn7310862.shtml
   source_title: 线缆材料公司追逐算力风口，杭州高新服务器项目仍待落地 | 长三角资本局
   confidence: 0.7
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 19:49
 - date: '2026-06-06'
   name: 特锐德发布算力中心高压交直流预制舱供电站“算电岛”
@@ -78,7 +78,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/china/gncj/2026-06-06/doc-iniankfm8624654.shtml
   source_title: 特锐德发布算力中心高压交直流预制舱供电站“算电岛”
   confidence: 0.85
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 19:49
 - date: '2026-06-06'
   name: 知情人士：美国政府考虑入股人工智能企业
@@ -88,7 +88,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/jjxw/2026-06-06/doc-iniankfp0649997.shtml
   source_title: 知情人士：美国政府考虑入股人工智能企业
   confidence: 0.7
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 19:49
 - date: '2026-06-06'
   name: 间氨基苯酚商品报价动态（2026-06-06）
@@ -98,7 +98,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/money/future/nyzx/2026-06-06/doc-iniankfp0655738.shtml
   source_title: 间氨基苯酚商品报价动态（2026-06-06）
   confidence: 0.7
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 21:52
 - date: '2026-06-06'
   name: 一甲氨基甲酰氯商品报价动态（2026-06-06）
@@ -108,7 +108,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/money/future/nyzx/2026-06-06/doc-iniankfp0655542.shtml
   source_title: 一甲氨基甲酰氯商品报价动态（2026-06-06）
   confidence: 0.7
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 21:52
 - date: '2026-06-06'
   name: 二甲氨基甲酰氯商品报价动态（2026-06-06）
@@ -118,7 +118,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/money/future/nyzx/2026-06-06/doc-iniankfp0654511.shtml
   source_title: 二甲氨基甲酰氯商品报价动态（2026-06-06）
   confidence: 0.7
-  status: pending
+  status: rejected
   detected_at: 2026-06-06 21:52
 - date: '2026-06-05'
   name: 华安证券：短期AI算力方向内部切换 中期仍有上涨空间
@@ -128,7 +128,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/stock/2026-06-07/doc-iniaqhwq9705462.shtml
   source_title: 华安证券：短期AI算力方向内部切换 中期仍有上涨空间
   confidence: 0.8
-  status: pending
+  status: rejected
   detected_at: 2026-06-07 14:54
 - date: '2026-06-07'
   name: 京东与腾讯就AI Agent将达成重要合作
@@ -138,7 +138,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/tob/2026-06-07/doc-iniaqtnk9511200.shtml
   source_title: 京东与腾讯就AI Agent将达成重要合作
   confidence: 0.75
-  status: pending
+  status: rejected
   detected_at: 2026-06-07 18:46
 - date: '2026-06-05'
   name: 一篇推文带火机器人龙头，“白毛股神”Serenity究竟是谁？
@@ -149,7 +149,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/jjxw/2026-06-07/doc-iniaqtns4624401.shtml
   source_title: 一篇推文带火机器人龙头，“白毛股神”Serenity究竟是谁？
   confidence: 0.8
-  status: pending
+  status: rejected
   detected_at: 2026-06-07 18:46
 - date: '2026-06-09'
   name: 300831，将被ST！明日停牌
@@ -159,7 +159,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/stock/s/2026-06-07/doc-iniaqtns4623887.shtml
   source_title: 300831，将被ST！明日停牌
   confidence: 0.85
-  status: pending
+  status: rejected
   detected_at: 2026-06-07 18:46
 - date: '2026-06-05'
   name: 吴清，周末发声！国常会，重磅部署！算力，大利好！重大资产重组，终止！影响一周市场的十大消息
@@ -169,7 +169,7 @@ detected_events:
   source_url: https://finance.sina.com.cn/wm/2026-06-07/doc-iniaqpes7965209.shtml
   source_title: 吴清，周末发声！国常会，重磅部署！算力，大利好！重大资产重组，终止！影响一周市场的十大消息
   confidence: 0.85
-  status: pending
+  status: rejected
   detected_at: 2026-06-07 18:46
 - date: '2026-06-07'
   name: 领益智造通过港交所上市聆讯
@@ -179,5 +179,5 @@ detected_events:
   source_url: https://finance.sina.com.cn/stock/relnews/cn/2026-06-07/doc-iniaqtnk9511919.shtml
   source_title: 领益智造通过港交所上市聆讯
   confidence: 0.7
-  status: pending
+  status: rejected
   detected_at: 2026-06-07 20:47

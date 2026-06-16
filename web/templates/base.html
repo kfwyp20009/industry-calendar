@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>行业投资日历 {% block title %}{% endblock %}</title>
-    <script>document.documentElement.setAttribute('data-theme','light');</script>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');</script>
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            /* ── 常规模式（Light） ── */
+            /* ── 浅色模式（Light） ── */
             --bg-body: #f5f6fa;
             --bg-card: #ffffff;
             --bg-secondary: #f0f2f5;
@@ -39,6 +39,45 @@
             --bs-warning: #f59e0b;
             --bs-warning-rgb: 245, 158, 11;
         }
+
+        /* ── 暗色模式（Dark） ── */
+        [data-theme="dark"] {
+            --bg-body: #111827;
+            --bg-card: #1f2937;
+            --bg-secondary: #374151;
+            --text-primary: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #374151;
+            --sidebar-gradient: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --sidebar-text: rgba(255,255,255,0.55);
+            --sidebar-text-hover: #fff;
+            --sidebar-hover-bg: rgba(255,255,255,0.1);
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-hover: 0 4px 16px rgba(0,0,0,0.4);
+            --table-stripe: rgba(255,255,255,0.03);
+            --color-primary: #3b82f6;
+            --color-accent: #8b5cf6;
+            --color-success: #22c55e;
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+            --bs-primary: #3b82f6;
+            --bs-primary-rgb: 59, 130, 246;
+            --bs-success: #22c55e;
+            --bs-success-rgb: 34, 197, 94;
+            --bs-danger: #ef4444;
+            --bs-danger-rgb: 239, 68, 68;
+            --bs-warning: #f59e0b;
+            --bs-warning-rgb: 245, 158, 11;
+        }
+        [data-theme="dark"] .table { --bs-table-bg: var(--bg-card); --bs-table-color: var(--text-primary); }
+        [data-theme="dark"] .table-light { --bs-table-bg: var(--bg-secondary); --bs-table-color: var(--text-primary); }
+        [data-theme="dark"] .alert-info { background: rgba(59,130,246,0.15); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+        [data-theme="dark"] .alert-warning { background: rgba(245,158,11,0.15); color: #fcd34d; border-color: rgba(245,158,11,0.3); }
+        [data-theme="dark"] .btn-close { filter: invert(1); }
+        [data-theme="dark"] .mobile-header { background: #0f172a; }
+        [data-theme="dark"] .page-link { background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary); }
+        [data-theme="dark"] .page-item.disabled .page-link { background: var(--bg-secondary); color: var(--text-muted); }
+
         body {
             font-size: 14px;
             background: var(--bg-body);
@@ -578,6 +617,10 @@
         </div>
         <div class="sidebar-footer">
             <span style="font-size:0.65rem;opacity:0.4;">v1.0</span>
+            <button onclick="toggleTheme()" title="切换暗色/浅色模式" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1rem;padding:0.1rem 0.4rem;border-radius:4px;transition:color 0.2s;"
+                    onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
         </div>
     </nav>
 
@@ -776,7 +819,15 @@
 </div>
 
 <script>
-<script>
+// ── 初始化暗色模式图标 ──
+(function() {
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        const theme = localStorage.getItem('theme') || 'light';
+        icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+})();
+
 // ── 移动端侧边栏 ──
 function toggleMobileSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -829,6 +880,17 @@ function toggleIndustries() {
         document.getElementById('industryToggle').classList.add('collapsed');
     }
 })();
+
+// ── 暗色模式切换 ──
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
 
 // ── 通用操作包装：显示 Toast 后刷新 ──
 function doAction(url, data, successMsg) {

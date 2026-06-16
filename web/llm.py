@@ -5,9 +5,11 @@ import json
 import re
 import time
 import hashlib
+import http.client
 from datetime import datetime, timedelta
 from urllib.request import Request, urlopen
 from urllib.error import URLError
+from urllib.parse import urlparse
 
 import yaml
 
@@ -144,13 +146,43 @@ def remove_custom_provider(key):
     return True, "删除成功"
 
 
+# Provider key → 环境变量名映射
+ENV_KEY_MAP = {
+    "deepseek": "DEEPSEEK_API_KEY",
+    "openai": "OPENAI_API_KEY",
+    "anthropic": "ANTHROPIC_API_KEY",
+    "google": "GOOGLE_API_KEY",
+    "siliconflow": "SILICONFLOW_API_KEY",
+    "zhipu": "ZHIPU_API_KEY",
+    "groq": "GROQ_API_KEY",
+    "openrouter": "OPENROUTER_API_KEY",
+}
+
+
+def _apply_env_overrides(config):
+    """用环境变量覆盖配置中的 API Key（环境变量优先级最高）"""
+    providers = config.get("providers", {})
+    for key, env_name in ENV_KEY_MAP.items():
+        env_val = os.environ.get(env_name, "").strip()
+        if env_val and key in providers:
+            providers[key]["api_key"] = env_val
+    # 自定义厂商：按命名约定 KEY_<大写标识>
+    custom = config.get("custom_providers", {})
+    for key in custom:
+        env_name = f"KEY_{key.upper()}"
+        env_val = os.environ.get(env_name, "").strip()
+        if env_val:
+            custom[key]["api_key"] = env_val
+    return config
+
+
 def load_config():
-    """加载 LLM 配置"""
+    """加载 LLM 配置（环境变量中的 API Key 会覆盖配置文件）"""
     if not os.path.exists(CONFIG_FILE):
-        return _default_config()
+        return _apply_env_overrides(_default_config())
     with open(CONFIG_FILE, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
-    return data
+    return _apply_env_overrides(data)
 
 
 def _default_config():
@@ -311,6 +343,8 @@ def _get_provider_cfg(config, provider_key):
 def call_llm(prompt, provider_key="deepseek", model=None, temperature=0.7, max_tokens=4096):
     """调用 LLM 生成文本（支持内置+自定义厂商）"""
     config = load_config()
+    if not provider_key:
+        provider_key = config.get("default_provider", "deepseek")
     provider_cfg = _get_provider_cfg(config, provider_key)
     if not provider_cfg:
         return {"ok": False, "error": f"未找到厂商 {provider_key}"}
@@ -403,6 +437,80 @@ def _call_ollama(base_url, model, prompt, temperature, max_tokens):
     with urlopen(req, timeout=300) as resp:
         result = json.loads(resp.read())
     return {"ok": True, "content": result.get("response", "")}
+
+
+# ── 流式调用 ──
+
+
+def _stream_openai_compat(url, api_key, model, prompt, temperature, max_tokens):
+    """流式调用 OpenAI 兼容 API，逐个 yield 文本块"""
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+    body = json.dumps({
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "stream": True,
+    }).encode()
+
+    parsed = urlparse(url)
+    conn = http.client.HTTPSConnection(parsed.hostname, parsed.port or 443, timeout=120)
+    try:
+        conn.request("POST", parsed.path, body=body, headers=headers)
+        resp = conn.getresponse()
+        while True:
+            line = resp.readline()
+            if not line:
+                break
+            line = line.decode("utf-8", errors="ignore").strip()
+            if not line or line.startswith(":"):
+                continue
+            if line == "data: [DONE]":
+                break
+            if line.startswith("data: "):
+                try:
+                    chunk = json.loads(line[6:])
+                    delta = chunk.get("choices", [{}])[0].get("delta", {})
+                    text = delta.get("content", "")
+                    if text:
+                        yield text
+                except (json.JSONDecodeError, IndexError, KeyError):
+                    continue
+    finally:
+        conn.close()
+
+
+def call_llm_stream(prompt, provider_key="deepseek", model=None, temperature=0.3, max_tokens=4096):
+    """流式调用 LLM，返回 Generator。仅支持 OpenAI 兼容厂商。"""
+    config = load_config()
+    if not provider_key:
+        provider_key = config.get("default_provider", "deepseek")
+    provider_cfg = _get_provider_cfg(config, provider_key)
+    if not provider_cfg:
+        yield {"ok": False, "error": f"未找到厂商 {provider_key}"}
+        return
+    if not provider_cfg.get("api_key") and provider_key != "ollama":
+        yield {"ok": False, "error": f"{provider_key} 未配置 API Key"}
+        return
+
+    provider_info = BUILTIN_PROVIDERS.get(provider_key, {})
+    base_url = provider_cfg.get("base_url", provider_info.get("base_url", ""))
+    model_name = model or provider_cfg.get("model", provider_info.get("default_model", ""))
+    api_key = provider_cfg.get("api_key", "")
+
+    # OpenAI 兼容格式
+    url = base_url.rstrip("/") + "/chat/completions"
+    if "/chat/completions" in base_url:
+        url = base_url
+
+    try:
+        for text in _stream_openai_compat(url, api_key, model_name, prompt, temperature, max_tokens):
+            yield {"ok": True, "delta": text}
+    except Exception as e:
+        yield {"ok": False, "error": str(e)}
 
 
 # ── 分析报告 Prompt 模板 ──
@@ -660,6 +768,10 @@ def review_materials(industry_name, materials, existing_events, provider_key=Non
     """审核新闻素材，返回结构化建议"""
     if not materials:
         return {"ok": True, "suggestions": [], "total": 0}
+
+    if provider_key is None:
+        config = load_config()
+        provider_key = config.get("default_provider", "deepseek")
 
     # 格式化现有日历
     if existing_events:

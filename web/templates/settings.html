@@ -191,9 +191,20 @@
     {# ── 新闻素材推理 ── #}
     <div class="tab-pane fade" id="materials">
         <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <span><i class="fas fa-brain me-1"></i> 新闻素材推理审核</span>
-                <span class="text-muted" style="font-size:0.8rem;">勾选素材 → AI 判断哪些值得纳入行业日历</span>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-danger" onclick="reviewAllIndustries()" id="reviewAllBtn"
+                            title="逐行业推理所有待审核素材">
+                        <i class="fas fa-bolt me-1"></i>推理全部行业
+                    </button>
+                    <select class="form-select form-select-sm" id="materialsProvider" style="width:auto;font-size:0.8rem;">
+                        {% for pkey, _ in enabled_providers %}
+                        <option value="{{ pkey }}" {{ 'selected' if pkey == default_provider else '' }}>{{ provider_names.get(pkey, pkey) }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="text-muted" style="font-size:0.8rem;">勾选素材 → AI 判断哪些值得纳入行业日历</span>
+                </div>
             </div>
             <div class="card-body">
                 {% if materials_summary %}
@@ -254,7 +265,14 @@
 
                 <div id="reviewLoading" style="display:none;" class="text-center py-4">
                     <i class="fas fa-spinner fa-spin me-2" style="font-size:1.5rem;"></i>
-                    <p class="text-muted mt-2">AI 正在分析 {{ selectedCount }} 条素材，请稍候...</p>
+                    <p class="text-muted mt-2">AI 正在分析素材，请稍候...</p>
+                </div>
+
+                <!-- 批量推理进度 -->
+                <div id="batchReviewProgress" style="display:none;">
+                    <hr>
+                    <h6 class="mb-2"><i class="fas fa-tasks me-1"></i>全行业推理进度</h6>
+                    <div id="batchReviewProgressBody"></div>
                 </div>
             </div>
         </div>
@@ -1013,7 +1031,9 @@ document.getElementById('acceptEventForm').addEventListener('submit', function(e
 
 document.querySelectorAll('.reject-event').forEach(btn => {
     btn.addEventListener('click', function() {
-        doActionAndReload('/api/events/reject', {idx: parseInt(this.dataset.idx)}, '✓ 已忽略');
+        const row = this.closest('tr');
+        if (row) row.style.display = 'none';
+        doAction('/api/events/reject', {idx: parseInt(this.dataset.idx)}, '✓ 已忽略');
     });
 });
 
@@ -1398,6 +1418,9 @@ document.getElementById('addCustomProviderForm').addEventListener('submit', func
 let _currentSuggestions = [];
 let _currentIndustry = '';
 let _materialCache = {};
+// 跨行业推理结果 { industry: [suggestions] }
+let _allIndustryResults = {};
+let _isMultiIndustryMode = false;
 
 function toggleMaterials(industry) {
     const key = industry.replace(/\//g, '_');
@@ -1482,10 +1505,11 @@ function reviewSelected(industry) {
     const btn = document.getElementById('reviewBtn-' + key);
     if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> 分析中'; }
 
+    var provider = (document.getElementById('materialsProvider') || {}).value || '';
     fetch('/api/materials/review', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({industry: industry, material_ids: ids})
+        body: JSON.stringify({industry: industry, material_ids: ids, provider_key: provider})
     }).then(r => r.json()).then(data => {
         document.getElementById('reviewLoading').style.display = 'none';
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-robot me-1"></i>AI 推理 <span class="selected-count">(0)</span>'; }
@@ -1502,6 +1526,276 @@ function reviewSelected(industry) {
     });
 }
 
+// ── 推理全部行业 ──
+function reviewAllIndustries() {
+    const groups = document.querySelectorAll('.industry-material-group');
+    const industries = [];
+    groups.forEach(g => {
+        const name = g.dataset.industry;
+        const badgeText = g.querySelector('.badge')?.textContent || '';
+        const count = parseInt(badgeText) || 0;
+        if (count > 0) industries.push(name);
+    });
+    if (industries.length === 0) {
+        showToast('所有行业暂无待审核素材', 'info');
+        return;
+    }
+
+    _isMultiIndustryMode = true;
+    _allIndustryResults = {};
+    const provider = (document.getElementById('materialsProvider') || {}).value || '';
+    const reviewAllBtn = document.getElementById('reviewAllBtn');
+    reviewAllBtn.disabled = true;
+    reviewAllBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>推理中';
+
+    // 显示进度
+    const progressContainer = document.getElementById('batchReviewProgress');
+    const progressBody = document.getElementById('batchReviewProgressBody');
+    progressContainer.style.display = '';
+    progressBody.innerHTML = '';
+    document.getElementById('reviewResult').style.display = 'none';
+
+    let idx = 0;
+    let totalSuggestions = 0;
+
+    function fetchMaterialsAndReview(ind) {
+        return fetch('/api/materials?industry=' + encodeURIComponent(ind))
+            .then(r => r.json())
+            .then(data => {
+                if (!data.ok || !data.materials || data.materials.length === 0) return [];
+                return data.materials.map(m => m.id).filter(Boolean);
+            });
+    }
+
+    function reviewNext() {
+        if (idx >= industries.length) {
+            reviewAllBtn.disabled = false;
+            reviewAllBtn.innerHTML = '<i class="fas fa-bolt me-1"></i>推理全部行业';
+            showToast('✓ 全行业推理完成，共 ' + totalSuggestions + ' 条建议', totalSuggestions > 0 ? 'success' : 'info');
+            renderAllResults();
+            return;
+        }
+
+        const ind = industries[idx];
+        progressBody.innerHTML += '<div class="mb-1 small" id="bri-' + idx + '">'
+            + '<span class="text-muted">' + ind + '</span> '
+            + '<span class="text-muted" id="bri-status-' + idx + '">获取素材...</span>'
+            + '</div>';
+
+        // 直接通过 API 获取素材 ID，不依赖 DOM
+        fetchMaterialsAndReview(ind).then(ids => {
+            if (ids.length === 0) {
+                document.getElementById('bri-status-' + idx).textContent = '跳过（无素材）';
+                document.getElementById('bri-status-' + idx).className = 'text-muted';
+                idx++;
+                reviewNext();
+                return;
+            }
+
+            document.getElementById('bri-status-' + idx).textContent = '推理中 (' + ids.length + ' 条)...';
+            fetch('/api/materials/review', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({industry: ind, material_ids: ids, provider_key: provider})
+            }).then(r => r.json()).then(data => {
+                const statusEl = document.getElementById('bri-status-' + idx);
+                if (data.ok) {
+                    const count = (data.suggestions || []).length;
+                    _allIndustryResults[ind] = data.suggestions || [];
+                    totalSuggestions += count;
+                    if (count > 0) {
+                        statusEl.textContent = '✓ ' + count + ' 条建议';
+                        statusEl.className = 'text-success';
+                    } else {
+                        statusEl.textContent = '✓ 无建议';
+                        statusEl.className = 'text-muted';
+                    }
+                } else {
+                    statusEl.textContent = '✗ ' + (data.error || '失败');
+                    statusEl.className = 'text-danger';
+                }
+                reloadMaterials(ind);
+                idx++;
+                reviewNext();
+            }).catch(() => {
+                document.getElementById('bri-status-' + idx).textContent = '✗ 请求失败';
+                document.getElementById('bri-status-' + idx).className = 'text-danger';
+                idx++;
+                reviewNext();
+            });
+        });
+    }
+
+    reviewNext();
+}
+
+function renderAllResults() {
+    const resultDiv = document.getElementById('reviewResult');
+    const container = document.getElementById('suggestionsContainer');
+    const batch = document.getElementById('batchActions');
+
+    let total = 0;
+    let html = '';
+    for (const ind in _allIndustryResults) {
+        const sugs = _allIndustryResults[ind] || [];
+        if (sugs.length === 0) continue;
+        total += sugs.length;
+        html += '<div class="mt-2 mb-1"><strong>' + ind + '</strong> — ' + sugs.length + ' 条建议</div>';
+        sugs.forEach((s, i) => {
+            const ev = s.event || {};
+            const stars = '★'.repeat(ev.importance || 3);
+            const mat = s._material || {};
+            const uid = ind.replace(/\s/g, '_') + '-' + i;
+            html += '<div class="list-group-item list-group-item-action py-2" id="sug-' + uid + '" data-industry="' + ind.replace(/"/g, '&quot;') + '" data-idx="' + i + '">'
+                + '<div class="d-flex justify-content-between align-items-start">'
+                + '<div style="flex:1;min-width:0;">'
+                + '<div class="fw-semibold" style="font-size:0.85rem;">' + (ev.name || '') + '</div>'
+                + '<div class="text-muted" style="font-size:0.75rem;">' + (ev.date || '') + ' · ' + stars + ' · ' + (ev.type || '') + '</div>'
+                + '<div class="small text-muted mt-1">' + (s.reasoning || '') + '</div>'
+                + '<div class="small mt-1"><a href="' + (mat.source_url || '#') + '" target="_blank">来源</a></div>'
+                + '</div>'
+                + '<div class="ms-2" style="white-space:nowrap;">'
+                + '<button class="btn btn-sm btn-outline-success me-1" onclick="acceptCrossSuggestion(\'' + ind.replace(/'/g, "\\'") + '\',' + i + ')">采纳</button>'
+                + '<button class="btn btn-sm btn-outline-secondary" onclick="skipCrossSuggestion(\'' + ind.replace(/'/g, "\\'") + '\',' + i + ')">跳过</button>'
+                + '</div>'
+                + '</div>'
+                + '</div>';
+        });
+    }
+
+    if (total === 0) {
+        container.innerHTML = '<div class="alert alert-success py-2 mb-0"><i class="fas fa-check me-1"></i>全行业推理完成，无值得纳入日历的事件。</div>';
+        batch.style.display = 'none';
+    } else {
+        container.innerHTML = '<div class="alert alert-info py-2"><strong>全行业推理汇总</strong>：共 ' + total + ' 条建议</div>' + html;
+        batch.innerHTML = '<div class="d-flex gap-2">'
+            + '<button class="btn btn-success btn-sm" onclick="acceptAllCrossSuggestions()"><i class="fas fa-check me-1"></i>一键采纳全部</button>'
+            + '<button class="btn btn-outline-secondary btn-sm" onclick="skipAllCrossSuggestions()"><i class="fas fa-forward me-1"></i>全部跳过</button>'
+            + '</div>';
+        batch.style.display = '';
+    }
+    resultDiv.style.display = '';
+    resultDiv.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
+
+// ── 跨行业单条采纳/跳过 ──
+function acceptCrossSuggestion(industry, idx) {
+    const sugs = _allIndustryResults[industry];
+    if (!sugs || !sugs[idx]) return;
+    fetch('/api/materials/accept', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({industry: industry, suggestions: [sugs[idx]]})
+    }).then(r => r.json()).then(data => {
+        if (data.ok) {
+            showToast('✓ 已采纳：' + (sugs[idx].event?.name || ''), 'success');
+            sugs[idx] = null;
+            const uid = industry.replace(/\s/g, '_') + '-' + idx;
+            const el = document.getElementById('sug-' + uid);
+            if (el) el.remove();
+            reloadMaterials(industry);
+            checkCrossAllDone();
+        }
+    });
+}
+
+function skipCrossSuggestion(industry, idx) {
+    const sugs = _allIndustryResults[industry];
+    if (!sugs || !sugs[idx]) return;
+    const mid = sugs[idx].material_id;
+    if (mid) {
+        fetch('/api/materials/skip', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({material_ids: [mid]})
+        }).then(r => r.json());
+    }
+    sugs[idx] = null;
+    const uid = industry.replace(/\s/g, '_') + '-' + idx;
+    const el = document.getElementById('sug-' + uid);
+    if (el) el.remove();
+    reloadMaterials(industry);
+    checkCrossAllDone();
+}
+
+function checkCrossAllDone() {
+    let remaining = 0;
+    for (const ind in _allIndustryResults) {
+        const sugs = _allIndustryResults[ind];
+        if (sugs) remaining += sugs.filter(s => s !== null).length;
+    }
+    if (remaining === 0) document.getElementById('batchActions').style.display = 'none';
+}
+
+// ── 一键采纳全部（跨行业） ──
+function acceptAllCrossSuggestions() {
+    const batchBtn = document.querySelector('#batchActions .btn-success');
+    if (batchBtn) { batchBtn.disabled = true; batchBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>采纳中...'; }
+
+    const industries = Object.keys(_allIndustryResults);
+    let idx = 0;
+    let totalAccepted = 0;
+
+    function acceptNext() {
+        if (idx >= industries.length) {
+            showToast('✓ 全部采纳完成，共 ' + totalAccepted + ' 个事件', 'success');
+            document.getElementById('suggestionsContainer').innerHTML = ''
+                + '<div class="alert alert-success py-2 mb-0"><i class="fas fa-check me-1"></i>一键采纳完成，共 ' + totalAccepted + ' 个事件</div>';
+            document.getElementById('batchActions').style.display = 'none';
+            // 刷新所有行业的素材列表
+            industries.forEach(ind => reloadMaterials(ind));
+            _allIndustryResults = {};
+            if (batchBtn) { batchBtn.disabled = false; batchBtn.innerHTML = '<i class="fas fa-check me-1"></i>一键采纳全部'; }
+            return;
+        }
+
+        const ind = industries[idx];
+        const valid = (_allIndustryResults[ind] || []).filter(s => s !== null);
+        if (valid.length === 0) {
+            idx++;
+            acceptNext();
+            return;
+        }
+
+        fetch('/api/materials/accept', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({industry: ind, suggestions: valid})
+        }).then(r => r.json()).then(data => {
+            if (data.ok) totalAccepted += data.accepted || 0;
+            idx++;
+            acceptNext();
+        }).catch(() => {
+            idx++;
+            acceptNext();
+        });
+    }
+
+    acceptNext();
+}
+
+function skipAllCrossSuggestions() {
+    const mids = [];
+    for (const ind in _allIndustryResults) {
+        (_allIndustryResults[ind] || []).filter(s => s !== null).forEach(s => {
+            if (s.material_id) mids.push(s.material_id);
+        });
+    }
+    if (mids.length > 0) {
+        fetch('/api/materials/skip', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({material_ids: mids})
+        }).then(r => r.json());
+    }
+    document.getElementById('suggestionsContainer').innerHTML = ''
+        + '<div class="alert alert-secondary py-2 mb-0"><i class="fas fa-forward me-1"></i>已跳过全部建议</div>';
+    document.getElementById('batchActions').style.display = 'none';
+    Object.keys(_allIndustryResults).forEach(ind => reloadMaterials(ind));
+    _allIndustryResults = {};
+}
+
+// ── 单行业推理结果渲染 ──
 function renderSuggestions(industry, suggestions) {
     const container = document.getElementById('suggestionsContainer');
     const resultDiv = document.getElementById('reviewResult');
@@ -1511,6 +1805,9 @@ function renderSuggestions(industry, suggestions) {
         container.innerHTML = '<div class="alert alert-success py-2 mb-0"><i class="fas fa-check me-1"></i>选中的素材无值得纳入日历的事件。</div>';
         resultDiv.style.display = '';
         batch.style.display = 'none';
+        showToast('AI 分析完成：所选素材无值得纳入日历的事件', 'info');
+        // 滚动到结果区域
+        resultDiv.scrollIntoView({behavior: 'smooth', block: 'nearest'});
         return;
     }
 
@@ -1541,6 +1838,8 @@ function renderSuggestions(industry, suggestions) {
     container.innerHTML = html;
     resultDiv.style.display = '';
     batch.style.display = suggestions.length > 1 ? '' : 'none';
+    // 滚动到结果区域
+    resultDiv.scrollIntoView({behavior: 'smooth', block: 'nearest'});
 }
 
 function acceptSuggestion(idx) {
@@ -1560,6 +1859,7 @@ function acceptSuggestion(idx) {
             if (el) el.remove();
             _currentSuggestions[idx] = null;
             checkAllDone();
+            reloadMaterials(_currentIndustry);
         } else {
             showToast('采纳失败: ' + (data.error || ''), 'error');
         }
@@ -1581,6 +1881,7 @@ function skipSuggestion(idx) {
     if (el) el.remove();
     _currentSuggestions[idx] = null;
     checkAllDone();
+    reloadMaterials(_currentIndustry);
 }
 
 function acceptAllSuggestions() {
@@ -1600,6 +1901,7 @@ function acceptAllSuggestions() {
                 + '<div class="alert alert-success py-2 mb-0"><i class="fas fa-check me-1"></i>已采纳 ' + data.accepted + ' 个事件</div>';
             document.getElementById('batchActions').style.display = 'none';
             _currentSuggestions = [];
+            reloadMaterials(_currentIndustry);
         } else {
             showToast('采纳失败: ' + (data.error || ''), 'error');
         }
@@ -1619,6 +1921,7 @@ function skipAllSuggestions() {
         + '<div class="alert alert-secondary py-2 mb-0"><i class="fas fa-forward me-1"></i>已跳过全部建议</div>';
     document.getElementById('batchActions').style.display = 'none';
     _currentSuggestions = [];
+    reloadMaterials(_currentIndustry);
 }
 
 function checkAllDone() {
@@ -1626,6 +1929,26 @@ function checkAllDone() {
     if (remaining === 0) {
         document.getElementById('batchActions').style.display = 'none';
     }
+}
+
+function reloadMaterials(industry) {
+    // 刷新素材列表
+    loadMaterials(industry);
+    // 刷新该行业的素材计数徽标
+    fetch('/api/materials/summary').then(r => r.json()).then(data => {
+        if (data.ok) {
+            const summary = data.summary || {};
+            document.querySelectorAll('.industry-material-group').forEach(group => {
+                const name = group.dataset.industry;
+                const badge = group.querySelector('.badge');
+                if (badge) {
+                    const count = summary[name] || 0;
+                    badge.textContent = count + ' 条素材';
+                    badge.className = 'badge ' + (count > 0 ? 'bg-primary' : 'bg-secondary');
+                }
+            });
+        }
+    });
 }
 </script>
 {% endblock %}

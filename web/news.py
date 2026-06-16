@@ -4,6 +4,7 @@ import json
 import os
 import re
 import time
+import threading as _threading
 from datetime import datetime, date
 from urllib.request import urlopen, Request
 
@@ -18,6 +19,9 @@ MATERIALS_FILE = os.path.join(BASE_DIR, "data", "news-materials.yaml")
 
 # 新闻缓存
 _cache = {"data": [], "timestamp": 0}
+
+# YAML 写入锁
+_news_write_lock = _threading.Lock()
 
 # 关键词通过 skills 模块动态获取（内置行业 + 自定义技能）
 def get_all_keywords():
@@ -36,10 +40,11 @@ def load_sources():
 
 
 def save_sources(sources):
-    """保存新闻源配置"""
-    os.makedirs(os.path.dirname(SOURCES_FILE), exist_ok=True)
-    with open(SOURCES_FILE, "w", encoding="utf-8") as f:
-        yaml.dump({"sources": sources}, f, allow_unicode=True, sort_keys=False)
+    """保存新闻源配置（线程安全）"""
+    with _news_write_lock:
+        os.makedirs(os.path.dirname(SOURCES_FILE), exist_ok=True)
+        with open(SOURCES_FILE, "w", encoding="utf-8") as f:
+            yaml.dump({"sources": sources}, f, allow_unicode=True, sort_keys=False)
 
 
 def add_source(name, url, source_type="json", encoding="utf-8", fields=None):
@@ -310,7 +315,7 @@ def detect_events_from_news(news_items):
 
 
 def save_detected_events(events):
-    """保存检测到的事件"""
+    """保存检测到的事件（线程安全）"""
     os.makedirs(os.path.dirname(AUTO_EVENTS_FILE), exist_ok=True)
     # 合并现有 + 新检测
     existing = load_detected_events()
@@ -321,8 +326,9 @@ def save_detected_events(events):
             existing.append(ev)
             existing_urls.add(ev["source_url"])
             new_count += 1
-    with open(AUTO_EVENTS_FILE, "w", encoding="utf-8") as f:
-        yaml.dump({"detected_events": existing}, f, allow_unicode=True, sort_keys=False)
+    with _news_write_lock:
+        with open(AUTO_EVENTS_FILE, "w", encoding="utf-8") as f:
+            yaml.dump({"detected_events": existing}, f, allow_unicode=True, sort_keys=False)
     return new_count
 
 
@@ -440,27 +446,42 @@ def load_materials():
 
 
 def save_materials(materials):
-    """保存新闻素材"""
-    os.makedirs(os.path.dirname(MATERIALS_FILE), exist_ok=True)
-    with open(MATERIALS_FILE, "w", encoding="utf-8") as f:
-        yaml.dump({"materials": materials}, f, allow_unicode=True, sort_keys=False)
+    """保存新闻素材（线程安全）"""
+    with _news_write_lock:
+        os.makedirs(os.path.dirname(MATERIALS_FILE), exist_ok=True)
+        with open(MATERIALS_FILE, "w", encoding="utf-8") as f:
+            yaml.dump({"materials": materials}, f, allow_unicode=True, sort_keys=False)
+
+
+def _append_materials_safe(new_materials):
+    """以线程安全方式追加素材（读 + 写）"""
+    with _news_write_lock:
+        materials = load_materials()
+        existing_urls = {m["source_url"] for m in materials if m.get("source_url")}
+        count = 0
+        for m in new_materials:
+            if m.get("source_url") and m["source_url"] not in existing_urls:
+                materials.append(m)
+                existing_urls.add(m["source_url"])
+                count += 1
+        if count:
+            os.makedirs(os.path.dirname(MATERIALS_FILE), exist_ok=True)
+            with open(MATERIALS_FILE, "w", encoding="utf-8") as f:
+                yaml.dump({"materials": materials}, f, allow_unicode=True, sort_keys=False)
+        return count
 
 
 def extract_news_materials(news_items):
-    """从已匹配的新闻中提取素材（不解析事件，只保存原文）"""
-    materials = load_materials()
-    existing_urls = {m["source_url"] for m in materials if m.get("source_url")}
-    new_count = 0
-
+    """从已匹配的新闻中提取素材（线程安全）"""
+    new_materials = []
     for item in news_items:
         if not item.get("matched") or not item.get("industries"):
             continue
         url = item.get("url", "")
-        if not url or url in existing_urls:
+        if not url:
             continue
-
-        materials.append({
-            "id": f"mat_{int(time.time()*1000)}_{new_count}",
+        new_materials.append({
+            "id": f"mat_{int(time.time()*1000)}_{len(new_materials)}",
             "title": item["title"],
             "summary": (item.get("intro", "") or "")[:300],
             "source_url": url,
@@ -469,12 +490,9 @@ def extract_news_materials(news_items):
             "detected_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "status": "pending",
         })
-        existing_urls.add(url)
-        new_count += 1
-
-    if new_count:
-        save_materials(materials)
-    return new_count
+    if new_materials:
+        return _append_materials_safe(new_materials)
+    return 0
 
 
 def get_materials_by_industry(industry_name, status="pending"):

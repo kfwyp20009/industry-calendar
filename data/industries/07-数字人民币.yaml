@@ -4,7 +4,7 @@ tags:
 - 金融
 - 政策
 - 跨境
-updated: '2026-06-05'
+updated: '2026-06-16'
 core_stocks:
 - code: '300348'
   name: 长亮科技
@@ -179,6 +179,14 @@ events:
     reason: 跨年布局，政策预期
   linked_industries:
   - __all__
+- confirmed: true
+  date: '2026-06-16'
+  date_precision: day
+  description: 数币国际运营中心上线，26家金融机构入局跨境结算
+  importance: 5
+  name: 数字人民币国际运营中心首批直接参与者签约
+  type: product
+  sources: []
 monitors:
 - indicator: 央行明确宣布2.0改革推迟或取消
   risk_level: high

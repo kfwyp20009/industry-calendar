@@ -2,7 +2,7 @@ project:
   name: 行业投资日历系统
   version: 1.0.0
   created: '2026-06-05'
-  updated: '2026-06-07'
+  updated: '2026-06-16'
   status: active
 industries:
 - id: 1

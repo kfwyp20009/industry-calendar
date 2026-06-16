@@ -230,11 +230,11 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> 生成中...';
 
     if (industries.length === 1) {
-        // 单个行业：直接生成
+        // 单个行业：流式生成
         status.textContent = '生成中...';
-        content.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary mb-3" role="status"></div><p class="text-muted">AI 正在分析...</p></div>';
+        content.innerHTML = '<div class="analysis-report py-3" id="streamReport"></div>';
 
-        fetch('/api/analysis/generate', {
+        fetch('/api/analysis/generate-stream', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -242,24 +242,62 @@ document.getElementById('analysisForm').addEventListener('submit', function(e) {
                 provider: provider,
                 model: model,
                 extra_instructions: extra,
-                save_to_calendar: saveToCalendar,
                 custom_prompt: customPrompt,
             })
-        }).then(r => r.json()).then(function(data) {
+        }).then(function(response) {
+            var reader = response.body.getReader();
+            var decoder = new TextDecoder();
+            var buffer = '';
+            var fullText = '';
+            var previewEl = document.getElementById('streamReport');
+
+            function processStream() {
+                reader.read().then(function(result) {
+                    if (result.done) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-magic me-1"></i> 生成分析报告';
+                        status.textContent = '✓ 完成';
+                        return;
+                    }
+                    buffer += decoder.decode(result.value, {stream: true});
+                    var lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i].trim();
+                        if (!line || !line.startsWith('data: ')) continue;
+                        try {
+                            var msg = JSON.parse(line.slice(6));
+                            if (msg.type === 'delta') {
+                                fullText += msg.content;
+                                previewEl.innerHTML = renderReportText(fullText);
+                            } else if (msg.type === 'mock') {
+                                fullText = msg.content;
+                                previewEl.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle me-1"></i>' + (msg.warning || '示例报告') + '</div>' + renderReportText(msg.content);
+                                btn.disabled = false;
+                                btn.innerHTML = '<i class="fas fa-magic me-1"></i> 生成分析报告';
+                                status.textContent = '✓ 完成（示例）';
+                            } else if (msg.type === 'error') {
+                                previewEl.innerHTML = '<div class="alert alert-danger">生成失败: ' + msg.content + '</div>';
+                                btn.disabled = false;
+                                btn.innerHTML = '<i class="fas fa-magic me-1"></i> 生成分析报告';
+                                status.textContent = '✗ 失败';
+                            } else if (msg.type === 'done') {
+                                btn.disabled = false;
+                                btn.innerHTML = '<i class="fas fa-magic me-1"></i> 生成分析报告';
+                                status.textContent = '✓ 完成';
+                            }
+                        } catch(e) {}
+                    }
+                    processStream();
+                });
+            }
+            processStream();
+        }).catch(function(err) {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-magic me-1"></i> 生成分析报告';
-            if (data.ok) {
-                status.textContent = '✓ 完成';
-                if (data.mock) {
-                    content.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle me-1"></i>' + (data.warning || '示例报告') + '</div>' + renderReportText(data.content);
-                } else {
-                    renderReport(data.content, content);
-                }
-                if (data.saved) showToast('报告已写入行业日历', 'success');
-            } else {
-                status.textContent = '✗ 失败';
-                content.innerHTML = '<div class="alert alert-danger">生成失败: ' + (data.error || '未知错误') + '</div>';
-            }
+            status.textContent = '✗ 失败';
+            content.innerHTML = '<div class="alert alert-danger">网络错误: ' + err.message + '</div>';
         });
     } else {
         // 多行业批量

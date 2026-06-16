@@ -4,7 +4,7 @@ tags:
 - 芯片
 - 制造
 - 安全
-updated: '2026-06-05'
+updated: '2026-06-16'
 core_stocks:
 - code: '002371'
   name: 北方华创
@@ -186,6 +186,22 @@ events:
     - '688981'
     action: 持有
     reason: 管制升级则国产替代加速，管制放松则板块回调
+- confirmed: true
+  date: '2026-06-15'
+  date_precision: day
+  description: 燧原科技上交所IPO审核，国产GPU标志性事件
+  importance: 4
+  name: 燧原科技科创板IPO审核
+  type: other
+  sources: []
+- confirmed: true
+  date: '2026-06-15'
+  date_precision: day
+  description: 国产GPU+晶圆制造双龙头同日通过上市审核
+  importance: 4
+  name: 燧原科技/粤芯半导体科创板IPO同步过会
+  type: other
+  sources: []
 monitors:
 - indicator: MATCH法案通过→DUV售后支持停止
   risk_level: high

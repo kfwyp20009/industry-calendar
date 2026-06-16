@@ -8,3 +8,540 @@ materials:
   - 半导体/国产替代
   detected_at: 2026-06-07 23:24
   status: pending
+- id: mat_1780917975752_0
+  title: 网易支付被罚220.4万元：违反数据安全管理规定等
+  summary: 6月8日金融一线消息，中国人民银行浙江省分行公布的行政处罚决定信息公示表显示，网易支付（杭州）有限公司因违反账户管理规定、违反清算管理规定、违反数据安全管理规定...
+  source_url: https://finance.sina.com.cn/jryx/fd/2026-06-08/doc-iniatatq3776955.shtml
+  source_name: 新浪财经
+  industries:
+  - 数字人民币
+  detected_at: 2026-06-08 19:26
+  status: pending
+- id: mat_1780917975752_1
+  title: 光模块再踩刹车，高“光”创业板人工智能ETF（159363）三连跌，情绪“错杀”还是行情见顶？机构火线解读
+  summary: ' 周一（6月8日），A股震荡调整，创业板指跌超3%，全市场近4600只个股下跌。盘面上，光模块CPO等算力硬件调整，天孚通信下跌7%日线三连跌，新易盛下跌3%，中际旭创下跌2%。'
+  source_url: https://finance.sina.com.cn/money/fund/etf/2026-06-08/doc-iniatatn6999627.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-08 19:26
+  status: pending
+- id: mat_1780917975752_2
+  title: 三大指数集体大跌！高股息逆市走强，华宝基金银行ETF（512800）冲高1%！AI硬件跳水，科创芯片ETF收跌4.46%
+  summary: A股三大指数今日（6月8日）集体走弱，截至收盘，上证指数跌1.7%，失守4000点，收报3959.34点；深证成指跌3.22%，创业板指跌3.69%。
+  source_url: https://finance.sina.com.cn/money/fund/etf/2026-06-08/doc-iniatatq3776063.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  - 半导体/国产替代
+  detected_at: 2026-06-08 19:26
+  status: pending
+- id: mat_1780917975752_3
+  title: 三大指数集体重挫，沪指失守4000点，银行、机器人等概念逆市走强  | 华宝基金3A日报（2026.6.8）
+  summary: ''
+  source_url: https://finance.sina.com.cn/money/fund/etf/2026-06-08/doc-iniatath8581160.shtml
+  source_name: 新浪财经
+  industries:
+  - 机器人零部件
+  detected_at: 2026-06-08 19:26
+  status: pending
+- id: mat_1780917975752_4
+  title: 燧原科技、粤芯半导体定于6月15日上会
+  summary: 6月8日，据上交所官网，上海证券交易所上市审核委员会定于2026年6月15日召开2026年第37次上市审核委员会审议会议，审议上海燧原科技股份有限公司（以下称“燧原科技”）首发...
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-08/doc-iniatath8577857.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-08 19:26
+  status: pending
+- id: mat_1780917975752_5
+  title: U2 正式亮相：原生可执行Agent大模型，云知声跳出参数竞赛
+  summary: 2026年6月8日，港股上市AI企业云知声（9678.HK）正式发布新一代通用基座模型U2。 在国内大模型赛道已经拥挤到"百模大战"变成"百模洗牌"的当下，这条消息本身不算稀奇。
+  source_url: https://finance.sina.com.cn/tech/it/2026-06-08/doc-iniaswms3893790.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-08 19:26
+  status: pending
+- id: mat_1780917975752_6
+  title: 天生多屏！中兴云电脑解锁 AI 全场景新生活
+  summary: ' 无需笨重主机，中兴云电脑实现多端无缝流转，手机、平板、笔电、自由屏一套数据通用，办公全程零切换成本。云端多重加密备份，数据远比本地设备安全。'
+  source_url: https://finance.sina.com.cn/tech/mobile/n/n/2026-06-08/doc-iniaswms3893308.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-08 19:26
+  status: pending
+- id: mat_1780917975752_7
+  title: A股年内93家半导体公司减持
+  summary: 记者丨张赛男 编辑丨包芳鸣 曾静娇 6月8日，A股主要指数集体回调，沪指失守4000点。Wind数据显示，半导体指数收盘跌超4%，东微半导、新相微、宏微科技跌超11%...
+  source_url: https://finance.sina.com.cn/stock/marketresearch/2026-06-08/doc-iniaswmq7116185.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-08 19:26
+  status: pending
+- id: mat_1781014614013_0
+  title: 明星基金经理雷涛卸任全部产品，德邦基金痛失顶梁柱，权益发展路在何方？
+  summary: 文|吴理想 来源|财富独角兽 五月底六月初，内地股市在热点轮动中仍以科技风为主，特别是国产半导体热度飙升成为主线之一，这也让一众公募半导体主题基金成为主题类产品中的...
+  source_url: https://finance.sina.com.cn/stock/marketresearch/2026-06-09/doc-iniavmyk6381066.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-09 22:16
+  status: pending
+- id: mat_1781014614013_1
+  title: 早盘：美股继续上扬 道指上涨逾400点
+  summary: ' 北京时间6月9日晚，美股周二早盘维持涨势。芯片股经历上周五暴跌之后连续第二天反弹，同时由于市场预期美伊协议接近达成，原油价格回落。'
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-09/doc-iniavmyp5001913.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-09 22:16
+  status: pending
+- id: mat_1781014614013_2
+  title: 工具层辅助层应用逐渐铺开，银行业务类智能体应用要来？业内：最快下半年落地
+  summary: ' 财联社6月9日讯（记者 梁柯志）财联社记者日前从多家银行了解到，随着工具层、辅助层AI应用在业内铺开，智能体层应用在银行业的落地有望加快。'
+  source_url: https://finance.sina.com.cn/money/bank/bank_hydt/2026-06-09/doc-iniavmyp5000852.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-09 22:16
+  status: pending
+- id: mat_1781014614013_3
+  title: 恺英网络设立上海时光川行人工智能技术公司，注册资本1亿元 | 长三角资本局
+  summary: 文|新浪财经上海站 十里 恺英网络正在为AI内容业务搭建一个独立平台。 工商信息显示，上海时光川行人工智能技术有限公司成立于5月11日，注册资本1亿元...
+  source_url: https://finance.sina.com.cn/stock/csjzbj/2026-06-09/doc-iniavmyp4992506.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-09 22:16
+  status: pending
+- id: mat_1781014614013_4
+  title: H2DO启动北海绿氢可行性研究
+  summary: 荷兰本土氢能公司（H2DO）及其合作伙伴已启动一项关于荷兰北海30-50兆瓦海上绿氢项目的可行性与概念研究，旨在展示海上制氢如何支持海上风电的扩展...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-09/doc-iniavmyr1768348.shtml
+  source_name: 新浪财经
+  industries:
+  - 绿氢氨醇
+  detected_at: 2026-06-09 22:16
+  status: pending
+- id: mat_1781091251898_0
+  title: AI概念股的涨势突然变得根基不稳 甲骨文财报料成下一道考验
+  summary: 人工智能相关股票的涨势突然变得根基不稳，而甲骨文公司将于盘后公布的业绩，将成为这一板块面临的下一道考验。 这家软件和云计算公司的财报出炉之际...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-10/doc-iniaxqxk5874399.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-10 19:34
+  status: pending
+- id: mat_1781091251898_1
+  title: 一份研报扰动，“光”芒暂敛！天孚通信领跌，创业板人工智能ETF华宝（159363）再度失守20日线，资金加码
+  summary: ' 周三（6月10日），全球光通信板块共振下挫，光模块CPO含量超50%的创业板人工智能回调逾3%。其中，天孚通信、光库科技领跌超7%，中际旭创收跌2.8%，新易盛跌超1%。'
+  source_url: https://finance.sina.com.cn/money/fund/etf/2026-06-10/doc-iniaxqxk5873912.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-10 19:34
+  status: pending
+- id: mat_1781091251898_2
+  title: OpenAI洽谈租赁俄亥俄州10吉瓦数据中心 英伟达提供资金背书
+  summary: ' 两名熟知谈判内情的人士透露，OpenAI正进入深度磋商阶段，计划租赁俄亥俄州联邦地块上一座规划总规模10吉瓦的数据中心园区，这笔合作还有望获得英伟达的资金支持。'
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-10/doc-iniaxqxk5873431.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-10 19:34
+  status: pending
+- id: mat_1781091251898_3
+  title: “60后”姐夫携小舅子创业，给“芯片散热”年入7亿IPO
+  summary: 来源：风云IPO 创业板 实控人IPO前夕套现1.15亿元。 作者|刘俊群 编辑|刘钦文 你手里那部手机、眼前这台电脑、数据中心里耗费高额电费、满载运行AI模型的服务器...
+  source_url: https://finance.sina.com.cn/stock/newstock/2026-06-10/doc-iniaxqxn2648840.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  - 半导体/国产替代
+  detected_at: 2026-06-10 19:34
+  status: pending
+- id: mat_1781091251898_4
+  title: Meta达成印度AI数据中心合作，大型云厂商加码本土算力基建
+  summary: 核心要点元平台（Meta）计划向印度信实工业租赁一座算力规模 168 兆瓦、适配人工智能业务的数据中心。信实工业将为 Meta 承建该数据中心，两年内交付，后续可扩容。
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-10/doc-iniaxkrt1296878.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-10 19:34
+  status: pending
+- id: mat_1781176923943_0
+  title: 人工智能板块轮动与新股吸金效应显现 美股面临结构性调整压力
+  summary: 野村证券（Nomura）日前发布最新跨资产策略报告指出，随着全球人工智能（AI）投资范式发生实质性转变，前期领涨的头部科技巨头因资金分流与大规模融资正由市场主力向阻力转...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniaztwr0784997.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_1
+  title: 投机重心转移：加密货币风光不再 资金流向大宗商品与未上市科技股
+  summary: 受地缘政治冲突升级以及人工智能（AI）产业动能分化影响，全球资本市场投机资金正加速从加密货币资产流向传统大宗商品、半导体板块以及未上市科技股。
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniaztwp4003545.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  - 半导体/国产替代
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_2
+  title: 麦格米特欲赴港“捞金”，出海能否解其“困局”？
+  summary: 来源：环球老虎财经app AI算力赛道热度高居不下，麦格米特顺势抛出赴港上市计划。依托英伟达中国大陆独家电源供应商的身份，公司A股股价与市值近期创下历史新高。
+  source_url: https://finance.sina.com.cn/stock/newstock/2026-06-11/doc-iniaztwr0774449.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_3
+  title: “借势”2500亿亨通光电，崔根良父子再启“分拆造富”游戏
+  summary: 来源：环球老虎财经app AI浪潮持续催生海量算力与网络传输需求，为国内光纤行业撬动了一轮强劲的景气上行周期，行业龙头亨通光电借此迎来业绩与市值的双重爆发。
+  source_url: https://finance.sina.com.cn/stock/s/2026-06-11/doc-iniaztwr0773451.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_4
+  title: “AI定义汽车：先有AI，再有车”——赛豆科技物理AI元年下的造车逻辑重构
+  summary: 2026年，汽车行业迎来了敢于“打破常规”的新入局者。6月9日，赛豆科技在北京官宣出道，旗下全新AI汽车品牌AIVA正式发布，并同步亮相概念车AIVA
+    Origin Concept...
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-11/doc-iniaztwn2262426.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_5
+  title: 奇瑞引望签署深化战略合作协议：目标直指L3、L4自动驾驶
+  summary: 快科技6月11日消息，“华为乾崑智能汽车解决方案”官宣，奇瑞汽车股份有限公司（以下简称“奇瑞汽车”）与引望智能技术有限公司（以下简称“引望”）在安徽芜湖签署深化战略合作...
+  source_url: https://finance.sina.com.cn/tech/roll/2026-06-11/doc-iniaztwn2259115.shtml
+  source_name: 新浪财经
+  industries:
+  - 自动驾驶/L4
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_6
+  title: Anthropic提议设立公共基金，让美国民众持有人工智能企业股权
+  summary: 特朗普周三再度表态，计划与人工智能企业会面，商议由政府持有相关企业股权一事 Anthropic首席执行官达里奥・阿莫代伊于周三发布一套政策框架，提出一套机制...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniaztwp3968970.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_7
+  title: 医保目录调整启幕，商保创新药重构医药支付生态
+  summary: 来源：中保新知 年中政策落地窗口如期开启，牵动万亿医药市场走向的2026年国家医保药品目录调整，已全面迈入实质性推进阶段。 6月9日...
+  source_url: https://finance.sina.com.cn/money/insurance/sbxw/2026-06-11/doc-iniaztwn2261429.shtml
+  source_name: 新浪财经
+  industries:
+  - 数字人民币
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_8
+  title: Anthropic全新大模型瞄准专业重度用户，同时切断竞品AI蒸馏训练渠道
+  summary: ' 经过数周铺天盖地的业内热议，Anthropic于周二正式对外推出阉割版新模型 Claude Fable 5，应用开发者终于得以直观体验其旗舰模型
+    Mythos 的基础版本。'
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniaztwr0743408.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_9
+  title: 甲骨文盘前跌7.9% 云业务高增难抵传统软件疲软
+  summary: 本季度甲骨文 AI 数据中心营收近乎翻倍，达 58 亿美元，但用于扩建 AI 数据中心的资本开支同步大幅攀升 甲骨文公布截至 5 月的财年收官季度财报，季度总营收
+    192 亿美元...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniaztwp3963712.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781176923943_10
+  title: 国电电力炉内无人机检测技术首次在大同公司落地应用
+  summary: 近日，国电电力大同公司顺利开展7号机组炉内无人机检测作业，高效完成炉膛内部设备检查任务，标志着国电电力炉内无人机检测技术首次实现工程化应用。
+  source_url: https://finance.sina.com.cn/stock/bxjj/2026-06-11/doc-iniaztwn2264642.shtml
+  source_name: 新浪财经
+  industries:
+  - 低空经济
+  detected_at: 2026-06-11 19:22
+  status: pending
+- id: mat_1781178156860_0
+  title: 关键材料引爆，热门龙头再创新高，年内暴涨超765%！科创芯片ETF华宝（589190）冲高2%，逆市3连涨
+  summary: ' 6月11日，芯片半导体整体延续强势，全“芯”布局芯片产业、成份股更硬核的科创芯片ETF华宝（589190）场内价格一度涨超2%，收涨1.34%，逆市3连涨。'
+  source_url: https://finance.sina.com.cn/money/fund/etf/2026-06-11/doc-iniaztwn2322161.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-11 19:42
+  status: pending
+- id: mat_1781178156860_1
+  title: 新易盛上演过山车！高“光”创业板人工智能ETF华宝（159363）跌2.62%，资金加仓超1亿份！后市怎么看？
+  summary: 周四（6月11日），AI应用全线走低，光模块CPO突发巨震，创业板人工智能回调逾2%。或受赴港上市影响，新易盛单日振幅近14%，从早盘涨超4%到午后一度下跌9.51%...
+  source_url: https://finance.sina.com.cn/money/fund/etf/2026-06-11/doc-iniaztwk5543226.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:42
+  status: pending
+- id: mat_1781178156860_2
+  title: A股缩量回调！有色金属断层领涨，华宝基金有色ETF（159876）盘中涨超3%！AI应用全线走低
+  summary: ' A股三大指数今日（6月11日）集体回调，截至收盘，沪指跌0.16%，深证成指跌0.68%，创业板指跌1.13%。沪深京三市成交额25751亿元，较昨日缩量692亿元。'
+  source_url: https://finance.sina.com.cn/money/fund/etf/2026-06-11/doc-iniaztwn2318107.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 19:42
+  status: pending
+- id: mat_1781182014225_0
+  title: 全球市场涨跌互现，AI股抛售与油价波动主导走势
+  summary: ' 全球股市周四交易涨跌互现，投资者仍在消化人工智能相关股票的持续波动以及中东局势引发的油价起伏。市场对通胀前景的担忧情绪依然浓厚。'
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniazyeh5449683.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 20:46
+  status: pending
+- id: mat_1781182014225_1
+  title: 甲骨文盘前重挫10% 财报超预期但融资计划令股价承压
+  summary: 美国软件巨头甲骨文公司周三公布了2026财年第四季度财报，虽然多项财务指标超出市场预期，但由于公司宣布计划额外融资200亿美元用于人工智能基础设施建设...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniazyeh5447777.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 20:46
+  status: pending
+- id: mat_1781182014225_2
+  title: Anthropic撤回争议性隐藏政策，Fable 5安全措施改为可见
+  summary: ' 人工智能公司Anthropic在遭遇研究社区强烈反对后，宣布撤回其最新模型Claude Fable 5中的一项争议性隐藏政策。该公司将把此前不透明的干预措施调整为对用户完全可见。'
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniazyek2223773.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 20:46
+  status: pending
+- id: mat_1781182014225_3
+  title: SpaceX将进行历史性IPO：筹资750亿美元，马斯克保留超80%投票权
+  summary: 埃隆·马斯克的火箭公司SpaceX即将于周五在纳斯达克进行首次公开募股，这将成为全球资本市场历史上规模最大的IPO事件。根据公司向美国证券交易委员会提交的文件...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniazyep0695319.shtml
+  source_name: 新浪财经
+  industries:
+  - 商业航天/火箭
+  detected_at: 2026-06-11 20:46
+  status: pending
+- id: mat_1781182014225_4
+  title: 雷蛇CEO：SpaceX迎来里程碑式IPO，大型AI企业上市潮“仅仅是开端”
+  summary: 核心要点雷蛇 CEO 陈民亮预计，一大批人工智能相关企业将接连掀起重磅上市浪潮。此番表态发布之际，SpaceX、安索帕、OpenAI 等多家头部企业即将迎来具有里程碑意义的集中上...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniazyep0691267.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 20:46
+  status: pending
+- id: mat_1781182014225_5
+  title: 甲骨文宣布再融资200亿美元用于AI建设，股价大跌逾8%
+  summary: 美国软件巨头甲骨文公司周三盘后宣布，计划通过股权和债务方式额外融资200亿美元，以支持其人工智能基础设施建设。尽管公司当天公布的第四财季财报多项指标创下历史新高...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-11/doc-iniazyem3913293.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-11 20:46
+  status: pending
+- id: mat_1781182014225_6
+  title: 这类主题，三连涨
+  summary: 01 6月11日，全市场1500余只ETF中，超1100只ETF下跌，跌幅大于1%的产品超过400只。逆势收涨的ETF数量占比约25%。 02
+    半导体主题ETF今日表现亮眼...
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-11/doc-iniazyek2222319.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-11 20:46
+  status: pending
+- id: mat_1781612306329_0
+  title: SpaceX有望超越亚马逊，跻身全球第五大企业
+  summary: ' 马斯克旗下这家横跨人工智能、航天火箭与卫星业务的集团公司，在完成创纪录的首次公开募股后股价一路暴涨。按市值计算，SpaceX即将超越亚马逊，成为全球第五大企业。'
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-16/doc-inicrcpk9421822.shtml
+  source_name: 新浪财经
+  industries:
+  - 卫星互联网
+  - AI大模型/应用
+  - 商业航天/火箭
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_1
+  title: SpaceX斥600亿美元收购AI编程初创企业Cursor，发力企业级AI市场
+  summary: SpaceX 将以 600 亿美元收购 AI 编程工具 Cursor 的母公司 Anysphere 埃隆・马斯克旗下的 SpaceX 于周二宣布，将收购热门
+    AI 编程工具 Cursor 的开发企业 Anysphere...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-16/doc-inicrcpk9421731.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_2
+  title: AI版支付宝发布，超级应用抢滩智能体生态
+  summary: 超级APP的竞争正从流量入口的抢夺，转向Agent生态厚度与场景理解深度的终极较量。 6月16日，AI版支付宝正式发布，命名“阿宝”，支付宝完成全端AI化。
+  source_url: https://finance.sina.com.cn/roll/2026-06-16/doc-inicrcpk9413306.shtml
+  source_name: 新浪财经
+  industries:
+  - 数字人民币
+  - AI大模型/应用
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_3
+  title: 微信支付“AI专属卡”最快本周上线，支付巨头AI对垒战加速
+  summary: 财联社6月16日讯（记者 郭子硕）支付宝之外，微信支付也在加速推进AI战略。 财联社记者从知情人士处获悉，微信支付正联合腾讯智能体产品WorkBuddy测试AI支付功能...
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-16/doc-inicrcpp7616376.shtml
+  source_name: 新浪财经
+  industries:
+  - 数字人民币
+  - AI大模型/应用
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_4
+  title: 港股硬科技上涨中继？规模最大港股通信息技术ETF华宝（159131）跌1.46%，机构：关注进攻型科技方向！
+  summary: 今日（6月16日），港股硬科技震荡盘整，中芯国际跌超3%，小米集团跌1.8%，智谱继昨日单日飙涨32%后今日盘中一度冲高逾13%，午后震荡回落收涨1.17%。
+  source_url: https://finance.sina.com.cn/money/fund/etf/2026-06-16/doc-inicrcpn6184075.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  - 半导体/国产替代
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_5
+  title: 加速切入硬科技投资，燧原科技、粤芯半导体IPO浮现多家银行身影
+  summary: 财联社6月16日讯（记者 邹俊涛） 银行资金再度现身硬科技投资领域。 6月15日，国产GPU企业燧原科技与晶圆制造企业粤芯半导体双双通过上市审核。
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-16/doc-inicrcpn6187954.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_6
+  title: 301176，“20cm”三连板！2只热门股，紧急提示风险！
+  summary: ' 近期受AI服务器升级带动，高端铜箔市场需求大幅攀升，铜箔板块迎来行情热潮，宝鼎科技、铜冠铜箔、德福科技等多只个股股价接连创下历史新高。'
+  source_url: https://finance.sina.com.cn/wm/2026-06-16/doc-inicrcpr4387003.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_7
+  title: DeepSeek或完成超70亿美元首轮融资，估值超500亿美元
+  summary: 6月16日，据科创板日报报道，备受外界关注的人工智能公司DeepSeek或完成首轮融资，募集资金超74亿美元（约合人民币500亿元），公司估值突破500亿美元（约合人民币3300亿元...
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-16/doc-inicrcpn6180894.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_8
+  title: 拉普拉斯上市不到两年推22亿元定增 大幅扩产与低迷业绩是否矛盾？
+  summary: 2026年6月14日晚间，拉普拉斯发布公告称，拟向不超过35名特定对象发行股票募资不超22.01亿元，用于光伏及半导体高端装备研发项目、无锡光伏高端装备基地二期建设项目...
+  source_url: https://finance.sina.com.cn/stock/aigcy/2026-06-16/doc-inicrcpk9399480.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781612306329_9
+  title: 后厂村码农集体猜错榜首：12个AI世界杯预测准确率仅35%，人类“瞎猜”反而更准
+  summary: ' “我以为AI怎么也能猜对七成。”6月16日，在北京后厂村联想咖啡车活动现场，一位程序员在得知AI实际预测成绩后这样感慨。而他的想法，代表了现场绝大多数人的心声。'
+  source_url: https://finance.sina.com.cn/stock/marketresearch/2026-06-16/doc-inicrcpr4381024.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-16 20:18
+  status: pending
+- id: mat_1781613384380_0
+  title: 健康管理“知易行难”僵局松动：“保险+健康”进入AI融合快进期，生态升维加速兑现
+  summary: ' 蓝鲸新闻6月16日讯（记者 石雨）健康管理在保险业喊了多年，却始终“知易行难”——同质化严重、用户获得感低、闭环难形成。'
+  source_url: https://finance.sina.com.cn/money/insurance/bxdt/2026-06-16/doc-inicrivk6084734.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-16 20:36
+  status: pending
+- id: mat_1781613384380_1
+  title: 数币达首批参与者出炉，26家金融机构入局跨境数币结算
+  summary: 6月16日，数字人民币国际运营中心与首批26家金融机构在沪签署直接参与者服务协议，上线后业务可覆盖中国香港、中国澳门、新加坡、老挝、泰国、阿联酋、卡塔尔...
+  source_url: https://finance.sina.com.cn/jjxw/2026-06-16/doc-inicrivp4287279.shtml
+  source_name: 新浪财经
+  industries:
+  - 数字人民币
+  detected_at: 2026-06-16 20:36
+  status: pending
+- id: mat_1781620990537_0
+  title: SpaceX股票期权开始交易，成交量巨大
+  summary: SpaceX的期权于周二开始活跃交易，为投资者提供了押注埃隆·马斯克旗下火箭公司新上市股票未来走势的又一途径。 期权允许投资者在规定时间内以预定价格买入或卖出某种资产...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-16/doc-inicrivm7551960.shtml
+  source_name: 新浪财经
+  industries:
+  - 商业航天/火箭
+  detected_at: 2026-06-16 22:43
+  status: pending
+- id: mat_1781620990537_1
+  title: 高通：AI芯片赛道里难得的价值洼地
+  summary: 尽管已向汽车、数据中心业务多元化布局，智能手机业务依旧拖累公司股价高通首席执行官克里斯蒂亚诺・安蒙 高通（股票代码：QCOM，涨幅 4...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-16/doc-inicrivp4327713.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  - 半导体/国产替代
+  detected_at: 2026-06-16 22:43
+  status: pending
+- id: mat_1781620990537_2
+  title: 002384，拟投资81亿元“追光”
+  summary: 东山精密（002384）拟大手笔加码光芯片及光模块赛道。 6月16日晚，东山精密公告显示，公司董事会同意公司子公司索尔思光电及其子公司在常州等地实施光芯片及光模块扩建项目...
+  source_url: https://finance.sina.com.cn/stock/marketresearch/2026-06-16/doc-inicrivp4323861.shtml
+  source_name: 新浪财经
+  industries:
+  - 半导体/国产替代
+  detected_at: 2026-06-16 22:43
+  status: pending
+- id: mat_1781620990537_3
+  title: 上市首日暴涨193.71%，溜溜梅意外蹭上AI概念？
+  summary: 来源：雷达Finance 雷达财经出品 文|丁禹 编|孟帅 “你没事儿吧？没事儿就吃溜溜梅！”昔日杨幂的一句洗脑广告词，让无数人记住了溜溜梅。
+  source_url: https://finance.sina.com.cn/stock/s/2026-06-16/doc-inicrivp4324660.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-16 22:43
+  status: pending
+- id: mat_1781620990537_4
+  title: 挪威国家石油公司上调股票回购规模至30亿美元，新战略聚焦化石燃料业务扩张
+  summary: 该公司计划抓住人工智能发展与电气化转型带动的能源需求增长机遇公司超半数资本开支将投向挪威大陆架油气区域。在欧洲摆脱对俄罗斯天然气依赖的过程中...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-16/doc-inicrivh9341111.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-16 22:43
+  status: pending
+- id: mat_1781620990537_5
+  title: SpaceX市值一举超越亚马逊 位列全球第五
+  summary: 埃隆·马斯克旗下的SpaceX股价周二上涨逾8%，使其市值超越亚马逊，成为全球市值第五大的公司。 这家业务涵盖火箭到人工智能的公司股价最新报209.30美元，上涨8.7%...
+  source_url: https://finance.sina.com.cn/stock/usstock/c/2026-06-16/doc-inicrivp4319752.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  - 商业航天/火箭
+  detected_at: 2026-06-16 22:43
+  status: pending
+- id: mat_1781622080287_0
+  title: DeepSeek首轮融资完成，传梁文锋砸200亿“一票独大”
+  summary: 21世纪经济报道记者 赵云帆 据市场消息，并经21世纪经济报道记者求证，中国人工智能大模型企业深度求索（DeepSeek）已于6月16日完成公司成立以来的首轮融资。
+  source_url: https://finance.sina.com.cn/roll/2026-06-16/doc-inicrqci7435615.shtml
+  source_name: 新浪财经
+  industries:
+  - AI大模型/应用
+  detected_at: 2026-06-16 23:01
+  status: pending

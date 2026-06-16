@@ -2,6 +2,7 @@
 
 import os
 import sys
+import threading
 import calendar as _cal
 from collections import defaultdict
 from datetime import datetime, date, timedelta
@@ -22,23 +23,8 @@ import sync_data
 app = Flask(__name__)
 
 
-@app.context_processor
-def inject_globals():
-    """全局模板变量：最近更新的行业列表"""
-    try:
-        inds = load_all_industries()
-        updates = get_recent_updates(inds, since_days=7)
-        recent_codes = {u["code"] for u in updates}
-    except Exception:
-        updates = []
-        recent_codes = set()
-    return dict(
-        now=date.today(),
-        recent_updates_global=updates,
-        recent_codes_global=recent_codes,
-        news_last_refresh=news._cache.get("timestamp", 0),
-    )
-
+# 全局 YAML 写入锁（防止并发写导致数据损坏）
+_write_lock = threading.Lock()
 
 # ── 路径 ──
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -48,6 +34,11 @@ PORTFOLIO_FILE = os.path.join(BASE_DIR, "data", "stocks", "portfolio.yaml")
 ETF_FILE = os.path.join(BASE_DIR, "data", "etf_mapping.yaml")
 
 # ── 数据加载 ──
+
+# 行业数据缓存：{mtime_map: {filename: mtime, ...}, data: {code: ...}, date_loaded: str}
+_industries_cache = {"mtime_map": {}, "data": None, "date_loaded": ""}
+
+
 def load_yaml(path):
     if not os.path.exists(path):
         return {}
@@ -55,29 +46,92 @@ def load_yaml(path):
         return yaml.safe_load(f) or {}
 
 
+def _invalidate_industries_cache():
+    """重置行业缓存（供写入操作后调用）"""
+    _industries_cache["mtime_map"] = {}
+    _industries_cache["data"] = None
+
+
 def load_all_industries():
-    """加载所有行业数据"""
-    industries = {}
-    if not os.path.isdir(DATA_DIR):
-        return industries
-    for fname in sorted(os.listdir(DATA_DIR)):
-        if fname.endswith(".yaml"):
-            data = load_yaml(os.path.join(DATA_DIR, fname))
-            if data and "industry" in data:
-                code = fname.replace(".yaml", "")
-                data["_code"] = code
-                data["_file"] = fname
-                data["_filepath"] = os.path.join(DATA_DIR, fname)
-                # 标记当月事件
-                now = date.today()
-                month_str = f"{now.year}-{now.month:02d}"
-                for ev in data.get("events", []):
+    """加载所有行业数据（带 mtime 缓存，文件未变更时跳过重读）"""
+    today_str = date.today().isoformat()
+
+    # 检查缓存是否有效：对比 mtime 和日期
+    if _industries_cache["data"] is not None:
+        cache_valid = True
+        if not os.path.isdir(DATA_DIR):
+            cache_valid = False
+        else:
+            for fname in sorted(os.listdir(DATA_DIR)):
+                if not fname.endswith(".yaml"):
+                    continue
+                fpath = os.path.join(DATA_DIR, fname)
+                try:
+                    cur_mtime = os.path.getmtime(fpath)
+                except OSError:
+                    cache_valid = False
+                    break
+                if fname not in _industries_cache["mtime_map"] or _industries_cache["mtime_map"][fname] != cur_mtime:
+                    cache_valid = False
+                    break
+            # 缓存中有的文件但现在被删了 → 失效
+            cached_files = set(_industries_cache["mtime_map"].keys())
+            current_files = {f for f in os.listdir(DATA_DIR) if f.endswith(".yaml")}
+            if cached_files != current_files:
+                cache_valid = False
+
+        if cache_valid:
+            # 日期相关标记需要每天更新（is_current_month, is_past 等）
+            if _industries_cache["date_loaded"] == today_str:
+                return _industries_cache["data"]
+            # 仅仅是跨天了：复用解析数据，只刷新日期标记
+            data = _industries_cache["data"]
+            now = date.today()
+            month_str = f"{now.year}-{now.month:02d}"
+            for ind in data.values():
+                for ev in ind.get("events", []):
                     ev_date = ev.get("date", "")
                     ev["is_current_month"] = ev_date.startswith(month_str) if ev_date else False
-                industries[code] = data
-    # 为所有事件添加回测上下文（过期判断、回测标签）
+            enrich_events_with_backtest([ev for ind in data.values() for ev in ind.get("events", [])])
+            _industries_cache["date_loaded"] = today_str
+            return data
+
+    # 缓存失效，完整重读
+    industries = {}
+    mtime_map = {}
+    if not os.path.isdir(DATA_DIR):
+        _industries_cache["mtime_map"] = mtime_map
+        _industries_cache["data"] = industries
+        _industries_cache["date_loaded"] = today_str
+        return industries
+
+    for fname in sorted(os.listdir(DATA_DIR)):
+        if not fname.endswith(".yaml"):
+            continue
+        fpath = os.path.join(DATA_DIR, fname)
+        try:
+            mtime_map[fname] = os.path.getmtime(fpath)
+        except OSError:
+            continue
+        data = load_yaml(fpath)
+        if data and "industry" in data:
+            code = fname.replace(".yaml", "")
+            data["_code"] = code
+            data["_file"] = fname
+            data["_filepath"] = fpath
+            now = date.today()
+            month_str = f"{now.year}-{now.month:02d}"
+            for ev in data.get("events", []):
+                ev_date = ev.get("date", "")
+                ev["is_current_month"] = ev_date.startswith(month_str) if ev_date else False
+            industries[code] = data
+
     all_events = [ev for ind in industries.values() for ev in ind.get("events", [])]
     enrich_events_with_backtest(all_events)
+
+    _industries_cache["mtime_map"] = mtime_map
+    _industries_cache["data"] = industries
+    _industries_cache["date_loaded"] = today_str
     return industries
 
 
@@ -241,9 +295,19 @@ def get_stock_url(code):
 # ── 全局上下文 ──
 @app.context_processor
 def inject_globals():
+    """全局模板变量"""
     all_industries = load_all_industries()
     all_names = {ind["industry"] for ind in all_industries.values()}
     followed_names = followed.init_followed(all_names)
+
+    # 最近更新行业（用于侧边栏"新"标记）
+    try:
+        updates = get_recent_updates(all_industries, since_days=7)
+        recent_codes = {u["code"] for u in updates}
+    except Exception:
+        updates = []
+        recent_codes = set()
+
     return dict(
         industries=all_industries,
         now=date.today(),
@@ -253,6 +317,9 @@ def inject_globals():
         followed_names=followed_names,
         is_followed=followed.is_followed,
         get_stock_url=get_stock_url,
+        recent_updates_global=updates,
+        recent_codes_global=recent_codes,
+        news_last_refresh=news._cache.get("timestamp", 0),
     )
 
 
@@ -689,6 +756,16 @@ def settings_page():
             "id": s.get("id", ""),
         })
 
+    # 厂商列表（素材推理用）
+    enabled_providers = llm.get_enabled_providers()
+    provider_names = {}
+    for key, info in enabled_providers:
+        if key in llm.BUILTIN_PROVIDERS:
+            provider_names[key] = llm.BUILTIN_PROVIDERS[key]["name"]
+        else:
+            provider_names[key] = info.get("name", key)
+    default_provider = llm.get_default_provider()
+
     return render_template(
         "settings.html",
         active_page="settings",
@@ -703,6 +780,9 @@ def settings_page():
         existing_industry_names=existing_industry_names,
         llm_config=llm.load_config(),
         industries=all_industries,
+        enabled_providers=enabled_providers,
+        provider_names=provider_names,
+        default_provider=default_provider,
     )
 
 
@@ -813,9 +893,11 @@ def _find_industry_file(industry_name):
 
 
 def _save_industry_data(fpath, data):
-    """保存行业数据文件"""
-    with open(fpath, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, allow_unicode=True, sort_keys=False)
+    """保存行业数据文件（线程安全，自动失效缓存）"""
+    with _write_lock:
+        with open(fpath, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, allow_unicode=True, sort_keys=False)
+        _invalidate_industries_cache()
 
 
 @app.route("/api/events/update", methods=["POST"])
@@ -1334,6 +1416,58 @@ def api_generate_report():
     return jsonify(result)
 
 
+@app.route("/api/analysis/generate-stream", methods=["POST"])
+def api_generate_report_stream():
+    """流式生成行业分析报告（SSE）"""
+    data = request.get_json()
+    industry = (data or {}).get("industry", "")
+    provider = (data or {}).get("provider") or llm.load_config().get("default_provider", "deepseek")
+    model = (data or {}).get("model") or None
+    extra = (data or {}).get("extra_instructions", "")
+    custom_prompt = (data or {}).get("custom_prompt", "")
+
+    if not industry:
+        return jsonify({"ok": False, "error": "请选择行业"}), 400
+
+    def generate():
+        # 检查是否有 API Key
+        config = llm.load_config()
+        provider_cfg = llm._get_provider_cfg(config, provider)
+        has_api_key = provider_cfg.get("api_key") if provider_cfg else False
+        if not has_api_key and provider != "ollama":
+            yield f"data: {json.dumps({'type': 'mock', 'content': llm.MOCK_INDUSTRY_REPORT, 'warning': '未配置有效的 API Key，展示示例报告。'})}\n\n"
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+            return
+
+        if custom_prompt:
+            prompt = custom_prompt.format(industry=industry)
+        else:
+            prompt = llm.INDUSTRY_REPORT_PROMPT.format(industry=industry)
+        if extra:
+            prompt += f"\n\n## 额外关注点\n{extra}"
+
+        full_text = ""
+        for chunk in llm.call_llm_stream(prompt, provider_key=provider, model=model, temperature=0.3, max_tokens=4096):
+            if chunk.get("ok") and "delta" in chunk:
+                text = chunk["delta"]
+                full_text += text
+                yield f"data: {json.dumps({'type': 'delta', 'content': text})}\n\n"
+            elif not chunk.get("ok"):
+                yield f"data: {json.dumps({'type': 'error', 'content': chunk.get('error', '生成失败')})}\n\n"
+                return
+
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
+
+    return Response(
+        generate(),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
 def _generate_and_save_events(industry, provider, extra, custom_prompt="", model=None):
     """生成日历事件并写入行业 YAML 文件"""
     fpath, ind_data = _find_industry_file(industry)
@@ -1519,12 +1653,8 @@ def api_set_default_provider():
 # ── ICS 日历导出 ──
 
 
-@app.route("/export/calendar.ics")
-def export_calendar_ics():
-    """导出行业事件为 ICS 日历文件（iPhone 订阅 / 导入）"""
-    industries = load_all_industries()
-    industry_filter = request.args.get("industry", "").strip()
-
+def _build_ics_events(industries, industry_filter=""):
+    """构建 ICS Calendar 对象，供两个导出路由共用"""
     cal = Calendar()
     cal.add("prodid", "-//行业投资日历//hermes-industry-calendar//CN")
     cal.add("version", "2.0")
@@ -1532,7 +1662,7 @@ def export_calendar_ics():
     cal.add("x-wr-calname", "行业投资日历")
     cal.add("x-wr-timezone", "Asia/Shanghai")
 
-    now = datetime.now()
+    now_dt = datetime.now()
 
     for code, ind in industries.items():
         if industry_filter and code != industry_filter:
@@ -1553,12 +1683,10 @@ def export_calendar_ics():
             category = ev.get("category", "")
             ev_desc = ev.get("description", "")
 
-            # 构建日程标题
             summary = f"[{industry_name}] {title}"
             if importance >= 4:
                 summary = f"[重要] {summary}"
 
-            # 构建描述（纯文本，避免特殊字符问题）
             desc_parts = [
                 f"行业：{industry_name}",
                 f"类型：{ev_type}",
@@ -1571,19 +1699,17 @@ def export_calendar_ics():
                 desc_parts.append(ev_desc)
 
             description = "\n".join(desc_parts)
-
             uid = f"{code}-{ev_date_str[:10]}-{abs(hash(title)) % 10**8:08d}@industry-calendar"
 
             ical_event = ICalEvent()
             ical_event.add("uid", uid)
             ical_event.add("dtstart", dt.date())
             ical_event.add("dtend", dt.date())
-            ical_event.add("dtstamp", now)
+            ical_event.add("dtstamp", now_dt)
             ical_event.add("summary", summary)
             ical_event.add("description", description)
             ical_event.add("categories", [industry_name, ev_type])
 
-            # 3 星以上加提醒（trigger 用负值：事件之前提醒）
             if importance >= 3:
                 alarm = Alarm()
                 alarm.add("action", "DISPLAY")
@@ -1593,8 +1719,16 @@ def export_calendar_ics():
 
             cal.add_component(ical_event)
 
-    ics_content = cal.to_ical()
+    return cal
 
+
+@app.route("/export/calendar.ics")
+def export_calendar_ics():
+    """导出行业事件为 ICS 日历文件（一次性导入）"""
+    industries = load_all_industries()
+    industry_filter = request.args.get("industry", "").strip()
+    cal = _build_ics_events(industries, industry_filter)
+    ics_content = cal.to_ical()
     return Response(
         ics_content,
         mimetype="text/calendar; charset=utf-8",
@@ -1607,77 +1741,12 @@ def export_calendar_ics():
 
 @app.route("/export/subscribe.ics")
 def subscribe_calendar_ics():
-    """用途同上，专为 iPhone 订阅日历优化"""
+    """导出 ICS 日历（专为 iPhone 订阅日历优化，含自动刷新标记）"""
     industries = load_all_industries()
     industry_filter = request.args.get("industry", "").strip()
-
-    cal = Calendar()
-    cal.add("prodid", "-//行业投资日历//hermes-industry-calendar//CN")
-    cal.add("version", "2.0")
-    cal.add("calscale", "GREGORIAN")
-    cal.add("x-wr-calname", "行业投资日历")
-    cal.add("x-wr-timezone", "Asia/Shanghai")
+    cal = _build_ics_events(industries, industry_filter)
     cal.add("x-published-ttl", timedelta(hours=12))
-
-    now = datetime.now()
-
-    for code, ind in industries.items():
-        if industry_filter and code != industry_filter:
-            continue
-        industry_name = ind.get("industry", code)
-        for ev in ind.get("events", []):
-            ev_date_str = ev.get("date", "").strip()
-            if not ev_date_str:
-                continue
-            try:
-                dt = datetime.strptime(ev_date_str[:10], "%Y-%m-%d")
-            except (ValueError, IndexError):
-                continue
-
-            title = ev.get("title", "")
-            importance = ev.get("importance", 1)
-            ev_type = ev.get("type", "")
-            category = ev.get("category", "")
-            ev_desc = ev.get("description", "")
-
-            summary = f"[{industry_name}] {title}"
-            if importance >= 4:
-                summary = f"[重要] {summary}"
-
-            desc_parts = [
-                f"行业：{industry_name}",
-                f"类型：{ev_type}",
-                f"重要性：{'★' * importance}",
-            ]
-            if category:
-                desc_parts.append(f"阶段：{category}")
-            if ev_desc:
-                desc_parts.append("")
-                desc_parts.append(ev_desc)
-
-            description = "\n".join(desc_parts)
-            uid = f"{code}-{ev_date_str[:10]}-{abs(hash(title)) % 10**8:08d}@industry-calendar"
-
-            ical_event = ICalEvent()
-            ical_event.add("uid", uid)
-            ical_event.add("dtstart", dt.date())
-            ical_event.add("dtend", dt.date())
-            ical_event.add("dtstamp", now)
-            ical_event.add("summary", summary)
-            ical_event.add("description", description)
-            ical_event.add("categories", [industry_name, ev_type])
-
-            if importance >= 3:
-                alarm = Alarm()
-                alarm.add("action", "DISPLAY")
-                alarm.add("description", f"提醒：{title}")
-                alarm.add("trigger", timedelta(days=-1) if importance >= 4 else timedelta(hours=-3))
-                ical_event.add_component(alarm)
-
-            cal.add_component(ical_event)
-
     ics_content = cal.to_ical()
-
     return Response(
         ics_content,
         mimetype="text/calendar; charset=utf-8",
@@ -1695,12 +1764,12 @@ def api_materials():
     """获取新闻素材列表"""
     industry = request.args.get("industry")
     materials = news.load_materials()
-    # 过滤已接受（避免重复展示）
+    # 过滤已处理（避免重复展示）
     if industry:
         materials = [m for m in materials if industry in m.get("industries", [])
-                     and m.get("status") != "accepted"]
+                     and m.get("status") not in ("accepted", "skipped")]
     else:
-        materials = [m for m in materials if m.get("status") != "accepted"]
+        materials = [m for m in materials if m.get("status") not in ("accepted", "skipped")]
     # 按检测时间倒序
     materials.sort(key=lambda m: m.get("detected_at", ""), reverse=True)
     return jsonify({"ok": True, "count": len(materials), "materials": materials})
@@ -1733,8 +1802,8 @@ def api_review_materials():
     _, ind_data = _find_industry_file(industry)
     existing_events = (ind_data or {}).get("events", [])
 
-    # 调用 LLM 审核
-    provider = data.get("provider") or data.get("provider_key")
+    # 调用 LLM 审核（未指定厂商时使用默认）
+    provider = data.get("provider") or data.get("provider_key") or llm.load_config().get("default_provider", "deepseek")
     result = llm.review_materials(industry, materials, existing_events, provider_key=provider)
     if not result.get("ok"):
         return jsonify(result)
@@ -1797,14 +1866,11 @@ def api_accept_materials():
     _save_industry_data(fpath, ind_data)
     sync_data.sync_all()
 
-    # 标记素材为已采纳
+    # 从素材池删除已采纳的素材（事件已写入行业 YAML）
     materials = news.load_materials()
-    updated = 0
-    for m in materials:
-        if m.get("id") in accepted_ids:
-            m["status"] = "accepted"
-            updated += 1
-    if updated:
+    before = len(materials)
+    materials = [m for m in materials if m.get("id") not in accepted_ids]
+    if len(materials) != before:
         news.save_materials(materials)
 
     return jsonify({
@@ -1823,15 +1889,12 @@ def api_skip_materials():
         return jsonify({"ok": False, "error": "请指定素材"}), 400
 
     materials = news.load_materials()
-    updated = 0
-    for m in materials:
-        if m.get("id") in material_ids and m.get("status") == "pending":
-            m["status"] = "skipped"
-            updated += 1
-    if updated:
+    before = len(materials)
+    materials = [m for m in materials if m.get("id") not in material_ids]
+    if len(materials) != before:
         news.save_materials(materials)
 
-    return jsonify({"ok": True, "skipped": updated})
+    return jsonify({"ok": True, "skipped": len(material_ids)})
 
 
 if __name__ == "__main__":
